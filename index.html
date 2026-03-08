@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Central Command</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero">
+        <div class="hero__copy">
+          <p class="eyebrow">Operations Hub</p>
+          <h1>Central Command</h1>
+          <p class="hero__text">
+            One place for the tools you reach for most. Launch faster, organize by workflow,
+            and keep the day moving.
+          </p>
+          <div class="hero__quick-links">
+            <a class="hero__quick-link" href="https://mail.google.com" target="_blank" rel="noreferrer">
+              <span class="hero__quick-link-icon" data-app-icon="gmail" aria-hidden="true"></span>
+              <span>Open Gmail</span>
+            </a>
+            <a class="hero__quick-link hero__quick-link--secondary" href="https://slack.com/signin" target="_blank" rel="noreferrer">
+              <span class="hero__quick-link-icon" data-app-icon="slack" aria-hidden="true"></span>
+              <span>Open Slack</span>
+            </a>
+            <a class="hero__quick-link hero__quick-link--secondary" href="https://web.telegram.org" target="_blank" rel="noreferrer">
+              <span class="hero__quick-link-icon" data-app-icon="telegram" aria-hidden="true"></span>
+              <span>Open Telegram</span>
+            </a>
+          </div>
+        </div>
+        <div class="hero__status">
+          <div class="status-card">
+            <span class="status-card__label">Pinned Tools</span>
+            <strong id="pinnedCount">0</strong>
+          </div>
+          <div class="status-card">
+            <span class="status-card__label">Total Tools</span>
+            <strong id="toolCount">0</strong>
+          </div>
+        </div>
+      </header>
+
+      <section class="panel panel--spotlight">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">AI Tools</p>
+            <h2>Model and builder stack</h2>
+          </div>
+        </div>
+        <div class="spotlight-grid">
+          <a class="spotlight-card" href="https://chatgpt.com" target="_blank" rel="noreferrer">
+            <span class="spotlight-card__icon" data-app-icon="chatgpt" aria-hidden="true"></span>
+            <strong>ChatGPT</strong>
+            <span>Research, drafting, and workflows</span>
+          </a>
+          <a class="spotlight-card" href="https://claude.ai" target="_blank" rel="noreferrer">
+            <span class="spotlight-card__icon" data-app-icon="claude" aria-hidden="true"></span>
+            <strong>Claude</strong>
+            <span>Long-form reasoning and writing</span>
+          </a>
+          <a class="spotlight-card" href="https://gemini.google.com/app" target="_blank" rel="noreferrer">
+            <span class="spotlight-card__icon" data-app-icon="gemini" aria-hidden="true"></span>
+            <strong>Gemini</strong>
+            <span>Google-native search and docs workflows</span>
+          </a>
+          <a class="spotlight-card" href="https://manus.im" target="_blank" rel="noreferrer">
+            <span class="spotlight-card__icon" data-app-icon="manus" aria-hidden="true"></span>
+            <strong>Manus</strong>
+            <span>Agentic task execution and delegation</span>
+          </a>
+          <a class="spotlight-card" href="https://github.com" target="_blank" rel="noreferrer">
+            <span class="spotlight-card__icon" data-app-icon="github" aria-hidden="true"></span>
+            <strong>GitHub</strong>
+            <span>Repos, PRs, and source control</span>
+          </a>
+          <a class="spotlight-card" href="https://vercel.com/dashboard" target="_blank" rel="noreferrer">
+            <span class="spotlight-card__icon" data-app-icon="vercel" aria-hidden="true"></span>
+            <strong>Vercel</strong>
+            <span>Deployments, previews, and domains</span>
+          </a>
+          <a class="spotlight-card" href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
+            <span class="spotlight-card__icon" data-app-icon="supabase" aria-hidden="true"></span>
+            <strong>Supabase</strong>
+            <span>Database, auth, and storage ops</span>
+          </a>
+        </div>
+      </section>
+
+      <main class="layout">
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Tool Registry</p>
+              <h2>Add or update a tool</h2>
+            </div>
+            <button id="resetDefaultsButton" class="ghost-button" type="button">
+              Restore starter set
+            </button>
+          </div>
+
+          <form id="toolForm" class="tool-form">
+            <input id="toolId" type="hidden" />
+
+            <label>
+              Tool name
+              <input id="name" name="name" type="text" placeholder="Notion" required />
+            </label>
+
+            <label>
+              URL or local path
+              <input
+                id="url"
+                name="url"
+                type="text"
+                placeholder="https://notion.so or C:\Path\To\App.exe"
+                required
+              />
+            </label>
+
+            <label>
+              Category
+              <input id="category" name="category" type="text" placeholder="Work" required />
+            </label>
+
+            <label>
+              Description
+              <textarea
+                id="description"
+                name="description"
+                rows="3"
+                placeholder="What you use this tool for"
+                required
+              ></textarea>
+            </label>
+
+            <div class="tool-form__row">
+              <label>
+                Accent
+                <select id="accent" name="accent">
+                  <option value="amber">Amber</option>
+                  <option value="teal">Teal</option>
+                  <option value="crimson">Crimson</option>
+                  <option value="cobalt">Cobalt</option>
+                </select>
+              </label>
+
+              <label class="checkbox">
+                <input id="pinned" name="pinned" type="checkbox" />
+                <span>Pin to top</span>
+              </label>
+            </div>
+
+            <div class="tool-form__actions">
+              <button class="primary-button" type="submit">Save tool</button>
+              <button id="cancelEditButton" class="ghost-button" type="button" hidden>
+                Cancel edit
+              </button>
+            </div>
+          </form>
+        </section>
+
+        <section class="panel panel--tools">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Quick Access</p>
+              <h2>Your command deck</h2>
+            </div>
+            <label class="search">
+              <span class="visually-hidden">Search tools</span>
+              <input id="searchInput" type="search" placeholder="Search tools or categories" />
+            </label>
+          </div>
+
+          <div id="filterBar" class="filter-bar"></div>
+          <div id="toolGrid" class="tool-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="panel panel--notes">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Runbook</p>
+              <h2>Daily notes</h2>
+            </div>
+          </div>
+          <textarea
+            id="notes"
+            class="notes"
+            placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here."
+          ></textarea>
+        </section>
+      </main>
+    </div>
+
+    <template id="toolCardTemplate">
+      <article class="tool-card">
+        <div class="tool-card__top">
+          <span class="tool-card__icon" aria-hidden="true"></span>
+          <span class="tool-card__category"></span>
+          <span class="tool-card__pin" hidden>Pinned</span>
+        </div>
+        <h3 class="tool-card__title"></h3>
+        <p class="tool-card__description"></p>
+        <code class="tool-card__url"></code>
+        <div class="tool-card__actions">
+          <a class="launch-button" target="_blank" rel="noreferrer">Launch</a>
+          <button class="ghost-button tool-card__edit" type="button">Edit</button>
+          <button class="ghost-button tool-card__delete" type="button">Delete</button>
+        </div>
+      </article>
+    </template>
+
+    <script src="./app.js"></script>
+  </body>
+</html>
