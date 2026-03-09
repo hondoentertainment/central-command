@@ -83,21 +83,30 @@ const elements = {
   presetIntroText: document.querySelector("#presetIntroText"),
   presetGrid: document.querySelector("#presetGrid"),
   tabCommand: document.querySelector("#tabCommand"),
+  tabActivity: document.querySelector("#tabActivity"),
   tabRegistry: document.querySelector("#tabRegistry"),
+  tabStarterPacks: document.querySelector("#tabStarterPacks"),
   tabpanelCommand: document.querySelector("#tabpanel-command"),
+  tabpanelActivity: document.querySelector("#tabpanel-activity"),
   tabpanelRegistry: document.querySelector("#tabpanel-registry"),
+  tabpanelStarterPacks: document.querySelector("#tabpanel-starter-packs"),
 };
 
 initialize();
 
 function switchTab(name) {
-  const isCommand = name === "command";
-  elements.tabCommand.classList.toggle("is-active", isCommand);
-  elements.tabRegistry.classList.toggle("is-active", !isCommand);
-  elements.tabCommand.setAttribute("aria-selected", isCommand);
-  elements.tabRegistry.setAttribute("aria-selected", !isCommand);
-  elements.tabpanelCommand.hidden = !isCommand;
-  elements.tabpanelRegistry.hidden = isCommand;
+  const tabs = [
+    { key: "command", btn: elements.tabCommand, panel: elements.tabpanelCommand },
+    { key: "activity", btn: elements.tabActivity, panel: elements.tabpanelActivity },
+    { key: "registry", btn: elements.tabRegistry, panel: elements.tabpanelRegistry },
+    { key: "starter-packs", btn: elements.tabStarterPacks, panel: elements.tabpanelStarterPacks },
+  ];
+  tabs.forEach(({ key, btn, panel }) => {
+    const active = key === name;
+    btn.classList.toggle("is-active", active);
+    btn.setAttribute("aria-selected", active);
+    panel.hidden = !active;
+  });
 }
 
 function initialize() {
@@ -115,7 +124,9 @@ function initialize() {
   elements.notes.addEventListener("input", (event) => saveNotes(event.target.value));
   elements.clearHistoryButton.addEventListener("click", clearLaunchHistory);
   elements.tabCommand.addEventListener("click", () => switchTab("command"));
+  elements.tabActivity.addEventListener("click", () => switchTab("activity"));
   elements.tabRegistry.addEventListener("click", () => switchTab("registry"));
+  elements.tabStarterPacks.addEventListener("click", () => switchTab("starter-packs"));
 
   renderIconOptions();
   renderCategoryOptions();
@@ -354,6 +365,7 @@ function applyPreset(presetId, isRestore = false) {
   renderLaunchHistory();
   resetForm({ preserveMessage: true });
   setFormMessage(`${preset.title} applied. Notes were kept.`, "success");
+  switchTab("command");
 }
 
 function removeTool(id) {

@@ -56,7 +56,9 @@
 
       <nav class="tab-bar" role="tablist" aria-label="Main navigation">
         <button id="tabCommand" class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="tabpanel-command">Command</button>
+        <button id="tabActivity" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-activity">Activity</button>
         <button id="tabRegistry" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-registry">Tool Registry</button>
+        <button id="tabStarterPacks" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-starter-packs">Starter Packs</button>
       </nav>
 
       <main class="layout">
@@ -75,13 +77,6 @@
               </button>
             </div>
           </div>
-
-          <section class="preset-panel" aria-labelledby="presetIntroTitle">
-            <p id="presetIntroEyebrow" class="eyebrow">Quick Start</p>
-            <h3 id="presetIntroTitle">Choose a setup and start fast</h3>
-            <p id="presetIntroText" class="preset-panel__text"></p>
-            <div id="presetGrid" class="preset-grid"></div>
-          </section>
 
           <form id="toolForm" class="tool-form">
             <input id="toolId" type="hidden" />
@@ -190,7 +185,20 @@
         </section>
         </div>
 
-        <div id="tabpanel-command" class="tab-panel tab-panel--active" role="tabpanel" aria-labelledby="tabCommand">
+        <div id="tabpanel-starter-packs" class="tab-panel" role="tabpanel" aria-labelledby="tabStarterPacks" hidden>
+        <section class="panel panel--presets" aria-labelledby="presetIntroTitle">
+          <div class="panel__header">
+            <div>
+              <p id="presetIntroEyebrow" class="eyebrow">Starter Packs</p>
+              <h3 id="presetIntroTitle">Swap in a curated starting deck</h3>
+              <p id="presetIntroText" class="preset-panel__text">Use these presets when you want to reset the deck around a specific kind of work.</p>
+            </div>
+          </div>
+          <div id="presetGrid" class="preset-grid"></div>
+        </section>
+        </div>
+
+        <div id="tabpanel-command" class="tab-panel" role="tabpanel" aria-labelledby="tabCommand">
         <section class="panel panel--tools">
           <div class="panel__header">
             <div>
@@ -206,7 +214,9 @@
           <div id="filterBar" class="filter-bar"></div>
           <div id="toolGrid" class="tool-grid" aria-live="polite"></div>
         </section>
+        </div>
 
+        <div id="tabpanel-activity" class="tab-panel" role="tabpanel" aria-labelledby="tabActivity" hidden>
         <section class="panel panel--activity">
           <div class="panel__header">
             <div>
