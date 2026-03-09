@@ -1,4 +1,3 @@
-import { requireAuth } from "./lib/auth.js";
 import { renderNav } from "./lib/nav.js";
 import {
   createFallbackMetadataMap,
@@ -33,7 +32,7 @@ const elements = {
   clearHistoryButton: document.querySelector("#clearHistoryButton"),
 };
 
-requireAuth(initialize);
+initialize();
 
 function initialize() {
   renderNav("history");

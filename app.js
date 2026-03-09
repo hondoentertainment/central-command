@@ -1,6 +1,5 @@
 import { ALL_PRESET_TOOLS, CATEGORY_OPTIONS, DEFAULT_TOOLS } from "./data/presets.js";
 import { getIconMarkup, ICON_OPTIONS } from "./lib/icons.js";
-import { requireAuth } from "./lib/auth.js";
 import { renderNav } from "./lib/nav.js";
 import {
   createFallbackMetadataMap,
@@ -54,7 +53,7 @@ const elements = {
   toolCardTemplate: document.querySelector("#toolCardTemplate"),
 };
 
-requireAuth(initialize);
+initialize();
 
 function initialize() {
   renderNav("command");

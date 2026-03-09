@@ -1,5 +1,4 @@
 import { getIconMarkup } from "./lib/icons.js";
-import { requireAuth } from "./lib/auth.js";
 import { renderNav } from "./lib/nav.js";
 import {
   createFallbackMetadataMap,
@@ -32,7 +31,7 @@ const elements = {
   writingGrid: document.querySelector("#writingGrid"),
 };
 
-requireAuth(initialize);
+initialize();
 
 function initialize() {
   renderNav("writing");

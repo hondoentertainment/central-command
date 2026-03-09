@@ -1,5 +1,4 @@
 import { PRESET_PACKS } from "./data/presets.js";
-import { requireAuth } from "./lib/auth.js";
 import { renderNav } from "./lib/nav.js";
 import {
   hydrateTools,
@@ -36,7 +35,7 @@ const elements = {
   presetGrid: document.querySelector("#presetGrid"),
 };
 
-requireAuth(initialize);
+initialize();
 
 function initialize() {
   renderNav("packs");

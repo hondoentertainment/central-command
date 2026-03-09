@@ -1,6 +1,5 @@
 import { ALL_PRESET_TOOLS, CATEGORY_OPTIONS, DEFAULT_TOOLS, PRESET_PACKS } from "./data/presets.js";
 import { ICON_OPTIONS } from "./lib/icons.js";
-import { requireAuth } from "./lib/auth.js";
 import { renderNav } from "./lib/nav.js";
 import {
   createFallbackMetadataMap,
@@ -58,7 +57,7 @@ const elements = {
   importFileInput: document.querySelector("#importFileInput"),
 };
 
-requireAuth(initialize);
+initialize();
 
 function initialize() {
   renderNav("registry");

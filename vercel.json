@@ -1,4 +1,13 @@
 {
-  "buildCommand": null,
-  "outputDirectory": "."
+  "rewrites": [
+    { "source": "/registry", "destination": "/registry.html" },
+    { "source": "/agents", "destination": "/agents.html" },
+    { "source": "/packs", "destination": "/packs.html" },
+    { "source": "/sports", "destination": "/sports.html" },
+    { "source": "/games", "destination": "/games.html" },
+    { "source": "/writing", "destination": "/writing.html" },
+    { "source": "/productivity", "destination": "/productivity.html" },
+    { "source": "/history", "destination": "/history.html" },
+    { "source": "/runbook", "destination": "/runbook.html" }
+  ]
 }
