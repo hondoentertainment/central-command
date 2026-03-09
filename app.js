@@ -1,307 +1,175 @@
-const STORAGE_KEY = "central-command.tools.v1";
-const NOTES_KEY = "central-command.notes.v1";
+import { ALL_PRESET_TOOLS, CATEGORY_OPTIONS, DEFAULT_TOOLS, PRESET_PACKS } from "./data/presets.js";
+import { getIconMarkup, ICON_OPTIONS } from "./lib/icons.js";
+import {
+  createFallbackMetadataMap,
+  filterHistoryForTools,
+  formatLaunchTime,
+  getNextPinRank,
+  getToolSignature,
+  hydrateTools,
+  isValidLaunchTarget,
+  movePinnedTool,
+  normalizePinRanks,
+  normalizeUrl,
+  recordLaunch,
+  sanitizeLaunchHistory,
+  sanitizeTool,
+  sortTools,
+} from "./lib/tool-model.js";
+import {
+  hasSavedTools,
+  loadLaunchHistory,
+  loadNotes,
+  loadStoredTools,
+  saveLaunchHistory,
+  saveNotes,
+  saveStoredTools,
+} from "./lib/storage.js";
 
-const appIcons = {
-  gmail: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="5" width="18" height="14" rx="3" fill="#F3F6FB"/>
-      <path d="M5 8.2 12 13l7-4.8" stroke="#EA4335" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-      <path d="M5 18V8.4" stroke="#34A853" stroke-width="2" stroke-linecap="round"/>
-      <path d="M19 18V8.4" stroke="#4285F4" stroke-width="2" stroke-linecap="round"/>
-      <path d="M5 8.5 12 14l7-5.5" stroke="#FBBC05" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" opacity=".9"/>
-    </svg>`,
-  slack: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="10.5" y="2" width="3" height="8" rx="1.5" fill="#36C5F0"/>
-      <rect x="10.5" y="14" width="3" height="8" rx="1.5" fill="#2EB67D"/>
-      <rect x="2" y="10.5" width="8" height="3" rx="1.5" fill="#E01E5A"/>
-      <rect x="14" y="10.5" width="8" height="3" rx="1.5" fill="#ECB22E"/>
-      <rect x="6.5" y="6.5" width="3" height="8" rx="1.5" fill="#36C5F0"/>
-      <rect x="14.5" y="6.5" width="3" height="8" rx="1.5" fill="#E01E5A"/>
-      <rect x="6.5" y="14.5" width="8" height="3" rx="1.5" fill="#2EB67D"/>
-      <rect x="9.5" y="6.5" width="8" height="3" rx="1.5" fill="#ECB22E"/>
-    </svg>`,
-  telegram: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" fill="#27A7E7"/>
-      <path d="m7 11.8 9.6-3.8c.45-.17.84.11.69.81l-1.64 7.73c-.12.55-.46.68-.94.42l-2.67-1.97-1.29 1.24c-.14.14-.26.26-.54.26l.19-2.73 4.97-4.49c.22-.19-.05-.3-.34-.11l-6.15 3.87-2.65-.83c-.58-.18-.59-.58.12-.86Z" fill="#fff"/>
-    </svg>`,
-  calendar: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="5" width="18" height="16" rx="3" fill="#4285F4"/>
-      <path d="M3 9h18" stroke="#DCE7FF" stroke-width="2"/>
-      <path d="M8 3v4M16 3v4" stroke="#DCE7FF" stroke-width="2" stroke-linecap="round"/>
-      <rect x="7.5" y="11.5" width="3" height="3" rx="1" fill="#fff"/>
-      <rect x="13.5" y="11.5" width="3" height="3" rx="1" fill="#fff" opacity=".9"/>
-      <rect x="7.5" y="16" width="3" height="3" rx="1" fill="#fff" opacity=".9"/>
-    </svg>`,
-  notion: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="4" y="4" width="16" height="16" rx="2" fill="#fff"/>
-      <path d="M8 17V8.2l1.2-.15 5.6 7V7h1.9v8.7l-1.1.3-5.7-7.1V17H8Z" fill="#111"/>
-      <rect x="4" y="4" width="16" height="16" rx="2" stroke="#111" stroke-width="1.6"/>
-    </svg>`,
-  chatgpt: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" fill="#10A37F"/>
-      <path d="M12 6.1a3.3 3.3 0 0 1 2.86 1.65 3.23 3.23 0 0 1 3.1.38 3.3 3.3 0 0 1 1.35 2.82 3.24 3.24 0 0 1 .62 3.1A3.3 3.3 0 0 1 18 16.57a3.24 3.24 0 0 1-1.74 2.63 3.3 3.3 0 0 1-3.12-.03 3.24 3.24 0 0 1-3.09-.34A3.3 3.3 0 0 1 8.7 16a3.24 3.24 0 0 1-.62-3.08A3.3 3.3 0 0 1 10 7.42a3.24 3.24 0 0 1 2-.72Z" stroke="#E9FFF8" stroke-width="1.5"/>
-      <path d="m9.2 9.2 5.5 3.2M9.3 14.8h6.1M14.6 9.1l-3.2 5.7" stroke="#E9FFF8" stroke-width="1.5" stroke-linecap="round"/>
-    </svg>`,
-  claude: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="3" width="18" height="18" rx="6" fill="#D97757"/>
-      <path d="M8.2 12c0-2.5 1.64-4.3 4.03-4.3 1.45 0 2.55.52 3.56 1.58l-1.44 1.4c-.58-.6-1.16-.95-2-.95-1.3 0-2.2.96-2.2 2.27s.9 2.28 2.2 2.28c.84 0 1.42-.35 2-.95l1.44 1.4c-1.01 1.06-2.1 1.58-3.56 1.58-2.39 0-4.03-1.8-4.03-4.31Z" fill="#FFF7F2"/>
-    </svg>`,
-  gemini: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 2c1.06 4.13 2.17 5.9 4.2 7.8C18.1 11.83 19.87 12.94 24 14c-4.13 1.06-5.9 2.17-7.8 4.2C14.17 20.1 13.06 21.87 12 26c-1.06-4.13-2.17-5.9-4.2-7.8C5.9 16.17 4.13 15.06 0 14c4.13-1.06 5.9-2.17 7.8-4.2C9.83 7.9 10.94 6.13 12 2Z" fill="url(#g)" transform="translate(0 -2) scale(.92) translate(1 1)"/>
-      <defs>
-        <linearGradient id="g" x1="0" y1="14" x2="24" y2="14" gradientUnits="userSpaceOnUse">
-          <stop stop-color="#6D8DFF"/>
-          <stop offset=".5" stop-color="#47D7C7"/>
-          <stop offset="1" stop-color="#FFB347"/>
-        </linearGradient>
-      </defs>
-    </svg>`,
-  manus: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="3" width="18" height="18" rx="5" fill="#111827"/>
-      <path d="M6.8 16V8h2.06l3.14 3.92L15.14 8h2.06v8h-1.98v-4.6L12 15.28 8.78 11.4V16H6.8Z" fill="#F8FAFC"/>
-    </svg>`,
-  github: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <circle cx="12" cy="12" r="10" fill="#0D1117"/>
-      <path d="M12 7.2c-2.65 0-4.8 2.19-4.8 4.9 0 2.17 1.38 4 3.3 4.65.24.05.33-.1.33-.24v-.84c-1.34.3-1.62-.58-1.62-.58-.22-.58-.54-.73-.54-.73-.44-.3.04-.3.04-.3.48.03.74.5.74.5.43.74 1.13.52 1.41.4.04-.32.17-.52.3-.64-1.07-.12-2.2-.55-2.2-2.45 0-.54.18-.97.49-1.31-.05-.13-.21-.62.05-1.29 0 0 .4-.13 1.32.5.38-.11.78-.17 1.18-.17s.8.06 1.18.17c.92-.63 1.32-.5 1.32-.5.26.67.1 1.16.05 1.29.31.34.49.77.49 1.31 0 1.9-1.13 2.33-2.21 2.45.18.15.33.46.33.94v1.39c0 .14.09.3.34.24 1.92-.65 3.29-2.48 3.29-4.65 0-2.71-2.15-4.9-4.8-4.9Z" fill="#fff"/>
-    </svg>`,
-  vercel: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M12 4 21 20H3L12 4Z" fill="#fff"/>
-    </svg>`,
-  supabase: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <path d="M14.8 3.5c.3-.38.92-.16.92.33v9.08l-5.14 7.25c-.3.43-.98.21-.98-.32v-9.1L14.8 3.5Z" fill="#3ECF8E"/>
-      <path d="M14.4 3.5H8.9c-.4 0-.63.46-.39.8l5.22 7.25h5.46c.4 0 .63-.45.4-.79L14.4 3.5Z" fill="#B6F3D8"/>
-    </svg>`,
-  generic: `
-    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-      <rect x="3" y="3" width="18" height="18" rx="5" fill="#6D8DFF"/>
-      <path d="M8 12h8M12 8v8" stroke="#F5F8FF" stroke-width="2" stroke-linecap="round"/>
-    </svg>`,
-};
-
-const starterTools = [
-  {
-    id: crypto.randomUUID(),
-    name: "Gmail",
-    url: "https://mail.google.com",
-    category: "Comms",
-    description: "Inbox triage, follow-ups, and daily communication.",
-    accent: "amber",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Google Calendar",
-    url: "https://calendar.google.com",
-    category: "Planning",
-    description: "Schedule view, meetings, and time blocking.",
-    accent: "cobalt",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Slack",
-    url: "https://slack.com/signin",
-    category: "Comms",
-    description: "Team messaging, channels, and quick check-ins.",
-    accent: "teal",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Telegram",
-    url: "https://web.telegram.org",
-    category: "Comms",
-    description: "Messages, groups, and fast communication from the web app.",
-    accent: "cobalt",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "ChatGPT",
-    url: "https://chatgpt.com",
-    category: "AI",
-    description: "Research, drafting, and problem solving.",
-    accent: "crimson",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Claude",
-    url: "https://claude.ai",
-    category: "AI",
-    description: "Long-form reasoning, writing, and analysis.",
-    accent: "amber",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Gemini",
-    url: "https://gemini.google.com/app",
-    category: "AI",
-    description: "Google-native AI workflows and search assistance.",
-    accent: "cobalt",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Manus",
-    url: "https://manus.im",
-    category: "AI",
-    description: "Agentic execution for complex delegated tasks.",
-    accent: "teal",
-    pinned: false,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "GitHub",
-    url: "https://github.com",
-    category: "Build",
-    description: "Repos, pull requests, issues, and automation.",
-    accent: "crimson",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Vercel",
-    url: "https://vercel.com/dashboard",
-    category: "Build",
-    description: "Deployments, preview environments, and hosting.",
-    accent: "teal",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Supabase",
-    url: "https://supabase.com/dashboard",
-    category: "Build",
-    description: "Database, auth, storage, and backend operations.",
-    accent: "cobalt",
-    pinned: true,
-  },
-  {
-    id: crypto.randomUUID(),
-    name: "Notion",
-    url: "https://www.notion.so",
-    category: "Workspace",
-    description: "Projects, docs, and task capture.",
-    accent: "teal",
-    pinned: false,
-  },
-];
+const EXPORT_VERSION = 2;
+const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
 const state = {
-  tools: loadTools(),
+  tools: normalizePinRanks(
+    loadStoredTools((value) => hydrateTools(value, fallbackMetadataBySignature), DEFAULT_TOOLS)
+  ),
   activeCategory: "All",
   query: "",
+  launchHistory: [],
+  isFirstVisit: !hasSavedTools(),
 };
+
+state.launchHistory = filterHistoryForTools(
+  loadLaunchHistory(sanitizeLaunchHistory),
+  state.tools
+);
 
 const elements = {
   toolForm: document.querySelector("#toolForm"),
   toolId: document.querySelector("#toolId"),
   name: document.querySelector("#name"),
   url: document.querySelector("#url"),
-  category: document.querySelector("#category"),
+  categorySelect: document.querySelector("#categorySelect"),
+  customCategoryWrap: document.querySelector("#customCategoryWrap"),
+  customCategory: document.querySelector("#customCategory"),
   description: document.querySelector("#description"),
   accent: document.querySelector("#accent"),
+  iconKey: document.querySelector("#iconKey"),
+  shortcutLabel: document.querySelector("#shortcutLabel"),
+  openMode: document.querySelector("#openMode"),
   pinned: document.querySelector("#pinned"),
+  showInHero: document.querySelector("#showInHero"),
+  showInSpotlight: document.querySelector("#showInSpotlight"),
+  formMessage: document.querySelector("#formMessage"),
   cancelEditButton: document.querySelector("#cancelEditButton"),
   resetDefaultsButton: document.querySelector("#resetDefaultsButton"),
+  exportButton: document.querySelector("#exportButton"),
+  importButton: document.querySelector("#importButton"),
+  importFileInput: document.querySelector("#importFileInput"),
   searchInput: document.querySelector("#searchInput"),
   toolGrid: document.querySelector("#toolGrid"),
   filterBar: document.querySelector("#filterBar"),
   notes: document.querySelector("#notes"),
   pinnedCount: document.querySelector("#pinnedCount"),
   toolCount: document.querySelector("#toolCount"),
+  recentLaunchCount: document.querySelector("#recentLaunchCount"),
+  heroQuickLinks: document.querySelector("#heroQuickLinks"),
+  spotlightGrid: document.querySelector("#spotlightGrid"),
   toolCardTemplate: document.querySelector("#toolCardTemplate"),
-  quickLinkIcons: document.querySelectorAll("[data-app-icon]"),
+  launchHistoryList: document.querySelector("#launchHistoryList"),
+  clearHistoryButton: document.querySelector("#clearHistoryButton"),
+  presetIntroEyebrow: document.querySelector("#presetIntroEyebrow"),
+  presetIntroTitle: document.querySelector("#presetIntroTitle"),
+  presetIntroText: document.querySelector("#presetIntroText"),
+  presetGrid: document.querySelector("#presetGrid"),
 };
 
 initialize();
 
 function initialize() {
   elements.toolForm.addEventListener("submit", handleSubmit);
-  elements.cancelEditButton.addEventListener("click", resetForm);
-  elements.resetDefaultsButton.addEventListener("click", restoreStarterSet);
+  elements.cancelEditButton.addEventListener("click", () => resetForm());
+  elements.resetDefaultsButton.addEventListener("click", () => applyPreset("full-command", true));
+  elements.exportButton.addEventListener("click", exportBackup);
+  elements.importButton.addEventListener("click", () => elements.importFileInput.click());
+  elements.importFileInput.addEventListener("change", handleImport);
   elements.searchInput.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     render();
   });
-  elements.notes.addEventListener("input", (event) => {
-    localStorage.setItem(NOTES_KEY, event.target.value);
-  });
+  elements.categorySelect.addEventListener("change", syncCategoryVisibility);
+  elements.notes.addEventListener("input", (event) => saveNotes(event.target.value));
+  elements.clearHistoryButton.addEventListener("click", clearLaunchHistory);
 
-  elements.notes.value = localStorage.getItem(NOTES_KEY) ?? "";
-  renderQuickLinkIcons();
-  render();
-}
+  renderIconOptions();
+  renderCategoryOptions();
+  renderPresetCards();
 
-function loadTools() {
-  try {
-    const raw = localStorage.getItem(STORAGE_KEY);
-    if (!raw) return structuredClone(starterTools);
+  elements.notes.value = loadNotes();
+  saveStoredTools(state.tools);
+  saveLaunchHistory(state.launchHistory);
 
-    const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) && parsed.length > 0 ? parsed : structuredClone(starterTools);
-  } catch {
-    return structuredClone(starterTools);
-  }
-}
-
-function saveTools() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(state.tools));
-}
-
-function restoreStarterSet() {
-  state.tools = structuredClone(starterTools);
-  state.activeCategory = "All";
-  state.query = "";
-  elements.searchInput.value = "";
-  saveTools();
   resetForm();
   render();
 }
 
 function handleSubmit(event) {
   event.preventDefault();
+  clearFormMessage();
 
-  const tool = {
-    id: elements.toolId.value || crypto.randomUUID(),
-    name: elements.name.value.trim(),
-    url: elements.url.value.trim(),
-    category: elements.category.value.trim(),
-    description: elements.description.value.trim(),
-    accent: elements.accent.value,
-    pinned: elements.pinned.checked,
-  };
+  const existingTool = state.tools.find((entry) => entry.id === elements.toolId.value);
+  const resolvedCategory = getResolvedCategory();
+  const draft = sanitizeTool(
+    {
+      id: elements.toolId.value || crypto.randomUUID(),
+      name: elements.name.value,
+      url: elements.url.value,
+      category: resolvedCategory,
+      description: elements.description.value,
+      accent: elements.accent.value,
+      iconKey: elements.iconKey.value,
+      shortcutLabel: elements.shortcutLabel.value,
+      openMode: elements.openMode.value,
+      pinned: elements.pinned.checked,
+      pinRank: existingTool?.pinRank,
+      surfaces: getSelectedSurfaces(),
+    },
+    existingTool
+  );
 
-  const existingIndex = state.tools.findIndex((entry) => entry.id === tool.id);
-  if (existingIndex >= 0) {
-    state.tools[existingIndex] = tool;
-  } else {
-    state.tools.unshift(tool);
+  if (!draft) {
+    setFormMessage("Fill out all required fields before saving the tool.", "error");
+    return;
   }
 
-  saveTools();
-  resetForm();
-  render();
-}
+  if (!isValidLaunchTarget(draft.url)) {
+    setFormMessage("Use a valid URL, local path, network path, or app protocol.", "error");
+    return;
+  }
 
-function resetForm() {
-  elements.toolForm.reset();
-  elements.toolId.value = "";
-  elements.accent.value = "amber";
-  elements.cancelEditButton.hidden = true;
+  const duplicate = state.tools.find(
+    (tool) => tool.id !== draft.id && getToolSignature(tool) === getToolSignature(draft)
+  );
+  if (duplicate) {
+    setFormMessage("That tool already exists in your command deck.", "error");
+    return;
+  }
+
+  if (draft.pinned && !Number.isFinite(draft.pinRank)) {
+    draft.pinRank = getNextPinRank(state.tools);
+  }
+
+  const existingIndex = state.tools.findIndex((entry) => entry.id === draft.id);
+  if (existingIndex >= 0) {
+    state.tools[existingIndex] = draft;
+  } else {
+    state.tools.unshift(draft);
+  }
+
+  state.isFirstVisit = false;
+  commitTools();
+  resetForm({ preserveMessage: true });
+  setFormMessage(`${draft.name} saved.`, "success");
 }
 
 function beginEdit(id) {
@@ -311,43 +179,291 @@ function beginEdit(id) {
   elements.toolId.value = tool.id;
   elements.name.value = tool.name;
   elements.url.value = tool.url;
-  elements.category.value = tool.category;
+  setCategoryValue(tool.category);
   elements.description.value = tool.description;
   elements.accent.value = tool.accent;
+  elements.iconKey.value = tool.iconKey;
+  elements.shortcutLabel.value = tool.shortcutLabel;
+  elements.openMode.value = tool.openMode;
   elements.pinned.checked = tool.pinned;
+  elements.showInHero.checked = tool.surfaces.includes("hero");
+  elements.showInSpotlight.checked = tool.surfaces.includes("spotlight");
   elements.cancelEditButton.hidden = false;
+  setFormMessage(`Editing ${tool.name}.`, "info");
   elements.name.focus();
 }
 
+function resetForm(options = {}) {
+  const { preserveMessage = false } = options;
+
+  elements.toolForm.reset();
+  elements.toolId.value = "";
+  elements.accent.value = "amber";
+  elements.iconKey.value = "auto";
+  elements.openMode.value = "new-tab";
+  elements.pinned.checked = false;
+  elements.showInHero.checked = false;
+  elements.showInSpotlight.checked = false;
+  elements.shortcutLabel.value = "";
+  elements.customCategory.value = "";
+  elements.categorySelect.value = "";
+  syncCategoryVisibility();
+  elements.cancelEditButton.hidden = true;
+
+  if (!preserveMessage) clearFormMessage();
+}
+
+function getResolvedCategory() {
+  if (elements.categorySelect.value === "custom") {
+    return elements.customCategory.value;
+  }
+
+  return elements.categorySelect.value;
+}
+
+function getSelectedSurfaces() {
+  return [
+    elements.showInHero.checked ? "hero" : null,
+    elements.showInSpotlight.checked ? "spotlight" : null,
+  ].filter(Boolean);
+}
+
+function setCategoryValue(category) {
+  renderCategoryOptions(category);
+
+  const knownCategories = new Set([
+    ...CATEGORY_OPTIONS,
+    ...state.tools.map((tool) => tool.category),
+  ]);
+
+  if (knownCategories.has(category)) {
+    elements.categorySelect.value = category;
+    elements.customCategory.value = "";
+  } else {
+    elements.categorySelect.value = "custom";
+    elements.customCategory.value = category;
+  }
+
+  syncCategoryVisibility();
+}
+
+function syncCategoryVisibility() {
+  const isCustom = elements.categorySelect.value === "custom";
+  elements.customCategoryWrap.hidden = !isCustom;
+  elements.customCategory.toggleAttribute("required", isCustom);
+}
+
+function renderCategoryOptions(currentCategory = elements.categorySelect.value) {
+  const categories = [
+    ...new Set([...CATEGORY_OPTIONS, ...state.tools.map((tool) => tool.category)].filter(Boolean)),
+  ].sort();
+
+  elements.categorySelect.innerHTML = "";
+
+  const placeholder = document.createElement("option");
+  placeholder.value = "";
+  placeholder.textContent = "Choose a category";
+  elements.categorySelect.appendChild(placeholder);
+
+  categories.forEach((category) => {
+    const option = document.createElement("option");
+    option.value = category;
+    option.textContent = category;
+    elements.categorySelect.appendChild(option);
+  });
+
+  const customOption = document.createElement("option");
+  customOption.value = "custom";
+  customOption.textContent = "Custom category";
+  elements.categorySelect.appendChild(customOption);
+
+  elements.categorySelect.value = currentCategory || "";
+}
+
+function renderIconOptions() {
+  elements.iconKey.innerHTML = "";
+
+  ICON_OPTIONS.forEach((option) => {
+    const optionElement = document.createElement("option");
+    optionElement.value = option.value;
+    optionElement.textContent = option.label;
+    elements.iconKey.appendChild(optionElement);
+  });
+}
+
+function renderPresetCards() {
+  elements.presetGrid.innerHTML = "";
+
+  PRESET_PACKS.forEach((pack) => {
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "preset-card";
+    button.addEventListener("click", () => applyPreset(pack.id));
+
+    const title = document.createElement("strong");
+    title.textContent = pack.title;
+
+    const description = document.createElement("span");
+    description.textContent = pack.description;
+
+    const meta = document.createElement("span");
+    meta.className = "preset-card__meta";
+    meta.textContent = `${pack.tools.length} tools`;
+
+    button.append(title, description, meta);
+    elements.presetGrid.appendChild(button);
+  });
+}
+
+function applyPreset(presetId, isRestore = false) {
+  const preset = PRESET_PACKS.find((entry) => entry.id === presetId);
+  if (!preset) return;
+
+  const message = isRestore
+    ? "Restore the full starter deck and replace your current tools?"
+    : `Replace your current tools with the ${preset.title} preset?`;
+  const confirmed = window.confirm(message);
+  if (!confirmed) return;
+
+  state.tools = normalizePinRanks(structuredClone(preset.tools));
+  state.launchHistory = [];
+  state.activeCategory = "All";
+  state.query = "";
+  state.isFirstVisit = false;
+  elements.searchInput.value = "";
+  commitTools();
+  saveLaunchHistory(state.launchHistory);
+  renderLaunchHistory();
+  resetForm({ preserveMessage: true });
+  setFormMessage(`${preset.title} applied. Notes were kept.`, "success");
+}
+
 function removeTool(id) {
+  const tool = state.tools.find((entry) => entry.id === id);
+  if (!tool) return;
+
+  const confirmed = window.confirm(`Delete ${tool.name} from your command deck?`);
+  if (!confirmed) return;
+
   state.tools = state.tools.filter((entry) => entry.id !== id);
-  saveTools();
-  resetForm();
-  render();
+  state.launchHistory = filterHistoryForTools(state.launchHistory, state.tools);
+  commitTools();
+  saveLaunchHistory(state.launchHistory);
+  renderLaunchHistory();
+  resetForm({ preserveMessage: true });
+  setFormMessage(`${tool.name} removed.`, "success");
 }
 
-function setCategory(category) {
-  state.activeCategory = category;
-  render();
+function reorderPinnedTool(id, direction) {
+  state.tools = movePinnedTool(state.tools, id, direction);
+  commitTools(false);
+  setFormMessage("Pinned order updated.", "success");
 }
 
-function getVisibleTools() {
-  return [...state.tools]
-    .sort((a, b) => Number(b.pinned) - Number(a.pinned) || a.name.localeCompare(b.name))
-    .filter((tool) => {
-      const matchesCategory =
-        state.activeCategory === "All" || tool.category === state.activeCategory;
-      const haystack = `${tool.name} ${tool.category} ${tool.description}`.toLowerCase();
-      const matchesQuery = !state.query || haystack.includes(state.query);
-      return matchesCategory && matchesQuery;
-    });
+function clearLaunchHistory() {
+  if (state.launchHistory.length === 0) return;
+
+  const confirmed = window.confirm("Clear recent launch history?");
+  if (!confirmed) return;
+
+  state.launchHistory = [];
+  saveLaunchHistory(state.launchHistory);
+  renderLaunchHistory();
+  updateStatusCards();
+}
+
+function commitTools(keepMessage = true) {
+  state.tools = normalizePinRanks(state.tools);
+  saveStoredTools(state.tools);
+  renderCategoryOptions(getResolvedCategory());
+  render();
+
+  if (!keepMessage) clearFormMessage();
 }
 
 function render() {
+  renderPresetIntro();
+  renderHeroQuickLinks();
+  renderSpotlight();
   renderFilters();
   renderCards();
-  elements.toolCount.textContent = String(state.tools.length);
-  elements.pinnedCount.textContent = String(state.tools.filter((tool) => tool.pinned).length);
+  renderLaunchHistory();
+  updateStatusCards();
+}
+
+function renderPresetIntro() {
+  elements.presetIntroEyebrow.textContent = state.isFirstVisit ? "Quick Start" : "Starter Packs";
+  elements.presetIntroTitle.textContent = state.isFirstVisit
+    ? "Choose a setup and start fast"
+    : "Swap in a curated starting deck";
+  elements.presetIntroText.textContent = state.isFirstVisit
+    ? "Start with a preset, then tune the deck to match your day-to-day workflow."
+    : "Use these presets when you want to reset the deck around a specific kind of work.";
+}
+
+function renderHeroQuickLinks() {
+  const quickLinks = sortTools(state.tools.filter((tool) => tool.surfaces.includes("hero")));
+  elements.heroQuickLinks.innerHTML = "";
+
+  if (quickLinks.length === 0) {
+    elements.heroQuickLinks.appendChild(
+      createInlineEmptyState("Pick a few tools to feature in the hero for one-click launch.")
+    );
+    return;
+  }
+
+  quickLinks.forEach((tool, index) => {
+    const link = document.createElement("a");
+    link.className = `hero__quick-link${index === 0 ? "" : " hero__quick-link--secondary"}`;
+    link.setAttribute("aria-label", `Open ${tool.name}`);
+
+    const icon = document.createElement("span");
+    icon.className = "hero__quick-link-icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.innerHTML = getIconMarkup(tool);
+
+    const label = document.createElement("span");
+    label.textContent = `Open ${tool.name}`;
+
+    applyLaunchBehavior(link, tool);
+    link.append(icon, label);
+    elements.heroQuickLinks.appendChild(link);
+  });
+}
+
+function renderSpotlight() {
+  const spotlightTools = sortTools(
+    state.tools.filter((tool) => tool.surfaces.includes("spotlight"))
+  );
+  elements.spotlightGrid.innerHTML = "";
+
+  if (spotlightTools.length === 0) {
+    elements.spotlightGrid.appendChild(
+      createInlineEmptyState("Mark tools for spotlight to keep your core stack visible.")
+    );
+    return;
+  }
+
+  spotlightTools.forEach((tool) => {
+    const card = document.createElement("a");
+    card.className = "spotlight-card";
+    card.setAttribute("aria-label", `Open ${tool.name}`);
+
+    const icon = document.createElement("span");
+    icon.className = "spotlight-card__icon";
+    icon.setAttribute("aria-hidden", "true");
+    icon.innerHTML = getIconMarkup(tool);
+
+    const title = document.createElement("strong");
+    title.textContent = tool.name;
+
+    const description = document.createElement("span");
+    description.textContent = tool.description;
+
+    applyLaunchBehavior(card, tool);
+    card.append(icon, title, description);
+    elements.spotlightGrid.appendChild(card);
+  });
 }
 
 function renderFilters() {
@@ -359,8 +475,23 @@ function renderFilters() {
     button.type = "button";
     button.className = `filter-chip${state.activeCategory === category ? " is-active" : ""}`;
     button.textContent = category;
-    button.addEventListener("click", () => setCategory(category));
+    button.addEventListener("click", () => {
+      state.activeCategory = category;
+      renderCards();
+      renderLaunchHistory();
+      renderFilters();
+    });
     elements.filterBar.appendChild(button);
+  });
+}
+
+function getVisibleTools() {
+  return sortTools(state.tools).filter((tool) => {
+    const matchesCategory =
+      state.activeCategory === "All" || tool.category === state.activeCategory;
+    const haystack = `${tool.name} ${tool.category} ${tool.description}`.toLowerCase();
+    const matchesQuery = !state.query || haystack.includes(state.query);
+    return matchesCategory && matchesQuery;
   });
 }
 
@@ -376,6 +507,10 @@ function renderCards() {
     return;
   }
 
+  const pinnedIds = sortTools(state.tools)
+    .filter((tool) => tool.pinned)
+    .map((tool) => tool.id);
+
   visibleTools.forEach((tool) => {
     const fragment = elements.toolCardTemplate.content.cloneNode(true);
     const card = fragment.querySelector(".tool-card");
@@ -384,19 +519,52 @@ function renderCards() {
     const pin = fragment.querySelector(".tool-card__pin");
     const title = fragment.querySelector(".tool-card__title");
     const description = fragment.querySelector(".tool-card__description");
+    const meta = fragment.querySelector(".tool-card__meta");
     const url = fragment.querySelector(".tool-card__url");
     const launchButton = fragment.querySelector(".launch-button");
+    const moveUpButton = fragment.querySelector(".tool-card__move-up");
+    const moveDownButton = fragment.querySelector(".tool-card__move-down");
     const editButton = fragment.querySelector(".tool-card__edit");
     const deleteButton = fragment.querySelector(".tool-card__delete");
 
     card.style.setProperty("--accent", accentToColor(tool.accent));
-    icon.innerHTML = getAppIconMarkup(tool);
+    icon.innerHTML = getIconMarkup(tool);
     category.textContent = tool.category;
     pin.hidden = !tool.pinned;
     title.textContent = tool.name;
     description.textContent = tool.description;
     url.textContent = tool.url;
-    launchButton.href = normalizeUrl(tool.url);
+
+    const metaBits = [];
+    if (tool.shortcutLabel) metaBits.push({ label: `Shortcut ${tool.shortcutLabel}` });
+    if (tool.openMode === "same-tab") metaBits.push({ label: "Same tab" });
+    if (tool.surfaces.includes("hero")) metaBits.push({ label: "Hero" });
+    if (tool.surfaces.includes("spotlight")) metaBits.push({ label: "Spotlight" });
+
+    meta.innerHTML = "";
+    if (metaBits.length === 0) {
+      meta.hidden = true;
+    } else {
+      meta.hidden = false;
+      metaBits.forEach((item) => {
+        const badge = document.createElement("span");
+        badge.className = "tool-card__badge";
+        badge.textContent = item.label;
+        meta.appendChild(badge);
+      });
+    }
+
+    applyLaunchBehavior(launchButton, tool, `Launch ${tool.name}`);
+
+    const pinnedIndex = pinnedIds.indexOf(tool.id);
+    const isPinned = pinnedIndex >= 0;
+    moveUpButton.hidden = !isPinned;
+    moveDownButton.hidden = !isPinned;
+    moveUpButton.disabled = !isPinned || pinnedIndex === 0;
+    moveDownButton.disabled = !isPinned || pinnedIndex === pinnedIds.length - 1;
+    moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
+    moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
+
     editButton.addEventListener("click", () => beginEdit(tool.id));
     deleteButton.addEventListener("click", () => removeTool(tool.id));
 
@@ -404,27 +572,154 @@ function renderCards() {
   });
 }
 
-function renderQuickLinkIcons() {
-  elements.quickLinkIcons.forEach((icon) => {
-    icon.innerHTML = appIcons[icon.dataset.appIcon] ?? appIcons.generic;
+function renderLaunchHistory() {
+  const historyEntries = filterHistoryForTools(state.launchHistory, state.tools);
+  elements.launchHistoryList.innerHTML = "";
+  elements.clearHistoryButton.disabled = historyEntries.length === 0;
+
+  if (historyEntries.length === 0) {
+    const item = document.createElement("li");
+    item.className = "history-list__empty";
+    item.textContent = "Recent launches will appear here once you start using the deck.";
+    elements.launchHistoryList.appendChild(item);
+    return;
+  }
+
+  historyEntries.forEach((entry) => {
+    const tool = state.tools.find((candidate) => candidate.id === entry.toolId);
+    if (!tool) return;
+
+    const item = document.createElement("li");
+    item.className = "history-item";
+
+    const link = document.createElement("a");
+    link.className = "history-item__link";
+    applyLaunchBehavior(link, tool, `Reopen ${tool.name}`);
+
+    const title = document.createElement("strong");
+    title.textContent = tool.name;
+
+    const meta = document.createElement("span");
+    meta.textContent = `${tool.category} · ${formatLaunchTime(entry.launchedAt)}`;
+
+    link.append(title, meta);
+
+    const count = document.createElement("span");
+    count.className = "history-item__count";
+    count.textContent = `${entry.count}x`;
+
+    item.append(link, count);
+    elements.launchHistoryList.appendChild(item);
   });
 }
 
-function getAppIconMarkup(tool) {
-  const identity = `${tool.name} ${tool.url}`.toLowerCase();
-  if (identity.includes("gmail") || identity.includes("mail.google")) return appIcons.gmail;
-  if (identity.includes("slack")) return appIcons.slack;
-  if (identity.includes("telegram")) return appIcons.telegram;
-  if (identity.includes("calendar.google") || identity.includes("calendar")) return appIcons.calendar;
-  if (identity.includes("notion")) return appIcons.notion;
-  if (identity.includes("chatgpt") || identity.includes("openai")) return appIcons.chatgpt;
-  if (identity.includes("claude")) return appIcons.claude;
-  if (identity.includes("gemini")) return appIcons.gemini;
-  if (identity.includes("manus")) return appIcons.manus;
-  if (identity.includes("github")) return appIcons.github;
-  if (identity.includes("vercel")) return appIcons.vercel;
-  if (identity.includes("supabase")) return appIcons.supabase;
-  return appIcons.generic;
+function updateStatusCards() {
+  elements.toolCount.textContent = String(state.tools.length);
+  elements.pinnedCount.textContent = String(state.tools.filter((tool) => tool.pinned).length);
+  const launchTotal = state.launchHistory.reduce((sum, entry) => sum + entry.count, 0);
+  elements.recentLaunchCount.textContent = String(launchTotal);
+}
+
+function applyLaunchBehavior(element, tool, label = `Open ${tool.name}`) {
+  element.href = normalizeUrl(tool.url);
+  element.setAttribute("aria-label", label);
+
+  if (tool.openMode === "same-tab") {
+    element.removeAttribute("target");
+    element.setAttribute("rel", "noreferrer");
+  } else {
+    element.target = "_blank";
+    element.rel = "noreferrer";
+  }
+
+  element.addEventListener("click", () => {
+    state.launchHistory = recordLaunch(state.launchHistory, tool.id);
+    saveLaunchHistory(state.launchHistory);
+    renderLaunchHistory();
+    updateStatusCards();
+  });
+}
+
+function exportBackup() {
+  const payload = {
+    version: EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    tools: state.tools,
+    notes: elements.notes.value,
+    launchHistory: state.launchHistory,
+  };
+
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const objectUrl = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  const stamp = new Date().toISOString().slice(0, 10);
+
+  link.href = objectUrl;
+  link.download = `central-command-backup-${stamp}.json`;
+  link.click();
+
+  setTimeout(() => URL.revokeObjectURL(objectUrl), 0);
+  setFormMessage("Backup exported.", "success");
+}
+
+async function handleImport(event) {
+  const file = event.target.files?.[0];
+  event.target.value = "";
+  if (!file) return;
+
+  try {
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    const rawTools = Array.isArray(payload) ? payload : payload?.tools;
+    const importedTools = hydrateTools(rawTools, fallbackMetadataBySignature);
+
+    if (importedTools.length === 0) {
+      throw new Error("No valid tools were found in that backup.");
+    }
+
+    state.tools = importedTools;
+    state.launchHistory = filterHistoryForTools(
+      sanitizeLaunchHistory(payload?.launchHistory),
+      state.tools
+    );
+    state.activeCategory = "All";
+    state.query = "";
+    state.isFirstVisit = false;
+    elements.searchInput.value = "";
+
+    saveStoredTools(state.tools);
+    saveLaunchHistory(state.launchHistory);
+
+    if (typeof payload?.notes === "string") {
+      elements.notes.value = payload.notes;
+      saveNotes(payload.notes);
+    }
+
+    renderCategoryOptions();
+    resetForm({ preserveMessage: true });
+    render();
+    setFormMessage(`Imported ${importedTools.length} tools from ${file.name}.`, "success");
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Could not import that backup.";
+    setFormMessage(message, "error");
+  }
+}
+
+function createInlineEmptyState(message) {
+  const note = document.createElement("p");
+  note.className = "inline-empty-state";
+  note.textContent = message;
+  return note;
+}
+
+function setFormMessage(message, tone = "info") {
+  elements.formMessage.textContent = message;
+  elements.formMessage.className = `form-message is-${tone}`;
+}
+
+function clearFormMessage() {
+  elements.formMessage.textContent = "";
+  elements.formMessage.className = "form-message";
 }
 
 function accentToColor(accent) {
@@ -434,16 +729,4 @@ function accentToColor(accent) {
     crimson: "var(--crimson)",
     cobalt: "var(--cobalt)",
   }[accent] ?? "var(--amber)";
-}
-
-function normalizeUrl(value) {
-  if (/^https?:\/\//i.test(value) || /^file:\/\//i.test(value)) return value;
-  if (value.startsWith("\\\\")) {
-    return `file:${value.replace(/\\/g, "/")}`;
-  }
-  if (/^[a-zA-Z]:\\/.test(value)) {
-    return `file:///${value.replace(/\\/g, "/")}`;
-  }
-  if (/^[a-zA-Z]+:/.test(value)) return value;
-  return `https://${value}`;
 }

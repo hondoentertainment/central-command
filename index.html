@@ -1,8 +1,12 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Central Command keeps your most-used tools, quick links, presets, and daily runbook in one place."
+    />
     <title>Central Command</title>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -22,20 +26,7 @@
             One place for the tools you reach for most. Launch faster, organize by workflow,
             and keep the day moving.
           </p>
-          <div class="hero__quick-links">
-            <a class="hero__quick-link" href="https://mail.google.com" target="_blank" rel="noreferrer">
-              <span class="hero__quick-link-icon" data-app-icon="gmail" aria-hidden="true"></span>
-              <span>Open Gmail</span>
-            </a>
-            <a class="hero__quick-link hero__quick-link--secondary" href="https://slack.com/signin" target="_blank" rel="noreferrer">
-              <span class="hero__quick-link-icon" data-app-icon="slack" aria-hidden="true"></span>
-              <span>Open Slack</span>
-            </a>
-            <a class="hero__quick-link hero__quick-link--secondary" href="https://web.telegram.org" target="_blank" rel="noreferrer">
-              <span class="hero__quick-link-icon" data-app-icon="telegram" aria-hidden="true"></span>
-              <span>Open Telegram</span>
-            </a>
-          </div>
+          <div id="heroQuickLinks" class="hero__quick-links" aria-live="polite"></div>
         </div>
         <div class="hero__status">
           <div class="status-card">
@@ -46,53 +37,21 @@
             <span class="status-card__label">Total Tools</span>
             <strong id="toolCount">0</strong>
           </div>
+          <div class="status-card">
+            <span class="status-card__label">Recent Launches</span>
+            <strong id="recentLaunchCount">0</strong>
+          </div>
         </div>
       </header>
 
       <section class="panel panel--spotlight">
         <div class="panel__header">
           <div>
-            <p class="eyebrow">AI Tools</p>
-            <h2>Model and builder stack</h2>
+            <p class="eyebrow">Spotlight</p>
+            <h2>Keep your core stack above the fold</h2>
           </div>
         </div>
-        <div class="spotlight-grid">
-          <a class="spotlight-card" href="https://chatgpt.com" target="_blank" rel="noreferrer">
-            <span class="spotlight-card__icon" data-app-icon="chatgpt" aria-hidden="true"></span>
-            <strong>ChatGPT</strong>
-            <span>Research, drafting, and workflows</span>
-          </a>
-          <a class="spotlight-card" href="https://claude.ai" target="_blank" rel="noreferrer">
-            <span class="spotlight-card__icon" data-app-icon="claude" aria-hidden="true"></span>
-            <strong>Claude</strong>
-            <span>Long-form reasoning and writing</span>
-          </a>
-          <a class="spotlight-card" href="https://gemini.google.com/app" target="_blank" rel="noreferrer">
-            <span class="spotlight-card__icon" data-app-icon="gemini" aria-hidden="true"></span>
-            <strong>Gemini</strong>
-            <span>Google-native search and docs workflows</span>
-          </a>
-          <a class="spotlight-card" href="https://manus.im" target="_blank" rel="noreferrer">
-            <span class="spotlight-card__icon" data-app-icon="manus" aria-hidden="true"></span>
-            <strong>Manus</strong>
-            <span>Agentic task execution and delegation</span>
-          </a>
-          <a class="spotlight-card" href="https://github.com" target="_blank" rel="noreferrer">
-            <span class="spotlight-card__icon" data-app-icon="github" aria-hidden="true"></span>
-            <strong>GitHub</strong>
-            <span>Repos, PRs, and source control</span>
-          </a>
-          <a class="spotlight-card" href="https://vercel.com/dashboard" target="_blank" rel="noreferrer">
-            <span class="spotlight-card__icon" data-app-icon="vercel" aria-hidden="true"></span>
-            <strong>Vercel</strong>
-            <span>Deployments, previews, and domains</span>
-          </a>
-          <a class="spotlight-card" href="https://supabase.com/dashboard" target="_blank" rel="noreferrer">
-            <span class="spotlight-card__icon" data-app-icon="supabase" aria-hidden="true"></span>
-            <strong>Supabase</strong>
-            <span>Database, auth, and storage ops</span>
-          </a>
-        </div>
+        <div id="spotlightGrid" class="spotlight-grid" aria-live="polite"></div>
       </section>
 
       <main class="layout">
@@ -102,10 +61,21 @@
               <p class="eyebrow">Tool Registry</p>
               <h2>Add or update a tool</h2>
             </div>
-            <button id="resetDefaultsButton" class="ghost-button" type="button">
-              Restore starter set
-            </button>
+            <div class="panel__header-actions">
+              <button id="exportButton" class="ghost-button" type="button">Export backup</button>
+              <button id="importButton" class="ghost-button" type="button">Import backup</button>
+              <button id="resetDefaultsButton" class="ghost-button" type="button">
+                Restore starter set
+              </button>
+            </div>
           </div>
+
+          <section class="preset-panel" aria-labelledby="presetIntroTitle">
+            <p id="presetIntroEyebrow" class="eyebrow">Quick Start</p>
+            <h3 id="presetIntroTitle">Choose a setup and start fast</h3>
+            <p id="presetIntroText" class="preset-panel__text"></p>
+            <div id="presetGrid" class="preset-grid"></div>
+          </section>
 
           <form id="toolForm" class="tool-form">
             <input id="toolId" type="hidden" />
@@ -128,7 +98,12 @@
 
             <label>
               Category
-              <input id="category" name="category" type="text" placeholder="Work" required />
+              <select id="categorySelect" name="categorySelect" required></select>
+            </label>
+
+            <label id="customCategoryWrap" hidden>
+              Custom category
+              <input id="customCategory" name="customCategory" type="text" placeholder="Operations" />
             </label>
 
             <label>
@@ -142,7 +117,7 @@
               ></textarea>
             </label>
 
-            <div class="tool-form__row">
+            <div class="tool-form__row tool-form__row--split">
               <label>
                 Accent
                 <select id="accent" name="accent">
@@ -153,11 +128,51 @@
                 </select>
               </label>
 
+              <label>
+                Icon
+                <select id="iconKey" name="iconKey"></select>
+              </label>
+            </div>
+
+            <div class="tool-form__row tool-form__row--split">
+              <label>
+                Shortcut label
+                <input
+                  id="shortcutLabel"
+                  name="shortcutLabel"
+                  type="text"
+                  maxlength="16"
+                  placeholder="Ctrl+1"
+                />
+              </label>
+
+              <label>
+                Open behavior
+                <select id="openMode" name="openMode">
+                  <option value="new-tab">Open in new tab</option>
+                  <option value="same-tab">Open in same tab</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="tool-form__row tool-form__row--flags">
               <label class="checkbox">
                 <input id="pinned" name="pinned" type="checkbox" />
                 <span>Pin to top</span>
               </label>
+
+              <label class="checkbox">
+                <input id="showInHero" name="showInHero" type="checkbox" />
+                <span>Show in hero</span>
+              </label>
+
+              <label class="checkbox">
+                <input id="showInSpotlight" name="showInSpotlight" type="checkbox" />
+                <span>Show in spotlight</span>
+              </label>
             </div>
+
+            <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
 
             <div class="tool-form__actions">
               <button class="primary-button" type="submit">Save tool</button>
@@ -182,6 +197,17 @@
 
           <div id="filterBar" class="filter-bar"></div>
           <div id="toolGrid" class="tool-grid" aria-live="polite"></div>
+        </section>
+
+        <section class="panel panel--activity">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Launch History</p>
+              <h2>Recent activity</h2>
+            </div>
+            <button id="clearHistoryButton" class="ghost-button" type="button">Clear history</button>
+          </div>
+          <ul id="launchHistoryList" class="history-list" aria-live="polite"></ul>
         </section>
 
         <section class="panel panel--notes">
@@ -209,15 +235,20 @@
         </div>
         <h3 class="tool-card__title"></h3>
         <p class="tool-card__description"></p>
+        <div class="tool-card__meta" hidden></div>
         <code class="tool-card__url"></code>
         <div class="tool-card__actions">
           <a class="launch-button" target="_blank" rel="noreferrer">Launch</a>
+          <button class="ghost-button tool-card__move-up" type="button">Pin up</button>
+          <button class="ghost-button tool-card__move-down" type="button">Pin down</button>
           <button class="ghost-button tool-card__edit" type="button">Edit</button>
           <button class="ghost-button tool-card__delete" type="button">Delete</button>
         </div>
       </article>
     </template>
 
-    <script src="./app.js"></script>
+    <input id="importFileInput" type="file" accept="application/json,.json" hidden />
+
+    <script type="module" src="./app.js"></script>
   </body>
 </html>
