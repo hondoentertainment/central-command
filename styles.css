@@ -1,4 +1,4 @@
-﻿:root {
+:root {
   --bg: #09111f;
   --panel: rgba(9, 19, 36, 0.78);
   --panel-strong: rgba(15, 28, 49, 0.94);
@@ -177,6 +177,46 @@ select,
   margin-top: 20px;
 }
 
+.tab-bar {
+  display: flex;
+  gap: 4px;
+  margin-top: 20px;
+  padding: 6px;
+  border-radius: 20px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  width: fit-content;
+}
+
+.tab-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 14px;
+  background: transparent;
+  color: var(--muted);
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  transition: color 160ms, background 160ms;
+}
+
+.tab-button:hover {
+  color: var(--text);
+}
+
+.tab-button.is-active {
+  background: rgba(71, 215, 199, 0.2);
+  color: var(--teal);
+}
+
+.tab-panel {
+  margin-top: 20px;
+}
+
+.tab-panel[hidden] {
+  display: none;
+}
+
 .spotlight-grid {
   display: grid;
   gap: 14px;
@@ -207,11 +247,22 @@ select,
 }
 
 .layout {
+  display: block;
+  margin-top: 0;
+}
+
+.layout .tab-panel {
   display: grid;
   gap: 20px;
-  grid-template-columns: 360px minmax(0, 1fr);
-  margin-top: 20px;
   align-items: start;
+}
+
+.layout .tab-panel#tabpanel-command {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.layout .tab-panel#tabpanel-registry {
+  grid-template-columns: minmax(360px, 480px);
 }
 
 .panel {
@@ -615,8 +666,11 @@ button:focus-visible,
 }
 
 @media (max-width: 920px) {
-  .hero,
-  .layout {
+  .hero {
+    grid-template-columns: 1fr;
+  }
+
+  .layout .tab-panel#tabpanel-registry {
     grid-template-columns: 1fr;
   }
 

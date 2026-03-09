@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
@@ -54,7 +54,13 @@
         <div id="spotlightGrid" class="spotlight-grid" aria-live="polite"></div>
       </section>
 
+      <nav class="tab-bar" role="tablist" aria-label="Main navigation">
+        <button id="tabCommand" class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="tabpanel-command">Command</button>
+        <button id="tabRegistry" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-registry">Tool Registry</button>
+      </nav>
+
       <main class="layout">
+        <div id="tabpanel-registry" class="tab-panel" role="tabpanel" aria-labelledby="tabRegistry" hidden>
         <section class="panel panel--form">
           <div class="panel__header">
             <div>
@@ -182,7 +188,9 @@
             </div>
           </form>
         </section>
+        </div>
 
+        <div id="tabpanel-command" class="tab-panel tab-panel--active" role="tabpanel" aria-labelledby="tabCommand">
         <section class="panel panel--tools">
           <div class="panel__header">
             <div>
@@ -223,6 +231,7 @@
             placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here."
           ></textarea>
         </section>
+        </div>
       </main>
     </div>
 

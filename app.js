@@ -82,9 +82,23 @@ const elements = {
   presetIntroTitle: document.querySelector("#presetIntroTitle"),
   presetIntroText: document.querySelector("#presetIntroText"),
   presetGrid: document.querySelector("#presetGrid"),
+  tabCommand: document.querySelector("#tabCommand"),
+  tabRegistry: document.querySelector("#tabRegistry"),
+  tabpanelCommand: document.querySelector("#tabpanel-command"),
+  tabpanelRegistry: document.querySelector("#tabpanel-registry"),
 };
 
 initialize();
+
+function switchTab(name) {
+  const isCommand = name === "command";
+  elements.tabCommand.classList.toggle("is-active", isCommand);
+  elements.tabRegistry.classList.toggle("is-active", !isCommand);
+  elements.tabCommand.setAttribute("aria-selected", isCommand);
+  elements.tabRegistry.setAttribute("aria-selected", !isCommand);
+  elements.tabpanelCommand.hidden = !isCommand;
+  elements.tabpanelRegistry.hidden = isCommand;
+}
 
 function initialize() {
   elements.toolForm.addEventListener("submit", handleSubmit);
@@ -100,6 +114,8 @@ function initialize() {
   elements.categorySelect.addEventListener("change", syncCategoryVisibility);
   elements.notes.addEventListener("input", (event) => saveNotes(event.target.value));
   elements.clearHistoryButton.addEventListener("click", clearLaunchHistory);
+  elements.tabCommand.addEventListener("click", () => switchTab("command"));
+  elements.tabRegistry.addEventListener("click", () => switchTab("registry"));
 
   renderIconOptions();
   renderCategoryOptions();
@@ -175,6 +191,8 @@ function handleSubmit(event) {
 function beginEdit(id) {
   const tool = state.tools.find((entry) => entry.id === id);
   if (!tool) return;
+
+  switchTab("registry");
 
   elements.toolId.value = tool.id;
   elements.name.value = tool.name;
