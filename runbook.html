@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Daily runbook notes for Central Command."
+    />
+    <title>Runbook — Central Command</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero hero--compact">
+        <div class="hero__copy">
+          <p class="eyebrow">Runbook</p>
+          <h1>Daily notes</h1>
+          <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel panel--notes">
+          <div class="panel__header">
+            <div>
+              <h2>Short checklists, reminders, launch sequences</h2>
+              <p class="preset-panel__text">
+                Keep day-start notes, routines, or launch orders here. Auto-saved to your browser.
+              </p>
+            </div>
+          </div>
+          <textarea
+            id="notes"
+            class="notes"
+            placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here."
+          ></textarea>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app-runbook.js"></script>
+  </body>
+</html>

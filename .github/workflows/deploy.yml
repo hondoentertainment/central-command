@@ -1,0 +1,41 @@
+name: Deploy to GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Copy site files
+        run: |
+          mkdir -p deploy
+          cp index.html registry.html packs.html history.html runbook.html deploy/
+          cp app.js app-registry.js app-packs.js app-history.js app-runbook.js deploy/
+          cp styles.css deploy/
+          cp -r data lib deploy/
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: deploy
+
+  deploy-pages:
+    needs: deploy
+    runs-on: ubuntu-latest
+    environment: github-pages
+    steps:
+      - uses: actions/deploy-pages@v4

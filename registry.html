@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Add or update tools in Central Command."
+    />
+    <title>Tool Registry — Central Command</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero hero--compact">
+        <div class="hero__copy">
+          <p class="eyebrow">Tool Registry</p>
+          <h1>Add or update tools</h1>
+          <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+        </div>
+      </header>
+
+      <main class="layout layout--form">
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Tool form</h2>
+            </div>
+            <div class="panel__header-actions">
+              <a href="index.html" class="ghost-button">Back to deck</a>
+              <button id="exportButton" class="ghost-button" type="button">Export backup</button>
+              <button id="importButton" class="ghost-button" type="button">Import backup</button>
+              <button id="resetDefaultsButton" class="ghost-button" type="button">
+                Restore starter set
+              </button>
+            </div>
+          </div>
+
+          <form id="toolForm" class="tool-form">
+            <input id="toolId" type="hidden" />
+
+            <label>
+              Tool name
+              <input id="name" name="name" type="text" placeholder="Notion" required />
+            </label>
+
+            <label>
+              URL or local path
+              <input
+                id="url"
+                name="url"
+                type="text"
+                placeholder="https://notion.so or C:\Path\To\App.exe"
+                required
+              />
+            </label>
+
+            <label>
+              Category
+              <select id="categorySelect" name="categorySelect" required></select>
+            </label>
+
+            <label id="customCategoryWrap" hidden>
+              Custom category
+              <input id="customCategory" name="customCategory" type="text" placeholder="Operations" />
+            </label>
+
+            <label>
+              Description
+              <textarea
+                id="description"
+                name="description"
+                rows="3"
+                placeholder="What you use this tool for"
+                required
+              ></textarea>
+            </label>
+
+            <div class="tool-form__row tool-form__row--split">
+              <label>
+                Accent
+                <select id="accent" name="accent">
+                  <option value="amber">Amber</option>
+                  <option value="teal">Teal</option>
+                  <option value="crimson">Crimson</option>
+                  <option value="cobalt">Cobalt</option>
+                </select>
+              </label>
+
+              <label>
+                Icon
+                <select id="iconKey" name="iconKey"></select>
+              </label>
+            </div>
+
+            <div class="tool-form__row tool-form__row--split">
+              <label>
+                Shortcut label
+                <input
+                  id="shortcutLabel"
+                  name="shortcutLabel"
+                  type="text"
+                  maxlength="16"
+                  placeholder="Ctrl+1"
+                />
+              </label>
+
+              <label>
+                Open behavior
+                <select id="openMode" name="openMode">
+                  <option value="new-tab">Open in new tab</option>
+                  <option value="same-tab">Open in same tab</option>
+                </select>
+              </label>
+            </div>
+
+            <div class="tool-form__row tool-form__row--flags">
+              <label class="checkbox">
+                <input id="pinned" name="pinned" type="checkbox" />
+                <span>Pin to top</span>
+              </label>
+
+              <label class="checkbox">
+                <input id="showInHero" name="showInHero" type="checkbox" />
+                <span>Show in hero</span>
+              </label>
+
+              <label class="checkbox">
+                <input id="showInSpotlight" name="showInSpotlight" type="checkbox" />
+                <span>Show in spotlight</span>
+              </label>
+            </div>
+
+            <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
+
+            <div class="tool-form__actions">
+              <button class="primary-button" type="submit">Save tool</button>
+              <button id="cancelEditButton" class="ghost-button" type="button" hidden>
+                Cancel edit
+              </button>
+            </div>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <input id="importFileInput" type="file" accept="application/json,.json" hidden />
+
+    <script type="module" src="./app-registry.js"></script>
+  </body>
+</html>

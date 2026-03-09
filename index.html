@@ -26,6 +26,7 @@
             One place for the tools you reach for most. Launch faster, organize by workflow,
             and keep the day moving.
           </p>
+          <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
           <div id="heroQuickLinks" class="hero__quick-links" aria-live="polite"></div>
         </div>
         <div class="hero__status">
@@ -54,151 +55,17 @@
         <div id="spotlightGrid" class="spotlight-grid" aria-live="polite"></div>
       </section>
 
-      <nav class="tab-bar" role="tablist" aria-label="Main navigation">
-        <button id="tabCommand" class="tab-button is-active" type="button" role="tab" aria-selected="true" aria-controls="tabpanel-command">Command</button>
-        <button id="tabActivity" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-activity">Activity</button>
-        <button id="tabRegistry" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-registry">Tool Registry</button>
-        <button id="tabStarterPacks" class="tab-button" type="button" role="tab" aria-selected="false" aria-controls="tabpanel-starter-packs">Starter Packs</button>
-      </nav>
+      <section class="panel panel--sports">
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Sports</p>
+            <h2>Scores, news, and coverage</h2>
+          </div>
+        </div>
+        <div id="sportsGrid" class="spotlight-grid" aria-live="polite"></div>
+      </section>
 
       <main class="layout">
-        <div id="tabpanel-registry" class="tab-panel" role="tabpanel" aria-labelledby="tabRegistry" hidden>
-        <section class="panel panel--form">
-          <div class="panel__header">
-            <div>
-              <p class="eyebrow">Tool Registry</p>
-              <h2>Add or update a tool</h2>
-            </div>
-            <div class="panel__header-actions">
-              <button id="exportButton" class="ghost-button" type="button">Export backup</button>
-              <button id="importButton" class="ghost-button" type="button">Import backup</button>
-              <button id="resetDefaultsButton" class="ghost-button" type="button">
-                Restore starter set
-              </button>
-            </div>
-          </div>
-
-          <form id="toolForm" class="tool-form">
-            <input id="toolId" type="hidden" />
-
-            <label>
-              Tool name
-              <input id="name" name="name" type="text" placeholder="Notion" required />
-            </label>
-
-            <label>
-              URL or local path
-              <input
-                id="url"
-                name="url"
-                type="text"
-                placeholder="https://notion.so or C:\Path\To\App.exe"
-                required
-              />
-            </label>
-
-            <label>
-              Category
-              <select id="categorySelect" name="categorySelect" required></select>
-            </label>
-
-            <label id="customCategoryWrap" hidden>
-              Custom category
-              <input id="customCategory" name="customCategory" type="text" placeholder="Operations" />
-            </label>
-
-            <label>
-              Description
-              <textarea
-                id="description"
-                name="description"
-                rows="3"
-                placeholder="What you use this tool for"
-                required
-              ></textarea>
-            </label>
-
-            <div class="tool-form__row tool-form__row--split">
-              <label>
-                Accent
-                <select id="accent" name="accent">
-                  <option value="amber">Amber</option>
-                  <option value="teal">Teal</option>
-                  <option value="crimson">Crimson</option>
-                  <option value="cobalt">Cobalt</option>
-                </select>
-              </label>
-
-              <label>
-                Icon
-                <select id="iconKey" name="iconKey"></select>
-              </label>
-            </div>
-
-            <div class="tool-form__row tool-form__row--split">
-              <label>
-                Shortcut label
-                <input
-                  id="shortcutLabel"
-                  name="shortcutLabel"
-                  type="text"
-                  maxlength="16"
-                  placeholder="Ctrl+1"
-                />
-              </label>
-
-              <label>
-                Open behavior
-                <select id="openMode" name="openMode">
-                  <option value="new-tab">Open in new tab</option>
-                  <option value="same-tab">Open in same tab</option>
-                </select>
-              </label>
-            </div>
-
-            <div class="tool-form__row tool-form__row--flags">
-              <label class="checkbox">
-                <input id="pinned" name="pinned" type="checkbox" />
-                <span>Pin to top</span>
-              </label>
-
-              <label class="checkbox">
-                <input id="showInHero" name="showInHero" type="checkbox" />
-                <span>Show in hero</span>
-              </label>
-
-              <label class="checkbox">
-                <input id="showInSpotlight" name="showInSpotlight" type="checkbox" />
-                <span>Show in spotlight</span>
-              </label>
-            </div>
-
-            <p id="formMessage" class="form-message" role="status" aria-live="polite"></p>
-
-            <div class="tool-form__actions">
-              <button class="primary-button" type="submit">Save tool</button>
-              <button id="cancelEditButton" class="ghost-button" type="button" hidden>
-                Cancel edit
-              </button>
-            </div>
-          </form>
-        </section>
-        </div>
-
-        <div id="tabpanel-starter-packs" class="tab-panel" role="tabpanel" aria-labelledby="tabStarterPacks" hidden>
-        <section class="panel panel--presets" aria-labelledby="presetIntroTitle">
-          <div class="panel__header">
-            <div>
-              <p id="presetIntroEyebrow" class="eyebrow">Starter Packs</p>
-              <h3 id="presetIntroTitle">Swap in a curated starting deck</h3>
-              <p id="presetIntroText" class="preset-panel__text">Use these presets when you want to reset the deck around a specific kind of work.</p>
-            </div>
-          </div>
-          <div id="presetGrid" class="preset-grid"></div>
-        </section>
-        </div>
-
-        <div id="tabpanel-command" class="tab-panel" role="tabpanel" aria-labelledby="tabCommand">
         <section class="panel panel--tools">
           <div class="panel__header">
             <div>
@@ -214,34 +81,6 @@
           <div id="filterBar" class="filter-bar"></div>
           <div id="toolGrid" class="tool-grid" aria-live="polite"></div>
         </section>
-        </div>
-
-        <div id="tabpanel-activity" class="tab-panel" role="tabpanel" aria-labelledby="tabActivity" hidden>
-        <section class="panel panel--activity">
-          <div class="panel__header">
-            <div>
-              <p class="eyebrow">Launch History</p>
-              <h2>Recent activity</h2>
-            </div>
-            <button id="clearHistoryButton" class="ghost-button" type="button">Clear history</button>
-          </div>
-          <ul id="launchHistoryList" class="history-list" aria-live="polite"></ul>
-        </section>
-
-        <section class="panel panel--notes">
-          <div class="panel__header">
-            <div>
-              <p class="eyebrow">Runbook</p>
-              <h2>Daily notes</h2>
-            </div>
-          </div>
-          <textarea
-            id="notes"
-            class="notes"
-            placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here."
-          ></textarea>
-        </section>
-        </div>
       </main>
     </div>
 
@@ -265,8 +104,6 @@
         </div>
       </article>
     </template>
-
-    <input id="importFileInput" type="file" accept="application/json,.json" hidden />
 
     <script type="module" src="./app.js"></script>
   </body>
