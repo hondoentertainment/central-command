@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="AI agents for Central Command."
+    />
+    <title>Agents — Central Command</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero hero--compact">
+        <div class="hero__copy">
+          <p class="eyebrow">Agents</p>
+          <h1>AI agents that do the work</h1>
+          <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel panel--agents">
+          <div class="panel__header">
+            <div>
+              <h2>Agent tools</h2>
+              <p class="preset-panel__text">
+                Dreamer, Manus, GetViktor, OpenClaw, and other tools with category Agents appear here.
+              </p>
+            </div>
+          </div>
+          <div id="agentsGrid" class="spotlight-grid" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app-agents.js"></script>
+  </body>
+</html>

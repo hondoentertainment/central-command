@@ -51,7 +51,6 @@ const elements = {
   recentLaunchCount: document.querySelector("#recentLaunchCount"),
   heroQuickLinks: document.querySelector("#heroQuickLinks"),
   spotlightGrid: document.querySelector("#spotlightGrid"),
-  sportsGrid: document.querySelector("#sportsGrid"),
   toolCardTemplate: document.querySelector("#toolCardTemplate"),
 };
 
@@ -70,7 +69,6 @@ function initialize() {
 function render() {
   renderHeroQuickLinks();
   renderSpotlight();
-  renderSports();
   renderFilters();
   renderCards();
   updateStatusCards();
@@ -138,41 +136,6 @@ function renderSpotlight() {
     applyLaunchBehavior(card, tool);
     card.append(icon, title, description);
     elements.spotlightGrid.appendChild(card);
-  });
-}
-
-function renderSports() {
-  const sportsTools = sortTools(
-    state.tools.filter((tool) => tool.category === "Sports")
-  );
-  elements.sportsGrid.innerHTML = "";
-
-  if (sportsTools.length === 0) {
-    elements.sportsGrid.appendChild(
-      createInlineEmptyState("Add tools with category Sports (e.g. ESPN) to see them here.")
-    );
-    return;
-  }
-
-  sportsTools.forEach((tool) => {
-    const card = document.createElement("a");
-    card.className = "spotlight-card";
-    card.setAttribute("aria-label", `Open ${tool.name}`);
-
-    const icon = document.createElement("span");
-    icon.className = "spotlight-card__icon";
-    icon.setAttribute("aria-hidden", "true");
-    icon.innerHTML = getIconMarkup(tool);
-
-    const title = document.createElement("strong");
-    title.textContent = tool.name;
-
-    const description = document.createElement("span");
-    description.textContent = tool.description;
-
-    applyLaunchBehavior(card, tool);
-    card.append(icon, title, description);
-    elements.sportsGrid.appendChild(card);
   });
 }
 

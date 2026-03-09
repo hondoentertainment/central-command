@@ -234,7 +234,11 @@ select,
 }
 
 .panel--spotlight,
-.panel--sports {
+.panel--sports,
+.panel--writing,
+.panel--productivity,
+.panel--agents,
+.panel--games {
   margin-top: 20px;
 }
 

@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Sports tools and coverage for Central Command."
+    />
+    <title>Sports — Central Command</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="hero hero--compact">
+        <div class="hero__copy">
+          <p class="eyebrow">Sports</p>
+          <h1>Scores, news, and coverage</h1>
+          <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+        </div>
+      </header>
+
+      <main class="layout">
+        <section class="panel panel--sports">
+          <div class="panel__header">
+            <div>
+              <h2>Sports tools</h2>
+              <p class="preset-panel__text">
+                Tools with category Sports appear here. Add ESPN or other sports links via the Tool Registry.
+              </p>
+            </div>
+          </div>
+          <div id="sportsGrid" class="spotlight-grid" aria-live="polite"></div>
+        </section>
+      </main>
+    </div>
+
+    <script type="module" src="./app-sports.js"></script>
+  </body>
+</html>
