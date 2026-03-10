@@ -7,7 +7,14 @@
       name="description"
       content="Central Command keeps your most-used tools, quick links, presets, and daily runbook in one place."
     />
+    <meta property="og:title" content="Central Command" />
+    <meta property="og:description" content="Central Command keeps your most-used tools, quick links, presets, and daily runbook in one place." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Central Command" />
+    <meta name="theme-color" content="#09111f" />
     <title>Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,6 +22,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
     <div class="app-shell">
@@ -95,6 +103,7 @@
       </article>
     </template>
 
+    <script src="./sw-register.js"></script>
     <script type="module" src="./app.js"></script>
   </body>
 </html>

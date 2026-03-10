@@ -62,7 +62,55 @@ function initialize() {
     render();
   });
 
+  document.addEventListener("keydown", handleKeyboardShortcut);
   render();
+}
+
+function handleKeyboardShortcut(event) {
+  const active = document.activeElement;
+  const isEditable =
+    active &&
+    (active.tagName === "INPUT" ||
+      active.tagName === "TEXTAREA" ||
+      active.tagName === "SELECT" ||
+      active.isContentEditable);
+  if (isEditable) return;
+
+  const modifierHeld = event.ctrlKey || event.metaKey;
+  if (!modifierHeld) return;
+
+  const key = event.key?.toLowerCase?.();
+  if (!key || key.length > 1) return;
+
+  const pinnedWithShortcuts = sortTools(
+    state.tools.filter((tool) => tool.pinned && tool.shortcutLabel && tool.shortcutLabel.trim())
+  );
+  const shortcutKey = key;
+  const match = pinnedWithShortcuts.find((tool) => {
+    const label = tool.shortcutLabel.trim();
+    const labelKey = label.length === 1 ? label.toLowerCase() : parseShortcutKey(label);
+    return labelKey === shortcutKey;
+  });
+
+  if (!match) return;
+
+  event.preventDefault();
+  state.launchHistory = recordLaunch(state.launchHistory, match.id);
+  saveLaunchHistory(state.launchHistory);
+  updateStatusCards();
+
+  const url = normalizeUrl(match.url);
+  if (match.openMode === "same-tab") {
+    window.location.href = url;
+  } else {
+    window.open(url, "_blank", "noreferrer");
+  }
+}
+
+function parseShortcutKey(label) {
+  const parts = label.split(/[\s+]+/);
+  const last = parts[parts.length - 1];
+  return last?.length === 1 ? last.toLowerCase() : null;
 }
 
 function render() {
@@ -236,8 +284,8 @@ function renderCards() {
     moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
     moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
 
-    editButton.addEventListener("click", () => {
-      e.preventDefault();
+    editButton.addEventListener("click", (event) => {
+      event.preventDefault();
       window.location.href = `registry.html?edit=${encodeURIComponent(tool.id)}`;
     });
     deleteButton.addEventListener("click", () => removeTool(tool.id));

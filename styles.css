@@ -12,66 +12,6 @@
   --cobalt: #6d8dff;
 }
 
-.auth-gate {
-  position: fixed;
-  inset: 0;
-  z-index: 9999;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background: linear-gradient(180deg, #0a1324 0%, #050a13 100%);
-}
-
-.auth-gate__card {
-  padding: 32px;
-  border-radius: 24px;
-  background: var(--panel-strong);
-  border: 1px solid var(--line);
-  box-shadow: var(--shadow);
-  width: min(360px, calc(100% - 32px));
-}
-
-.auth-gate__title {
-  margin: 0 0 8px;
-  font-size: 1.5rem;
-  color: var(--text);
-}
-
-.auth-gate__text {
-  margin: 0 0 20px;
-  color: var(--muted);
-  font-size: 0.95rem;
-}
-
-.auth-gate__form {
-  display: grid;
-  gap: 12px;
-}
-
-.auth-gate__form input {
-  padding: 14px 16px;
-  border: 1px solid var(--line);
-  border-radius: 16px;
-  background: rgba(6, 13, 25, 0.92);
-  color: var(--text);
-  font: inherit;
-}
-
-.auth-gate__form input:focus {
-  outline: 2px solid rgba(109, 141, 255, 0.35);
-  border-color: rgba(109, 141, 255, 0.45);
-}
-
-.auth-gate__error {
-  margin: 12px 0 0;
-  color: #ffb7c3;
-  font-size: 0.9rem;
-}
-
-.auth-gate__error[hidden] {
-  display: none;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -242,11 +182,19 @@ select,
   margin-top: 20px;
 }
 
-.page-nav {
+/* Nav wrapper for mobile hamburger; on desktop behaves as simple container */
+.page-nav-bar {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
   margin-top: 20px;
+  align-items: flex-start;
+}
+
+.page-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .page-nav__link {
@@ -269,6 +217,63 @@ select,
   background: rgba(71, 215, 199, 0.2);
   color: var(--teal);
   border-color: rgba(71, 215, 199, 0.34);
+}
+
+/* Hamburger button: hidden on desktop, shown on mobile */
+.page-nav__menu-btn {
+  display: none;
+  align-items: center;
+  justify-content: center;
+  min-width: 44px;
+  min-height: 44px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.04);
+  color: var(--text);
+  cursor: pointer;
+  font: inherit;
+  transition: background 160ms, border-color 160ms;
+}
+
+.page-nav__menu-btn:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.page-nav__menu-btn:focus-visible {
+  outline: 2px solid rgba(109, 141, 255, 0.55);
+  outline-offset: 2px;
+}
+
+.page-nav__menu-btn[aria-expanded="true"] .page-nav__menu-icon span:nth-child(1) {
+  transform: translateY(6px) rotate(45deg);
+}
+
+.page-nav__menu-btn[aria-expanded="true"] .page-nav__menu-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.page-nav__menu-btn[aria-expanded="true"] .page-nav__menu-icon span:nth-child(3) {
+  transform: translateY(-6px) rotate(-45deg);
+}
+
+.page-nav__menu-icon {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  width: 22px;
+  height: 22px;
+}
+
+.page-nav__menu-icon span {
+  display: block;
+  width: 20px;
+  height: 2px;
+  background: currentColor;
+  border-radius: 1px;
+  transition: transform 180ms ease, opacity 160ms;
 }
 
 .hero--compact {
@@ -703,6 +708,16 @@ button:focus-visible,
   min-height: 280px;
 }
 
+.panel--activity .search {
+  display: block;
+  margin-bottom: 0.75rem;
+}
+
+.history-filter-actions {
+  margin-top: 0.25rem;
+  margin-bottom: 0.75rem;
+}
+
 .history-list {
   list-style: none;
   margin: 0;
@@ -789,6 +804,51 @@ button:focus-visible,
   .hero__status {
     grid-template-columns: repeat(3, minmax(0, 1fr));
   }
+
+  /* Mobile nav: hamburger + drawer */
+  .page-nav-bar {
+    position: relative;
+    flex-wrap: nowrap;
+  }
+
+  .page-nav__menu-btn {
+    display: flex;
+    flex-shrink: 0;
+  }
+
+  .page-nav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    margin-top: 8px;
+    padding: 12px;
+    flex-direction: column;
+    gap: 4px;
+    background: var(--panel-strong);
+    border: 1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    max-height: 0;
+    overflow: hidden;
+    opacity: 0;
+    visibility: hidden;
+    transition: max-height 220ms ease, opacity 180ms, visibility 180ms;
+  }
+
+  .page-nav-bar.is-open .page-nav {
+    max-height: 80vh;
+    overflow-y: auto;
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .page-nav__link {
+    min-height: 44px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+  }
 }
 
 @media (max-width: 640px) {
@@ -824,5 +884,10 @@ button:focus-visible,
 
   .tool-card__actions {
     flex-direction: column;
+  }
+
+  /* Nav: 44px touch targets on smallest screens */
+  .page-nav__link {
+    min-height: 44px;
   }
 }

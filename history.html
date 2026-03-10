@@ -7,7 +7,9 @@
       name="description"
       content="Recent launch history for Central Command."
     />
+    <meta name="theme-color" content="#09111f" />
     <title>Recent History — Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,6 +17,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
     <div class="app-shell">
@@ -34,11 +37,19 @@
             </div>
             <button id="clearHistoryButton" class="ghost-button" type="button">Clear history</button>
           </div>
+          <label class="search">
+            <span class="visually-hidden">Filter history by tool name or category</span>
+            <input id="historyFilterInput" type="search" placeholder="Filter by tool or category" />
+          </label>
+          <div id="historyFilterActions" class="history-filter-actions" hidden>
+            <button id="clearFiltersButton" class="ghost-button" type="button">Clear filters</button>
+          </div>
           <ul id="launchHistoryList" class="history-list" aria-live="polite"></ul>
         </section>
       </main>
     </div>
 
+    <script src="./sw-register.js"></script>
     <script type="module" src="./app-history.js"></script>
   </body>
 </html>

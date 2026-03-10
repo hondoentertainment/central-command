@@ -23,11 +23,13 @@ jobs:
 
       - name: Copy site files
         run: |
-          mkdir -p deploy
+          mkdir -p deploy deploy/icons
           cp index.html registry.html agents.html packs.html sports.html games.html writing.html productivity.html history.html runbook.html deploy/
           cp app.js app-registry.js app-agents.js app-packs.js app-sports.js app-games.js app-writing.js app-productivity.js app-history.js app-runbook.js deploy/
           cp styles.css deploy/
           cp -r data lib deploy/
+          cp favicon.svg manifest.json service-worker.js sw-register.js deploy/
+          cp -r icons deploy/
 
       - uses: actions/upload-pages-artifact@v3
         with:
