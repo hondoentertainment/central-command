@@ -26,9 +26,11 @@ import {
   performInitialSync,
   saveLayoutPreference,
   saveLaunchHistorySynced,
+  saveNotesSynced,
   saveStoredToolsSynced,
   saveSurfacesPreferences,
 } from "./lib/storage.js";
+import { showToast } from "./lib/toast.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -72,6 +74,8 @@ const elements = {
   surfacesSettingsPanel: document.querySelector("#surfacesSettingsPanel"),
   surfacesShowHero: document.querySelector("#surfacesShowHero"),
   surfacesShowSpotlight: document.querySelector("#surfacesShowSpotlight"),
+  importBackupBtn: document.querySelector("#importBackupBtn"),
+  importBackupInput: document.querySelector("#importBackupInput"),
 };
 
 initialize();
@@ -115,6 +119,8 @@ async function initialize() {
   elements.quickAddForm?.addEventListener("submit", handleQuickAddSubmit);
   elements.quickAddCancel?.addEventListener("click", hideQuickAddForm);
 
+  elements.importBackupBtn?.addEventListener("click", () => elements.importBackupInput?.click());
+  elements.importBackupInput?.addEventListener("change", handleImportBackup);
   elements.selectModeBtn?.addEventListener("click", toggleSelectMode);
   elements.batchPinBtn?.addEventListener("click", batchPinSelected);
   elements.batchDeleteBtn?.addEventListener("click", batchDeleteSelected);
@@ -244,6 +250,37 @@ function handleQuickAddSubmit(event) {
   hideQuickAddForm();
   render();
   updateStatusCards();
+}
+
+async function handleImportBackup(event) {
+  const file = event.target.files?.[0];
+  event.target.value = "";
+  if (!file) return;
+  try {
+    const text = await file.text();
+    const payload = JSON.parse(text);
+    const rawTools = Array.isArray(payload) ? payload : payload?.tools;
+    const importedTools = hydrateTools(rawTools, fallbackMetadataBySignature);
+    if (importedTools.length === 0) {
+      showToast("No valid tools found in that backup.", "error");
+      return;
+    }
+    state.tools = normalizePinRanks(importedTools);
+    state.launchHistory = filterHistoryForTools(
+      sanitizeLaunchHistory(payload?.launchHistory),
+      state.tools
+    );
+    await saveStoredToolsSynced(state.tools);
+    await saveLaunchHistorySynced(state.launchHistory);
+    if (typeof payload?.notes === "string") {
+      saveNotesSynced(payload.notes);
+    }
+    render();
+    updateStatusCards();
+    showToast(`Imported ${importedTools.length} tools from ${file.name}.`);
+  } catch {
+    showToast("Could not import that backup. Use a JSON file from Export.", "error");
+  }
 }
 
 function handleKeyboardShortcut(event) {

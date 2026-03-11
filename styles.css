@@ -115,6 +115,22 @@ h1 {
 }
 
 .hero__text,
+.hero__data-notice {
+  color: var(--muted);
+  font-size: 0.95rem;
+  margin: 0 0 16px;
+}
+.hero__data-notice {
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+.hero__data-notice a {
+  color: var(--teal);
+}
+.hero__data-notice a:hover {
+  text-decoration: underline;
+}
+
 .tool-card__description,
 .status-card__label,
 .tool-card__url,
