@@ -1,13 +1,23 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
       content="Central Command keeps your most-used tools, quick links, presets, and daily runbook in one place."
     />
+    <meta property="og:title" content="Central Command" />
+    <meta property="og:description" content="Central Command keeps your most-used tools, quick links, presets, and daily runbook in one place." />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary" />
+    <meta name="twitter:title" content="Central Command" />
+    <meta name="theme-color" content="#09111f" />
     <title>Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,10 +25,11 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
     <div class="app-shell">
-      <header class="hero">
+      <header class="hero" id="heroSection">
         <div class="hero__copy">
           <p class="eyebrow">Operations Hub</p>
           <h1>Central Command</h1>
@@ -45,7 +56,7 @@
         </div>
       </header>
 
-      <section class="panel panel--spotlight">
+      <section class="panel panel--spotlight" id="spotlightSection">
         <div class="panel__header">
           <div>
             <p class="eyebrow">Spotlight</p>
@@ -62,14 +73,58 @@
               <p class="eyebrow">Quick Access</p>
               <h2>Your command deck</h2>
             </div>
-            <label class="search">
-              <span class="visually-hidden">Search tools</span>
-              <input id="searchInput" type="search" placeholder="Search tools or categories" />
-            </label>
+            <div class="panel__header-actions panel__header-actions--tools">
+              <div id="layoutToggle" class="layout-toggle" role="group" aria-label="Grid layout">
+                <button type="button" class="layout-toggle__btn" data-layout="grid">Grid</button>
+                <button type="button" class="layout-toggle__btn" data-layout="list">List</button>
+                <button type="button" class="layout-toggle__btn" data-layout="compact">Compact</button>
+              </div>
+              <label class="search">
+                <span class="visually-hidden">Search tools</span>
+                <input id="searchInput" type="search" placeholder="Search tools or categories" />
+              </label>
+              <button type="button" id="surfacesSettingsBtn" class="ghost-button" aria-label="Page layout settings" aria-expanded="false">⚙ Layout</button>
+              <button type="button" id="addToolBtn" class="ghost-button">Add tool</button>
+              <button type="button" id="selectModeBtn" class="ghost-button">Select</button>
+            </div>
+          </div>
+          <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-label="Show hero and spotlight">
+            <div class="surfaces-settings-panel__content">
+              <label class="checkbox"><input type="checkbox" id="surfacesShowHero" checked /> Show hero</label>
+              <label class="checkbox"><input type="checkbox" id="surfacesShowSpotlight" checked /> Show spotlight</label>
+            </div>
+          </div>
+          <div id="batchActionBar" class="batch-action-bar" hidden>
+            <span class="batch-action-bar__count"><span id="batchSelectedCount">0</span> selected</span>
+            <div class="batch-action-bar__actions">
+              <button type="button" id="batchPinBtn" class="ghost-button">Pin selected</button>
+              <button type="button" id="batchDeleteBtn" class="ghost-button">Delete selected</button>
+              <select id="batchCategorySelect">
+                <option value="">Change category…</option>
+              </select>
+              <button type="button" id="batchDoneBtn" class="ghost-button">Done</button>
+            </div>
+          </div>
+          <div id="quickAddFormWrap" class="quick-add-form-wrap" hidden>
+            <form id="quickAddForm" class="quick-add-form">
+              <input id="quickAddName" type="text" placeholder="Tool name" required />
+              <input id="quickAddUrl" type="text" placeholder="URL" required />
+              <select id="quickAddCategory"></select>
+              <div class="quick-add-form__actions">
+                <button type="submit" class="ghost-button">Add</button>
+                <button type="button" id="quickAddCancel" class="ghost-button">Cancel</button>
+                <a href="registry.html" class="ghost-button">Advanced options →</a>
+              </div>
+            </form>
           </div>
 
           <div id="filterBar" class="filter-bar"></div>
-          <div id="toolGrid" class="tool-grid" aria-live="polite"></div>
+          <div id="toolGrid" class="tool-grid" aria-live="polite">
+            <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
+            <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
+            <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
+            <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
+          </div>
         </section>
       </main>
     </div>
@@ -77,6 +132,10 @@
     <template id="toolCardTemplate">
       <article class="tool-card">
         <div class="tool-card__top">
+          <label class="tool-card__select-wrap" hidden>
+            <span class="visually-hidden">Select tool</span>
+            <input type="checkbox" class="tool-card__select" />
+          </label>
           <span class="tool-card__icon" aria-hidden="true"></span>
           <span class="tool-card__category"></span>
           <span class="tool-card__pin" hidden>Pinned</span>
@@ -95,6 +154,7 @@
       </article>
     </template>
 
+    <script src="./sw-register.js"></script>
     <script type="module" src="./app.js"></script>
   </body>
 </html>

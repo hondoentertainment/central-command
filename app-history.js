@@ -11,7 +11,7 @@ import {
 import {
   loadLaunchHistory,
   loadStoredTools,
-  saveLaunchHistory,
+  saveLaunchHistorySynced,
 } from "./lib/storage.js";
 import { ALL_PRESET_TOOLS, DEFAULT_TOOLS } from "./data/presets.js";
 import { hydrateTools } from "./lib/tool-model.js";
@@ -25,11 +25,15 @@ const tools = normalizePinRanks(
 const state = {
   tools,
   launchHistory: filterHistoryForTools(loadLaunchHistory(sanitizeLaunchHistory), tools),
+  historyFilter: "",
 };
 
 const elements = {
   launchHistoryList: document.querySelector("#launchHistoryList"),
   clearHistoryButton: document.querySelector("#clearHistoryButton"),
+  historyFilterInput: document.querySelector("#historyFilterInput"),
+  historyFilterActions: document.querySelector("#historyFilterActions"),
+  clearFiltersButton: document.querySelector("#clearFiltersButton"),
 };
 
 initialize();
@@ -37,18 +41,41 @@ initialize();
 function initialize() {
   renderNav("history");
   elements.clearHistoryButton.addEventListener("click", clearLaunchHistory);
+  elements.historyFilterInput.addEventListener("input", (event) => {
+    state.historyFilter = event.target.value.trim().toLowerCase();
+    renderLaunchHistory();
+  });
+  elements.clearFiltersButton.addEventListener("click", () => {
+    state.historyFilter = "";
+    elements.historyFilterInput.value = "";
+    renderLaunchHistory();
+  });
   renderLaunchHistory();
 }
 
 function renderLaunchHistory() {
-  const historyEntries = filterHistoryForTools(state.launchHistory, state.tools);
+  let historyEntries = filterHistoryForTools(state.launchHistory, state.tools);
+
+  if (state.historyFilter) {
+    const needle = state.historyFilter;
+    historyEntries = historyEntries.filter((entry) => {
+      const tool = state.tools.find((c) => c.id === entry.toolId);
+      if (!tool) return false;
+      const haystack = `${tool.name} ${tool.category}`.toLowerCase();
+      return haystack.includes(needle);
+    });
+  }
+
+  elements.historyFilterActions.hidden = !state.historyFilter;
   elements.launchHistoryList.innerHTML = "";
-  elements.clearHistoryButton.disabled = historyEntries.length === 0;
+  elements.clearHistoryButton.disabled = state.launchHistory.length === 0;
 
   if (historyEntries.length === 0) {
     const item = document.createElement("li");
     item.className = "history-list__empty";
-    item.textContent = "Recent launches will appear here once you start using the deck.";
+    item.textContent = state.historyFilter
+      ? "No entries match that filter."
+      : "Recent launches will appear here once you start using the deck.";
     elements.launchHistoryList.appendChild(item);
     return;
   }
@@ -81,7 +108,7 @@ function renderLaunchHistory() {
 
     link.addEventListener("click", () => {
       state.launchHistory = recordLaunch(state.launchHistory, tool.id);
-      saveLaunchHistory(state.launchHistory);
+      saveLaunchHistorySynced(state.launchHistory);
       if (tool.openMode === "new-tab") renderLaunchHistory();
     });
 
@@ -101,6 +128,6 @@ function clearLaunchHistory() {
   if (!confirmed) return;
 
   state.launchHistory = [];
-  saveLaunchHistory(state.launchHistory);
+  saveLaunchHistorySynced(state.launchHistory);
   renderLaunchHistory();
 }

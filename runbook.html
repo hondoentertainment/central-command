@@ -1,13 +1,18 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
       content="Daily runbook notes for Central Command."
     />
+    <meta name="theme-color" content="#09111f" />
     <title>Runbook — Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -15,6 +20,7 @@
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
     <div class="app-shell">
@@ -35,16 +41,41 @@
                 Keep day-start notes, routines, or launch orders here. Auto-saved to your browser.
               </p>
             </div>
+            <div class="notes-header-actions">
+              <div class="notes-tabs" role="tablist" aria-label="Notes mode">
+                <button type="button" class="tab-button is-active" role="tab" aria-selected="true" data-mode="edit" id="tab-edit">Edit</button>
+                <button type="button" class="tab-button" role="tab" aria-selected="false" data-mode="preview" id="tab-preview">Preview</button>
+              </div>
+              <div class="notes-templates-wrap">
+                <button type="button" id="templatesToggleBtn" class="ghost-button" aria-expanded="false" aria-controls="templatesPanel">Templates</button>
+                <div id="templatesPanel" class="notes-templates-panel" hidden aria-labelledby="templatesToggleBtn">
+                  <div class="notes-templates-panel__header">
+                    <h3>Templates</h3>
+                    <button type="button" id="saveAsTemplateBtn" class="ghost-button">Save as template</button>
+                  </div>
+                  <ul id="templatesList" class="notes-templates-list"></ul>
+                </div>
+              </div>
+            </div>
           </div>
-          <textarea
-            id="notes"
-            class="notes"
-            placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here."
-          ></textarea>
+          <div id="notes-edit-panel" role="tabpanel" aria-labelledby="tab-edit">
+            <textarea
+              id="notes"
+              class="notes"
+              placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here. Supports **markdown**."
+            ></textarea>
+            <p class="notes-hint">Try markdown: <strong>**bold**</strong>, <code>- list</code></p>
+            <p id="notesLastEdited" class="notes-last-edited" aria-live="polite"></p>
+          </div>
+          <div id="notes-preview-panel" role="tabpanel" aria-labelledby="tab-preview" hidden>
+            <div id="notes-preview" class="notes-preview" aria-live="polite"></div>
+          </div>
         </section>
       </main>
     </div>
 
+    <script src="./sw-register.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module" src="./app-runbook.js"></script>
   </body>
 </html>

@@ -13,12 +13,14 @@ import {
   sanitizeTool,
 } from "./lib/tool-model.js";
 import {
+  loadCustomCategories,
   loadLaunchHistory,
   loadNotes,
   loadStoredTools,
-  saveLaunchHistory,
-  saveNotes,
-  saveStoredTools,
+  saveCustomCategories,
+  saveLaunchHistorySynced,
+  saveNotesSynced,
+  saveStoredToolsSynced,
 } from "./lib/storage.js";
 
 const EXPORT_VERSION = 2;
@@ -44,6 +46,8 @@ const elements = {
   description: document.querySelector("#description"),
   accent: document.querySelector("#accent"),
   iconKey: document.querySelector("#iconKey"),
+  iconUrlWrap: document.querySelector("#iconUrlWrap"),
+  iconUrl: document.querySelector("#iconUrl"),
   shortcutLabel: document.querySelector("#shortcutLabel"),
   openMode: document.querySelector("#openMode"),
   pinned: document.querySelector("#pinned"),
@@ -67,10 +71,12 @@ function initialize() {
   elements.exportButton.addEventListener("click", exportBackup);
   elements.importButton.addEventListener("click", () => elements.importFileInput.click());
   elements.importFileInput.addEventListener("change", handleImport);
-  elements.categorySelect.addEventListener("change", syncCategoryVisibility);
+  elements.categorySelect.addEventListener("change", handleCategoryChange);
+  elements.iconKey.addEventListener("change", syncIconUrlVisibility);
 
   renderIconOptions();
   renderCategoryOptions();
+  syncIconUrlVisibility();
   resetForm();
   loadEditFromUrl();
 }
@@ -92,6 +98,8 @@ function beginEdit(tool) {
   elements.description.value = tool.description;
   elements.accent.value = tool.accent;
   elements.iconKey.value = tool.iconKey;
+  elements.iconUrl.value = tool.iconUrl ?? "";
+  syncIconUrlVisibility();
   elements.shortcutLabel.value = tool.shortcutLabel;
   elements.openMode.value = tool.openMode;
   elements.pinned.checked = tool.pinned;
@@ -117,6 +125,7 @@ function handleSubmit(event) {
       description: elements.description.value,
       accent: elements.accent.value,
       iconKey: elements.iconKey.value,
+      iconUrl: elements.iconKey.value === "custom" ? elements.iconUrl.value : undefined,
       shortcutLabel: elements.shortcutLabel.value,
       openMode: elements.openMode.value,
       pinned: elements.pinned.checked,
@@ -167,6 +176,8 @@ function resetForm(options = {}) {
   elements.toolId.value = "";
   elements.accent.value = "amber";
   elements.iconKey.value = "auto";
+  elements.iconUrl.value = "";
+  syncIconUrlVisibility();
   elements.openMode.value = "new-tab";
   elements.pinned.checked = false;
   elements.showInHero.checked = false;
@@ -181,10 +192,10 @@ function resetForm(options = {}) {
 }
 
 function getResolvedCategory() {
-  if (elements.categorySelect.value === "custom") {
-    return elements.customCategory.value;
-  }
-  return elements.categorySelect.value;
+  const v = elements.categorySelect.value;
+  if (v === "custom") return elements.customCategory.value?.trim() ?? "";
+  if (v === "__add__" || !v) return "";
+  return v;
 }
 
 function getSelectedSurfaces() {
@@ -219,9 +230,19 @@ function syncCategoryVisibility() {
   elements.customCategory.toggleAttribute("required", isCustom);
 }
 
+function syncIconUrlVisibility() {
+  const isCustom = elements.iconKey.value === "custom";
+  elements.iconUrlWrap.hidden = !isCustom;
+}
+
 function renderCategoryOptions(currentCategory = elements.categorySelect.value) {
+  const customCategories = loadCustomCategories();
   const categories = [
-    ...new Set([...CATEGORY_OPTIONS, ...state.tools.map((tool) => tool.category)].filter(Boolean)),
+    ...new Set([
+      ...CATEGORY_OPTIONS,
+      ...customCategories,
+      ...state.tools.map((tool) => tool.category),
+    ].filter(Boolean)),
   ].sort();
 
   elements.categorySelect.innerHTML = "";
@@ -243,7 +264,33 @@ function renderCategoryOptions(currentCategory = elements.categorySelect.value) 
   customOption.textContent = "Custom category";
   elements.categorySelect.appendChild(customOption);
 
+  const addCategoryOption = document.createElement("option");
+  addCategoryOption.value = "__add__";
+  addCategoryOption.textContent = "+ Add category";
+  elements.categorySelect.appendChild(addCategoryOption);
+
   elements.categorySelect.value = currentCategory || "";
+}
+
+function handleCategoryChange() {
+  if (elements.categorySelect.value === "__add__") {
+    const name = window.prompt("New category name:");
+    if (name && name.trim()) {
+      const trimmed = name.trim();
+      const customCategories = loadCustomCategories();
+      if (!customCategories.includes(trimmed)) {
+        saveCustomCategories([...customCategories, trimmed]);
+        renderCategoryOptions(trimmed);
+        setFormMessage(`Category "${trimmed}" added.`, "info");
+      } else {
+        renderCategoryOptions(trimmed);
+      }
+    } else {
+      elements.categorySelect.value = "";
+    }
+  } else {
+    syncCategoryVisibility();
+  }
 }
 
 function renderIconOptions() {
@@ -269,7 +316,7 @@ function applyPreset(presetId, isRestore = false) {
   state.tools = normalizePinRanks(structuredClone(preset.tools));
   state.launchHistory = [];
   commitTools();
-  saveLaunchHistory(state.launchHistory);
+  saveLaunchHistorySynced(state.launchHistory);
   resetForm({ preserveMessage: true });
   setFormMessage(`${preset.title} applied. Notes were kept.`, "success");
   window.location.href = "index.html";
@@ -277,7 +324,7 @@ function applyPreset(presetId, isRestore = false) {
 
 function commitTools() {
   state.tools = normalizePinRanks(state.tools);
-  saveStoredTools(state.tools);
+  saveStoredToolsSynced(state.tools);
   renderCategoryOptions(getResolvedCategory());
 }
 
@@ -324,11 +371,11 @@ async function handleImport(event) {
       state.tools
     );
 
-    saveStoredTools(state.tools);
-    saveLaunchHistory(state.launchHistory);
+    saveStoredToolsSynced(state.tools);
+    saveLaunchHistorySynced(state.launchHistory);
 
     if (typeof payload?.notes === "string") {
-      saveNotes(payload.notes);
+      saveNotesSynced(payload.notes);
     }
 
     renderCategoryOptions();
