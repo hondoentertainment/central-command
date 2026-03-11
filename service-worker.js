@@ -1,38 +1,55 @@
 const CACHE_NAME = "central-command-v1";
 
-const REWRITES = { "/registry": "/registry.html", "/agents": "/agents.html", "/packs": "/packs.html", "/sports": "/sports.html", "/games": "/games.html", "/writing": "/writing.html", "/productivity": "/productivity.html", "/history": "/history.html", "/runbook": "/runbook.html" };
+const BASE = location.pathname.includes("/central-command") ? "/central-command" : "";
+
+const REWRITE_MAP = {
+  "/registry": "/registry.html",
+  "/agents": "/agents.html",
+  "/packs": "/packs.html",
+  "/sports": "/sports.html",
+  "/games": "/games.html",
+  "/writing": "/writing.html",
+  "/productivity": "/productivity.html",
+  "/history": "/history.html",
+  "/runbook": "/runbook.html",
+};
+
+const REWRITES = {};
+for (const [k, v] of Object.entries(REWRITE_MAP)) {
+  REWRITES[BASE + k] = BASE + v;
+}
 
 const PRECACHE = [
-  "/",
-  "/index.html",
-  "/registry.html",
-  "/agents.html",
-  "/packs.html",
-  "/sports.html",
-  "/games.html",
-  "/writing.html",
-  "/productivity.html",
-  "/history.html",
-  "/runbook.html",
-  "/styles.css",
-  "/manifest.json",
-  "/app.js",
-  "/app-registry.js",
-  "/app-agents.js",
-  "/app-packs.js",
-  "/app-sports.js",
-  "/app-games.js",
-  "/app-writing.js",
-  "/app-productivity.js",
-  "/app-history.js",
-  "/app-runbook.js",
-  "/lib/nav.js",
-  "/lib/icons.js",
-  "/lib/storage.js",
-  "/lib/tool-model.js",
-  "/data/presets.js",
-  "/icons/icon-192.svg",
-  "/icons/icon-512.svg",
+  BASE + "/",
+  BASE + "/index.html",
+  BASE + "/registry.html",
+  BASE + "/agents.html",
+  BASE + "/packs.html",
+  BASE + "/sports.html",
+  BASE + "/games.html",
+  BASE + "/writing.html",
+  BASE + "/productivity.html",
+  BASE + "/history.html",
+  BASE + "/runbook.html",
+  BASE + "/styles.css",
+  BASE + "/manifest.json",
+  BASE + "/app.js",
+  BASE + "/app-registry.js",
+  BASE + "/app-agents.js",
+  BASE + "/app-packs.js",
+  BASE + "/app-sports.js",
+  BASE + "/app-games.js",
+  BASE + "/app-writing.js",
+  BASE + "/app-productivity.js",
+  BASE + "/app-history.js",
+  BASE + "/app-runbook.js",
+  BASE + "/lib/nav.js",
+  BASE + "/lib/icons.js",
+  BASE + "/lib/storage.js",
+  BASE + "/lib/tool-model.js",
+  BASE + "/data/presets.js",
+  BASE + "/icons/icon-192.svg",
+  BASE + "/icons/icon-512.svg",
 ];
 
 self.addEventListener("install", (event) => {
@@ -54,17 +71,19 @@ self.addEventListener("fetch", (event) => {
   const url = new URL(event.request.url);
   if (url.origin !== location.origin) return;
 
+  const path = url.pathname;
+  const isRoot = path === "/" || path === BASE || path === BASE + "/";
   const isStatic =
-    /\.(html?|css|js|json|svg|png|ico|woff2?)$/i.test(url.pathname) ||
-    url.pathname === "/" ||
-    url.pathname in REWRITES ||
-    url.pathname.startsWith("/lib/") ||
-    url.pathname.startsWith("/data/") ||
-    url.pathname.startsWith("/icons/");
+    /\.(html?|css|js|json|svg|png|ico|woff2?)$/i.test(path) ||
+    isRoot ||
+    path in REWRITES ||
+    path.startsWith(BASE + "/lib/") ||
+    path.startsWith(BASE + "/data/") ||
+    path.startsWith(BASE + "/icons/");
 
   if (!isStatic) return;
 
-  const altRequest = REWRITES[url.pathname] ? new Request(new URL(REWRITES[url.pathname], url.origin)) : null;
+  const altRequest = REWRITES[path] ? new Request(new URL(REWRITES[path], url.origin)) : null;
 
   event.respondWith(
     caches.match(event.request).then((cached) => {

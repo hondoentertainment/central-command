@@ -763,6 +763,110 @@ button:focus-visible,
   line-height: 1.5;
 }
 
+.notes-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid var(--line);
+  width: fit-content;
+}
+
+.notes-tabs .tab-button {
+  padding: 8px 18px;
+  margin: 0;
+}
+
+.notes-preview {
+  min-height: 180px;
+  font-size: 1rem;
+  line-height: 1.6;
+  padding: 14px 16px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: rgba(6, 13, 25, 0.92);
+  color: var(--muted);
+}
+
+.notes-preview :first-child {
+  margin-top: 0;
+}
+
+.notes-preview :last-child {
+  margin-bottom: 0;
+}
+
+.notes-preview h1, .notes-preview h2, .notes-preview h3, .notes-preview h4, .notes-preview h5, .notes-preview h6 {
+  color: var(--text);
+  font-weight: 600;
+  margin: 1em 0 0.5em;
+}
+
+.notes-preview h1 { font-size: 1.5em; }
+.notes-preview h2 { font-size: 1.25em; }
+.notes-preview h3 { font-size: 1.1em; }
+
+.notes-preview p {
+  margin: 0.75em 0;
+}
+
+.notes-preview ul, .notes-preview ol {
+  margin: 0.75em 0;
+  padding-left: 1.5em;
+}
+
+.notes-preview li {
+  margin: 0.25em 0;
+}
+
+.notes-preview a {
+  color: var(--cobalt);
+  text-decoration: underline;
+}
+
+.notes-preview a:hover {
+  color: var(--teal);
+}
+
+.notes-preview code {
+  font-family: "JetBrains Mono", monospace;
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--teal);
+}
+
+.notes-preview pre {
+  overflow-x: auto;
+  padding: 12px;
+  border-radius: 10px;
+  background: rgba(6, 13, 25, 0.95);
+  border: 1px solid var(--line);
+  margin: 0.75em 0;
+}
+
+.notes-preview pre code {
+  padding: 0;
+  background: none;
+  color: var(--muted);
+}
+
+.notes-preview blockquote {
+  margin: 0.75em 0;
+  padding-left: 1em;
+  border-left: 3px solid var(--teal);
+  color: var(--muted);
+}
+
+.notes-preview__empty,
+.notes-preview__fallback {
+  color: var(--muted);
+  font-style: italic;
+  margin: 0;
+}
+
 .empty-state,
 .inline-empty-state {
   padding: 28px;

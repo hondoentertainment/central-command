@@ -63,6 +63,7 @@ function initialize() {
   });
 
   document.addEventListener("keydown", handleKeyboardShortcut);
+  document.addEventListener("keydown", handleToolGridKeydown);
   render();
 }
 
@@ -111,6 +112,63 @@ function parseShortcutKey(label) {
   const parts = label.split(/[\s+]+/);
   const last = parts[parts.length - 1];
   return last?.length === 1 ? last.toLowerCase() : null;
+}
+
+function handleToolGridKeydown(event) {
+  const active = document.activeElement;
+  if (
+    !active ||
+    active.tagName === "INPUT" ||
+    active.tagName === "TEXTAREA" ||
+    active.tagName === "SELECT" ||
+    active.isContentEditable
+  ) {
+    return;
+  }
+
+  if (!elements.toolGrid?.contains(active)) return;
+  const currentCard = active.classList?.contains("tool-card") ? active : active.closest(".tool-card");
+  if (!currentCard) return;
+
+  const cards = [...elements.toolGrid.querySelectorAll(".tool-card")];
+  if (cards.length === 0) return;
+
+  const key = event.key;
+  if (key === "Enter") {
+    if (active === currentCard) {
+      const launchBtn = currentCard.querySelector(".launch-button");
+      if (launchBtn) {
+        event.preventDefault();
+        launchBtn.click();
+      }
+    }
+    return;
+  }
+
+  const dirs = { ArrowUp: -1, ArrowDown: 1, ArrowLeft: -1, ArrowRight: 1 };
+  const step = dirs[key];
+  if (step === undefined) return;
+
+  event.preventDefault();
+
+  const rect = elements.toolGrid.getBoundingClientRect();
+  const firstCardRect = cards[0].getBoundingClientRect();
+  const gap = 16;
+  const cardWidth = firstCardRect.width + gap;
+  const cols = Math.max(1, Math.floor(rect.width / cardWidth));
+  const index = cards.indexOf(currentCard);
+  if (index === -1) return;
+
+  let nextIndex;
+  if (key === "ArrowUp" || key === "ArrowDown") {
+    nextIndex = index + step * cols;
+  } else {
+    nextIndex = index + step;
+  }
+  nextIndex = Math.max(0, Math.min(nextIndex, cards.length - 1));
+  if (nextIndex !== index) {
+    cards[nextIndex].focus();
+  }
 }
 
 function render() {
@@ -233,6 +291,7 @@ function renderCards() {
   visibleTools.forEach((tool) => {
     const fragment = elements.toolCardTemplate.content.cloneNode(true);
     const card = fragment.querySelector(".tool-card");
+    card.setAttribute("tabindex", "0");
     const icon = fragment.querySelector(".tool-card__icon");
     const category = fragment.querySelector(".tool-card__category");
     const pin = fragment.querySelector(".tool-card__pin");

@@ -38,17 +38,27 @@
                 Keep day-start notes, routines, or launch orders here. Auto-saved to your browser.
               </p>
             </div>
+            <div class="notes-tabs" role="tablist" aria-label="Notes mode">
+              <button type="button" class="tab-button is-active" role="tab" aria-selected="true" data-mode="edit" id="tab-edit">Edit</button>
+              <button type="button" class="tab-button" role="tab" aria-selected="false" data-mode="preview" id="tab-preview">Preview</button>
+            </div>
           </div>
-          <textarea
-            id="notes"
-            class="notes"
-            placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here."
-          ></textarea>
+          <div id="notes-edit-panel" role="tabpanel" aria-labelledby="tab-edit">
+            <textarea
+              id="notes"
+              class="notes"
+              placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here. Supports **markdown**."
+            ></textarea>
+          </div>
+          <div id="notes-preview-panel" role="tabpanel" aria-labelledby="tab-preview" hidden>
+            <div id="notes-preview" class="notes-preview" aria-live="polite"></div>
+          </div>
         </section>
       </main>
     </div>
 
     <script src="./sw-register.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
     <script type="module" src="./app-runbook.js"></script>
   </body>
 </html>
