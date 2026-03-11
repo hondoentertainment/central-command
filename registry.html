@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
@@ -101,6 +104,11 @@
                 <select id="iconKey" name="iconKey"></select>
               </label>
             </div>
+
+            <label id="iconUrlWrap" hidden>
+              Icon URL
+              <input id="iconUrl" name="iconUrl" type="url" placeholder="https://example.com/icon.png" />
+            </label>
 
             <div class="tool-form__row tool-form__row--split">
               <label>

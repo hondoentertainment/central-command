@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
@@ -44,7 +47,11 @@
           <div id="historyFilterActions" class="history-filter-actions" hidden>
             <button id="clearFiltersButton" class="ghost-button" type="button">Clear filters</button>
           </div>
-          <ul id="launchHistoryList" class="history-list" aria-live="polite"></ul>
+          <ul id="launchHistoryList" class="history-list" aria-live="polite">
+            <li class="skeleton-item"><div class="skeleton"></div><div class="skeleton"></div></li>
+            <li class="skeleton-item"><div class="skeleton"></div><div class="skeleton"></div></li>
+            <li class="skeleton-item"><div class="skeleton"></div><div class="skeleton"></div></li>
+          </ul>
         </section>
       </main>
     </div>

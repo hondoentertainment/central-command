@@ -10,7 +10,12 @@ import {
   sanitizeLaunchHistory,
   sortTools,
 } from "./lib/tool-model.js";
-import { loadLaunchHistory, loadStoredTools, saveLaunchHistory } from "./lib/storage.js";
+import {
+  loadLaunchHistory,
+  loadLayoutPreference,
+  loadStoredTools,
+  saveLaunchHistorySynced,
+} from "./lib/storage.js";
 import { ALL_PRESET_TOOLS, DEFAULT_TOOLS } from "./data/presets.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
@@ -35,7 +40,17 @@ initialize();
 
 function initialize() {
   renderNav("sports");
+  applyLayoutToGrid();
   renderSports();
+}
+
+function applyLayoutToGrid() {
+  const grid = elements.sportsGrid;
+  if (!grid) return;
+  const layout = loadLayoutPreference();
+  grid.classList.remove("tool-grid--list", "tool-grid--compact");
+  if (layout === "list") grid.classList.add("tool-grid--list");
+  else if (layout === "compact") grid.classList.add("tool-grid--compact");
 }
 
 function renderSports() {
@@ -87,7 +102,7 @@ function applyLaunchBehavior(element, tool, label = `Open ${tool.name}`) {
 
   element.addEventListener("click", () => {
     state.launchHistory = recordLaunch(state.launchHistory, tool.id);
-    saveLaunchHistory(state.launchHistory);
+    saveLaunchHistorySynced(state.launchHistory);
   });
 }
 

@@ -11,7 +11,7 @@ import {
 import {
   loadLaunchHistory,
   loadStoredTools,
-  saveLaunchHistory,
+  saveLaunchHistorySynced,
 } from "./lib/storage.js";
 import { ALL_PRESET_TOOLS, DEFAULT_TOOLS } from "./data/presets.js";
 import { hydrateTools } from "./lib/tool-model.js";
@@ -108,7 +108,7 @@ function renderLaunchHistory() {
 
     link.addEventListener("click", () => {
       state.launchHistory = recordLaunch(state.launchHistory, tool.id);
-      saveLaunchHistory(state.launchHistory);
+      saveLaunchHistorySynced(state.launchHistory);
       if (tool.openMode === "new-tab") renderLaunchHistory();
     });
 
@@ -128,6 +128,6 @@ function clearLaunchHistory() {
   if (!confirmed) return;
 
   state.launchHistory = [];
-  saveLaunchHistory(state.launchHistory);
+  saveLaunchHistorySynced(state.launchHistory);
   renderLaunchHistory();
 }

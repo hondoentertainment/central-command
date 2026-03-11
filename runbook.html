@@ -1,6 +1,9 @@
 <!doctype html>
 <html lang="en">
   <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
@@ -38,9 +41,21 @@
                 Keep day-start notes, routines, or launch orders here. Auto-saved to your browser.
               </p>
             </div>
-            <div class="notes-tabs" role="tablist" aria-label="Notes mode">
-              <button type="button" class="tab-button is-active" role="tab" aria-selected="true" data-mode="edit" id="tab-edit">Edit</button>
-              <button type="button" class="tab-button" role="tab" aria-selected="false" data-mode="preview" id="tab-preview">Preview</button>
+            <div class="notes-header-actions">
+              <div class="notes-tabs" role="tablist" aria-label="Notes mode">
+                <button type="button" class="tab-button is-active" role="tab" aria-selected="true" data-mode="edit" id="tab-edit">Edit</button>
+                <button type="button" class="tab-button" role="tab" aria-selected="false" data-mode="preview" id="tab-preview">Preview</button>
+              </div>
+              <div class="notes-templates-wrap">
+                <button type="button" id="templatesToggleBtn" class="ghost-button" aria-expanded="false" aria-controls="templatesPanel">Templates</button>
+                <div id="templatesPanel" class="notes-templates-panel" hidden aria-labelledby="templatesToggleBtn">
+                  <div class="notes-templates-panel__header">
+                    <h3>Templates</h3>
+                    <button type="button" id="saveAsTemplateBtn" class="ghost-button">Save as template</button>
+                  </div>
+                  <ul id="templatesList" class="notes-templates-list"></ul>
+                </div>
+              </div>
             </div>
           </div>
           <div id="notes-edit-panel" role="tabpanel" aria-labelledby="tab-edit">
@@ -49,6 +64,8 @@
               class="notes"
               placeholder="Keep short checklists, reminders, launch sequences, or day-start notes here. Supports **markdown**."
             ></textarea>
+            <p class="notes-hint">Try markdown: <strong>**bold**</strong>, <code>- list</code></p>
+            <p id="notesLastEdited" class="notes-last-edited" aria-live="polite"></p>
           </div>
           <div id="notes-preview-panel" role="tabpanel" aria-labelledby="tab-preview" hidden>
             <div id="notes-preview" class="notes-preview" aria-live="polite"></div>

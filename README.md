@@ -27,6 +27,30 @@ npx serve .
 python -m http.server 8000
 ```
 
+### Cross-Device Sync (Firebase)
+
+To enable cloud sync across devices:
+
+1. Copy `config/firebase.config.example.js` to `firebase.config.local.js` (in project root) or `config/firebase.config.local.js`
+2. Create a Firebase project at [console.firebase.google.com](https://console.firebase.google.com)
+3. Add a web app and copy the config values into `firebase.config.local.js`
+4. Enable **Anonymous Auth** (or Email/Password) in Firebase Authentication
+5. Create a Firestore database
+6. Set Firestore rules so users can read/write only their own data, e.g.:
+
+```javascript
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId}/{document=**} {
+      allow read, write: if request.auth != null && request.auth.uid == userId;
+    }
+  }
+}
+```
+
+Data (tools, notes, launch history) syncs to `users/{uid}/` in Firestore. **Offline persistence** is enabled: writes go to the local cache when offline and sync automatically when back online. Do not commit `firebase.config.local.js` (it is gitignored).
+
 ## Install as PWA
 
 Visit the deployed site and use your browser's **Add to home screen** (or **Install app**) option. Available when visiting the production URL.

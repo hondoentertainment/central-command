@@ -9,8 +9,8 @@ import {
   hasSavedTools,
   loadLaunchHistory,
   loadStoredTools,
-  saveLaunchHistory,
-  saveStoredTools,
+  saveLaunchHistorySynced,
+  saveStoredToolsSynced,
 } from "./lib/storage.js";
 import { createFallbackMetadataMap, filterHistoryForTools } from "./lib/tool-model.js";
 import { ALL_PRESET_TOOLS, DEFAULT_TOOLS } from "./data/presets.js";
@@ -91,8 +91,8 @@ function applyPreset(presetId, isRestore = false) {
   state.launchHistory = [];
   state.isFirstVisit = false;
 
-  saveStoredTools(state.tools);
-  saveLaunchHistory(state.launchHistory);
+  saveStoredToolsSynced(state.tools);
+  saveLaunchHistorySynced(state.launchHistory);
 
   window.location.href = "index.html";
 }
