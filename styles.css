@@ -853,6 +853,25 @@ button:focus-visible,
   margin: 0;
 }
 
+.surfaces-settings-panel__divider {
+  border: 0;
+  border-top: 1px solid var(--line);
+  width: 100%;
+  margin: 4px 0;
+}
+
+.stacked-label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.stacked-label input,
+.stacked-label select {
+  width: 100%;
+}
+
 .tool-card {
   position: relative;
   overflow: hidden;
