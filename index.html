@@ -92,6 +92,21 @@
             <div class="surfaces-settings-panel__content">
               <label class="checkbox"><input type="checkbox" id="surfacesShowHero" checked /> Show hero</label>
               <label class="checkbox"><input type="checkbox" id="surfacesShowSpotlight" checked /> Show spotlight</label>
+              <hr class="surfaces-settings-panel__divider" />
+              <p class="eyebrow">Integrations</p>
+              <label class="checkbox"><input type="checkbox" id="creativeHubEnabled" checked /> Enable Creative Hub</label>
+              <label class="checkbox"><input type="checkbox" id="creativeHubShowInNav" checked /> Show Creative Hub in nav</label>
+              <label class="checkbox"><input type="checkbox" id="creativeHubShowInPalette" checked /> Show Creative Hub in command palette</label>
+              <label class="checkbox"><input type="checkbox" id="creativeHubShowAsTool" checked /> Show Creative Hub as tool card</label>
+              <label class="stacked-label">Creative Hub URL
+                <input type="url" id="creativeHubUrl" placeholder="https://creativehub.com" />
+              </label>
+              <label class="stacked-label">Open mode
+                <select id="creativeHubOpenMode">
+                  <option value="new-tab">New tab</option>
+                  <option value="same-tab">Same tab</option>
+                </select>
+              </label>
             </div>
           </div>
           <div id="batchActionBar" class="batch-action-bar" hidden>

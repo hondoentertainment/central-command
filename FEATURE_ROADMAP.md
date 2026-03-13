@@ -120,3 +120,61 @@
 - **Prioritize** within each phase based on user feedback.
 - **Defer** lower-priority items if timelines change.
 - **Revisit** after Phase 2; sync may reveal new needs.
+
+---
+
+## Recommended Next Steps (Post-Phase 5)
+
+Now that the original roadmap is complete, the next milestone should focus on **ecosystem connectivity** and measurable adoption.
+
+### 1) Add Creative Hub Linking (Highest Priority)
+
+**Goal:** Make Creative Hub discoverable and one-click accessible from anywhere in Central Command.
+
+- Add a first-class **Creative Hub** surface in main navigation (desktop + mobile menu).
+- Add a **"Open Creative Hub"** quick action in the command palette.
+- Include a **Creative Hub starter pack** entry so new users can enable it in one step.
+- Track basic usage events (`creative_hub_link_opened`, source page, signed-in state) for adoption visibility.
+
+**Definition of done:**
+
+- Creative Hub can be launched from nav, command palette, and tool cards.
+- Link target and label are configurable in settings/registry.
+- Event telemetry validates that users are actually using the integration.
+
+### 2) Introduce Integration Settings
+
+**Goal:** Keep external-link integrations flexible without requiring code changes.
+
+- Add an "Integrations" settings section for external destinations (starting with Creative Hub).
+- Allow per-integration options:
+  - URL
+  - Open behavior (same tab/new tab)
+  - Visibility scope (global nav only vs command deck + nav)
+- Persist settings locally and include them in cloud sync payloads.
+
+### 3) Harden Reliability for External Surfaces
+
+**Goal:** Ensure external links fail gracefully and don't break user flow.
+
+- Add URL validation and health checks for integration URLs.
+- Show friendly fallback UI when an integration URL is missing/invalid.
+- Add unit tests around integration config parsing + launch behavior.
+
+### 4) Ship and Measure in a 2-Week Plan
+
+**Week 1:**
+
+- Implement Creative Hub nav link + command palette action.
+- Add integration settings schema and storage.
+
+**Week 2:**
+
+- Add starter pack entry + analytics events.
+- Add tests and run a small user validation pass.
+
+### Suggested Success Metrics
+
+- ≥25% of weekly active users open Creative Hub at least once.
+- <1% failed integration launches (invalid URL or blocked open).
+- Increased return usage on pages where Creative Hub entry points are visible.
