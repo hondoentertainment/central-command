@@ -1,6 +1,7 @@
 import { ALL_PRESET_TOOLS, CATEGORY_OPTIONS, DEFAULT_TOOLS } from "./data/presets.js";
 import { getIconMarkup, ICON_OPTIONS } from "./lib/icons.js";
 import { renderNav } from "./lib/nav.js";
+import { fireLaunchHook, loadLaunchHookUrl, saveLaunchHookUrl } from "./lib/hooks.js";
 import {
   createFallbackMetadataMap,
   filterHistoryForTools,
@@ -18,6 +19,7 @@ import {
   sortTools,
 } from "./lib/tool-model.js";
 import {
+  hasSavedTools,
   loadCustomCategories,
   loadLayoutPreference,
   loadLaunchHistorySynced,
@@ -29,10 +31,22 @@ import {
   saveNotesSynced,
   saveStoredToolsSynced,
   saveSurfacesPreferences,
+  loadIntegrationsPreferences,
+  saveIntegrationsPreferences,
 } from "./lib/storage.js";
+import {
+  buildCreativeHubTool,
+  getCreativeHubConfig,
+  sanitizeIntegrationsPreferences,
+  validateIntegrationUrl,
+} from "./lib/integrations.js";
 import { showToast } from "./lib/toast.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
+
+const VIRTUALIZE_THRESHOLD = 50;
+const OVERSCAN_ROWS = 2;
+const ROW_HEIGHT = { grid: 180, list: 72, compact: 100 };
 
 const state = {
   tools: [],
@@ -41,10 +55,21 @@ const state = {
   launchHistory: [],
   selectMode: false,
   selectedToolIds: new Set(),
+  virtual: {
+    cols: 3,
+    visibleStart: 0,
+    visibleEnd: 0,
+    scrollTop: 0,
+    viewHeight: 0,
+    rowHeight: ROW_HEIGHT.grid,
+    totalRows: 0,
+    focusIndex: null,
+  },
 };
 
 const elements = {
   searchInput: document.querySelector("#searchInput"),
+  toolGridScrollWrap: document.querySelector("#toolGridScrollWrap"),
   toolGrid: document.querySelector("#toolGrid"),
   layoutToggle: document.querySelector("#layoutToggle"),
   filterBar: document.querySelector("#filterBar"),
@@ -74,19 +99,50 @@ const elements = {
   surfacesSettingsPanel: document.querySelector("#surfacesSettingsPanel"),
   surfacesShowHero: document.querySelector("#surfacesShowHero"),
   surfacesShowSpotlight: document.querySelector("#surfacesShowSpotlight"),
+  launchHookUrlInput: document.querySelector("#launchHookUrlInput"),
   importBackupBtn: document.querySelector("#importBackupBtn"),
   importBackupInput: document.querySelector("#importBackupInput"),
+  creativeHubEnabled: document.querySelector("#creativeHubEnabled"),
+  creativeHubShowInNav: document.querySelector("#creativeHubShowInNav"),
+  creativeHubShowInPalette: document.querySelector("#creativeHubShowInPalette"),
+  creativeHubShowAsTool: document.querySelector("#creativeHubShowAsTool"),
+  creativeHubUrl: document.querySelector("#creativeHubUrl"),
+  creativeHubOpenMode: document.querySelector("#creativeHubOpenMode"),
 };
 
 initialize();
 
 async function initialize() {
-  const tools = await loadStoredToolsSynced(
+  let tools = await loadStoredToolsSynced(
     (value) => hydrateTools(value, fallbackMetadataBySignature),
     DEFAULT_TOOLS
   );
-  state.tools = normalizePinRanks(tools);
 
+  const importUrl = new URLSearchParams(location.search).get("import");
+  if (importUrl) {
+    const imported = await fetchAndImportBackup(importUrl);
+    if (imported) {
+      tools = imported.tools;
+      state.launchHistory = imported.history;
+      await saveStoredToolsSynced(tools);
+      await saveLaunchHistorySynced(state.launchHistory);
+      if (imported.notes != null) saveNotesSynced(imported.notes);
+      showToast(`Imported ${tools.length} tools from URL.`);
+      history.replaceState(null, "", location.pathname + location.hash);
+    }
+  } else if (!hasSavedTools()) {
+    const fromFile = await fetchAndImportBackup("./backup.json");
+    if (fromFile?.tools?.length) {
+      tools = fromFile.tools;
+      state.launchHistory = fromFile.history;
+      await saveStoredToolsSynced(tools);
+      await saveLaunchHistorySynced(state.launchHistory);
+      if (fromFile.notes != null) saveNotesSynced(fromFile.notes);
+      showToast(`Loaded ${tools.length} tools from backup.json.`);
+    }
+  }
+
+  state.tools = normalizePinRanks(tools);
   const history = await loadLaunchHistorySynced(sanitizeLaunchHistory);
   state.launchHistory = filterHistoryForTools(history, state.tools);
 
@@ -108,8 +164,10 @@ async function initialize() {
   });
   applyLayoutClass(loadLayoutPreference());
   setupLayoutToggle();
+  setupVirtualizationObservers();
   applySurfacesVisibility("command");
   setupSurfacesSettings();
+  setupIntegrationSettings();
   elements.searchInput.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     render();
@@ -127,9 +185,48 @@ async function initialize() {
   elements.batchCategorySelect?.addEventListener("change", batchChangeCategory);
   elements.batchDoneBtn?.addEventListener("click", exitSelectMode);
 
+  document.addEventListener("keydown", handleGlobalShortcuts);
   document.addEventListener("keydown", handleKeyboardShortcut);
   document.addEventListener("keydown", handleToolGridKeydown);
   render();
+}
+
+function handleGlobalShortcuts(event) {
+  const active = document.activeElement;
+  const isEditable =
+    active &&
+    (active.tagName === "INPUT" ||
+      active.tagName === "TEXTAREA" ||
+      active.tagName === "SELECT" ||
+      active.isContentEditable);
+
+  if (event.key === "Escape") {
+    if (elements.surfacesSettingsPanel && !elements.surfacesSettingsPanel.hidden) {
+      event.preventDefault();
+      elements.surfacesSettingsPanel.hidden = true;
+      elements.surfacesSettingsBtn?.setAttribute("aria-expanded", "false");
+      elements.surfacesSettingsBtn?.focus();
+      return;
+    }
+    if (elements.quickAddFormWrap && !elements.quickAddFormWrap.hidden) {
+      event.preventDefault();
+      hideQuickAddForm();
+      elements.addToolBtn?.focus();
+      return;
+    }
+    if (state.selectMode) {
+      event.preventDefault();
+      exitSelectMode();
+      elements.selectModeBtn?.focus();
+      return;
+    }
+    return;
+  }
+
+  if (!isEditable && event.key === "/") {
+    event.preventDefault();
+    elements.searchInput?.focus();
+  }
 }
 
 function applyLayoutClass(layout) {
@@ -137,6 +234,23 @@ function applyLayoutClass(layout) {
   elements.toolGrid.classList.remove("tool-grid--list", "tool-grid--compact");
   if (layout === "list") elements.toolGrid.classList.add("tool-grid--list");
   else if (layout === "compact") elements.toolGrid.classList.add("tool-grid--compact");
+}
+
+function setupVirtualizationObservers() {
+  const wrap = elements.toolGridScrollWrap;
+  if (!wrap) return;
+
+  wrap.addEventListener("scroll", onVirtualScroll, { passive: true });
+
+  const ro = new ResizeObserver(() => {
+    const visibleTools = getVisibleTools();
+    if (visibleTools.length >= VIRTUALIZE_THRESHOLD) {
+      computeVirtualCols();
+      computeVirtualVisibleRange(visibleTools);
+      renderVirtualizedCards(visibleTools);
+    }
+  });
+  ro.observe(wrap);
 }
 
 function setupLayoutToggle() {
@@ -152,6 +266,7 @@ function setupLayoutToggle() {
       layoutToggle.querySelectorAll(".layout-toggle__btn").forEach((b) =>
         b.setAttribute("aria-pressed", b.dataset.layout === l ? "true" : "false")
       );
+      render();
     });
   });
 }
@@ -176,12 +291,28 @@ function setupSurfacesSettings() {
   const surfaces = prefs?.command ?? DEFAULT_SURFACES.command;
   if (elements.surfacesShowHero) elements.surfacesShowHero.checked = surfaces.includes("hero");
   if (elements.surfacesShowSpotlight) elements.surfacesShowSpotlight.checked = surfaces.includes("spotlight");
+  if (elements.launchHookUrlInput) elements.launchHookUrlInput.value = loadLaunchHookUrl();
 
   elements.surfacesSettingsBtn?.addEventListener("click", () => {
     const panel = elements.surfacesSettingsPanel;
     if (!panel) return;
     panel.hidden = !panel.hidden;
     elements.surfacesSettingsBtn?.setAttribute("aria-expanded", String(!panel.hidden));
+    if (!panel.hidden) {
+      requestAnimationFrame(() => {
+        const firstFocusable = panel.querySelector(
+          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+        );
+        firstFocusable?.focus();
+      });
+    }
+  });
+
+  elements.launchHookUrlInput?.addEventListener("change", () => {
+    saveLaunchHookUrl(elements.launchHookUrlInput?.value ?? "");
+  });
+  elements.launchHookUrlInput?.addEventListener("blur", () => {
+    saveLaunchHookUrl(elements.launchHookUrlInput?.value ?? "");
   });
 
   const updateFromCheckboxes = () => {
@@ -198,6 +329,70 @@ function setupSurfacesSettings() {
 
   elements.surfacesShowHero?.addEventListener("change", updateFromCheckboxes);
   elements.surfacesShowSpotlight?.addEventListener("change", updateFromCheckboxes);
+}
+
+
+function getIntegrationPrefs() {
+  return sanitizeIntegrationsPreferences(loadIntegrationsPreferences());
+}
+
+function getToolsWithIntegrationEntries() {
+  const prefs = getIntegrationPrefs();
+  const creativeHubTool = buildCreativeHubTool(getCreativeHubConfig(prefs));
+  if (!creativeHubTool) return state.tools;
+  const hasCreativeHub = state.tools.some((tool) => tool.name.toLowerCase() === "creative hub");
+  if (hasCreativeHub) return state.tools;
+  const hydrated = sanitizeTool(creativeHubTool);
+  if (hydrated) hydrated._virtualIntegration = true;
+  return [...state.tools, hydrated].filter(Boolean);
+}
+
+function setupIntegrationSettings() {
+  const prefs = getIntegrationPrefs();
+  const creativeHub = prefs.creativeHub;
+
+  if (elements.creativeHubEnabled) elements.creativeHubEnabled.checked = creativeHub.enabled;
+  if (elements.creativeHubShowInNav) elements.creativeHubShowInNav.checked = creativeHub.showInNav;
+  if (elements.creativeHubShowInPalette) elements.creativeHubShowInPalette.checked = creativeHub.showInCommandPalette;
+  if (elements.creativeHubShowAsTool) elements.creativeHubShowAsTool.checked = creativeHub.showAsTool;
+  if (elements.creativeHubUrl) elements.creativeHubUrl.value = creativeHub.url;
+  if (elements.creativeHubOpenMode) elements.creativeHubOpenMode.value = creativeHub.openMode;
+
+  const savePrefs = () => {
+    const urlValidation = validateIntegrationUrl(elements.creativeHubUrl?.value);
+    if (!urlValidation.isValid) {
+      showToast("Creative Hub URL is invalid. Using default URL.", "error");
+    }
+
+    const next = sanitizeIntegrationsPreferences({
+      creativeHub: {
+        enabled: elements.creativeHubEnabled?.checked ?? true,
+        showInNav: elements.creativeHubShowInNav?.checked ?? true,
+        showInCommandPalette: elements.creativeHubShowInPalette?.checked ?? true,
+        showAsTool: elements.creativeHubShowAsTool?.checked ?? true,
+        url: urlValidation.url,
+        openMode: elements.creativeHubOpenMode?.value,
+      },
+    });
+
+    if (elements.creativeHubUrl) {
+      elements.creativeHubUrl.value = next.creativeHub.url;
+    }
+
+    saveIntegrationsPreferences(next);
+    renderNav("command");
+    render();
+  };
+
+  [
+    elements.creativeHubEnabled,
+    elements.creativeHubShowInNav,
+    elements.creativeHubShowInPalette,
+    elements.creativeHubShowAsTool,
+    elements.creativeHubOpenMode,
+  ].forEach((el) => el?.addEventListener("change", savePrefs));
+
+  elements.creativeHubUrl?.addEventListener("blur", savePrefs);
 }
 
 function showQuickAddForm() {
@@ -226,7 +421,7 @@ function hideQuickAddForm() {
   elements.quickAddFormWrap.hidden = true;
 }
 
-function handleQuickAddSubmit(event) {
+async function handleQuickAddSubmit(event) {
   event.preventDefault();
   const name = elements.quickAddName?.value?.trim();
   const url = elements.quickAddUrl?.value?.trim();
@@ -250,6 +445,32 @@ function handleQuickAddSubmit(event) {
   hideQuickAddForm();
   render();
   updateStatusCards();
+}
+
+/**
+ * Fetch JSON from URL and return parsed backup { tools, history, notes } or null.
+ * @param {string} url - Absolute or relative URL to fetch
+ */
+async function fetchAndImportBackup(url) {
+  try {
+    const res = await fetch(url);
+    if (!res.ok) return null;
+    const payload = await res.json();
+    const rawTools = Array.isArray(payload) ? payload : payload?.tools;
+    const tools = hydrateTools(rawTools, fallbackMetadataBySignature);
+    if (!tools.length) return null;
+    const history = filterHistoryForTools(
+      sanitizeLaunchHistory(payload?.launchHistory),
+      tools
+    );
+    return {
+      tools: normalizePinRanks(tools),
+      history,
+      notes: typeof payload?.notes === "string" ? payload.notes : null,
+    };
+  } catch {
+    return null;
+  }
 }
 
 async function handleImportBackup(event) {
@@ -333,6 +554,7 @@ function handleKeyboardShortcut(event) {
   } else {
     window.open(url, "_blank", "noreferrer");
   }
+  fireLaunchHook({ toolId: match.id, toolName: match.name, url });
 }
 
 function parseShortcutKey(label) {
@@ -362,9 +584,6 @@ function handleToolGridKeydown(event) {
   const currentCard = active.classList?.contains("tool-card") ? active : active.closest(".tool-card");
   if (!currentCard) return;
 
-  const cards = [...elements.toolGrid.querySelectorAll(".tool-card")];
-  if (cards.length === 0) return;
-
   const key = event.key;
   if (key === "Enter") {
     if (active === currentCard) {
@@ -381,25 +600,61 @@ function handleToolGridKeydown(event) {
   const step = dirs[key];
   if (step === undefined) return;
 
-  event.preventDefault();
+  const visibleTools = getVisibleTools();
+  if (visibleTools.length === 0) return;
 
-  const rect = elements.toolGrid.getBoundingClientRect();
-  const firstCardRect = cards[0].getBoundingClientRect();
-  const gap = 16;
-  const cardWidth = firstCardRect.width + gap;
-  const cols = Math.max(1, Math.floor(rect.width / cardWidth));
-  const index = cards.indexOf(currentCard);
-  if (index === -1) return;
+  const isVirtualized = visibleTools.length >= VIRTUALIZE_THRESHOLD;
+  const cards = [...elements.toolGrid.querySelectorAll(".tool-card")];
+
+  let currentIndex;
+  let cols;
+  if (isVirtualized) {
+    const idxAttr = currentCard.dataset?.index;
+    if (idxAttr === undefined) return;
+    currentIndex = parseInt(idxAttr, 10);
+    cols = state.virtual.cols;
+  } else {
+    if (cards.length === 0) return;
+    currentIndex = cards.indexOf(currentCard);
+    if (currentIndex === -1) return;
+    const rect = elements.toolGrid.getBoundingClientRect();
+    const firstCardRect = cards[0].getBoundingClientRect();
+    const gap = 16;
+    const cardWidth = firstCardRect.width + gap;
+    cols = Math.max(1, Math.floor(rect.width / cardWidth));
+  }
+
+  const layout = getLayoutMode();
 
   let nextIndex;
   if (key === "ArrowUp" || key === "ArrowDown") {
-    nextIndex = index + step * cols;
+    nextIndex = currentIndex + step * cols;
   } else {
-    nextIndex = index + step;
+    nextIndex = currentIndex + step;
   }
-  nextIndex = Math.max(0, Math.min(nextIndex, cards.length - 1));
-  if (nextIndex !== index) {
-    cards[nextIndex].focus();
+  nextIndex = Math.max(0, Math.min(nextIndex, visibleTools.length - 1));
+  if (nextIndex === currentIndex) return;
+
+  event.preventDefault();
+
+  if (isVirtualized) {
+    const wrap = elements.toolGridScrollWrap;
+    const rowHeight = ROW_HEIGHT[layout] ?? ROW_HEIGHT.grid;
+    const targetRow = Math.floor(nextIndex / cols);
+    const targetScrollTop = Math.max(0, targetRow * rowHeight - rowHeight * 0.5);
+    wrap.scrollTop = targetScrollTop;
+    state.virtual.focusIndex = nextIndex;
+    computeVirtualVisibleRange(visibleTools);
+    renderVirtualizedCards(visibleTools);
+    requestAnimationFrame(() => {
+      const view = elements.toolGrid?.querySelector(".tool-grid__view");
+      const focusCard = view?.querySelector(`[data-index="${nextIndex}"]`);
+      if (focusCard) focusCard.focus();
+      state.virtual.focusIndex = null;
+    });
+  } else {
+    const cards = [...elements.toolGrid.querySelectorAll(".tool-card")];
+    if (cards[nextIndex]) cards[nextIndex].focus();
   }
 }
 
@@ -412,7 +667,7 @@ function render() {
 }
 
 function renderHeroQuickLinks() {
-  const quickLinks = sortTools(state.tools.filter((tool) => tool.surfaces.includes("hero")));
+  const quickLinks = sortTools(getToolsWithIntegrationEntries().filter((tool) => tool.surfaces.includes("hero")));
   elements.heroQuickLinks.innerHTML = "";
 
   if (quickLinks.length === 0) {
@@ -443,7 +698,7 @@ function renderHeroQuickLinks() {
 
 function renderSpotlight() {
   const spotlightTools = sortTools(
-    state.tools.filter((tool) => tool.surfaces.includes("spotlight"))
+    getToolsWithIntegrationEntries().filter((tool) => tool.surfaces.includes("spotlight"))
   );
   elements.spotlightGrid.innerHTML = "";
 
@@ -477,7 +732,7 @@ function renderSpotlight() {
 }
 
 function renderFilters() {
-  const categories = ["All", ...new Set(state.tools.map((tool) => tool.category).sort())];
+  const categories = ["All", ...new Set(getToolsWithIntegrationEntries().map((tool) => tool.category).sort())];
   elements.filterBar.innerHTML = "";
 
   categories.forEach((category) => {
@@ -495,7 +750,7 @@ function renderFilters() {
 }
 
 function getVisibleTools() {
-  return sortTools(state.tools).filter((tool) => {
+  return sortTools(getToolsWithIntegrationEntries()).filter((tool) => {
     const matchesCategory =
       state.activeCategory === "All" || tool.category === state.activeCategory;
     const haystack = `${tool.name} ${tool.category} ${tool.description}`.toLowerCase();
@@ -504,9 +759,221 @@ function getVisibleTools() {
   });
 }
 
+function getLayoutMode() {
+  if (elements.toolGrid?.classList.contains("tool-grid--list")) return "list";
+  if (elements.toolGrid?.classList.contains("tool-grid--compact")) return "compact";
+  return "grid";
+}
+
+function computeVirtualCols() {
+  const wrap = elements.toolGridScrollWrap;
+  if (!wrap) return state.virtual.cols;
+  const width = wrap.clientWidth || 400;
+  const layout = getLayoutMode();
+  const gap = 16;
+  if (layout === "list") return 1;
+  const minCol = layout === "compact" ? 160 : 240;
+  const cols = Math.max(1, Math.floor((width + gap) / (minCol + gap)));
+  state.virtual.cols = cols;
+  return cols;
+}
+
+function computeVirtualVisibleRange(visibleTools) {
+  const wrap = elements.toolGridScrollWrap;
+  const grid = elements.toolGrid;
+  if (!wrap || !grid || visibleTools.length === 0) return;
+
+  const layout = getLayoutMode();
+  const rowHeight = ROW_HEIGHT[layout] ?? ROW_HEIGHT.grid;
+  const cols = computeVirtualCols();
+  const totalRows = Math.ceil(visibleTools.length / cols);
+
+  const scrollTop = wrap.scrollTop;
+  const viewHeight = Math.max(1, wrap.clientHeight || 400);
+
+  let startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - OVERSCAN_ROWS);
+  let endRow = Math.min(
+    totalRows - 1,
+    Math.ceil((scrollTop + viewHeight) / rowHeight) - 1 + OVERSCAN_ROWS
+  );
+
+  const visibleStart = Math.max(0, startRow * cols);
+  const visibleEnd = Math.min(visibleTools.length - 1, (endRow + 1) * cols - 1);
+
+  state.virtual.visibleStart = visibleStart;
+  state.virtual.visibleEnd = visibleEnd;
+  state.virtual.scrollTop = scrollTop;
+  state.virtual.viewHeight = viewHeight;
+  state.virtual.rowHeight = rowHeight;
+  state.virtual.totalRows = totalRows;
+}
+
+let virtualScrollRaf = null;
+function onVirtualScroll() {
+  if (virtualScrollRaf) return;
+  virtualScrollRaf = requestAnimationFrame(() => {
+    virtualScrollRaf = null;
+    const visibleTools = getVisibleTools();
+    if (visibleTools.length < VIRTUALIZE_THRESHOLD) return;
+    computeVirtualVisibleRange(visibleTools);
+    renderVirtualizedCards(visibleTools);
+  });
+}
+
+function createCardElement(tool, pinnedIds, opts = {}) {
+  const isVirtualIntegration = !!tool._virtualIntegration;
+  const fragment = elements.toolCardTemplate.content.cloneNode(true);
+  const card = fragment.querySelector(".tool-card");
+  card.setAttribute("tabindex", "0");
+  if (opts.dataIndex != null) card.dataset.index = String(opts.dataIndex);
+  const selectWrap = fragment.querySelector(".tool-card__select-wrap");
+  const selectCheckbox = fragment.querySelector(".tool-card__select");
+  const icon = fragment.querySelector(".tool-card__icon");
+  const category = fragment.querySelector(".tool-card__category");
+  const pin = fragment.querySelector(".tool-card__pin");
+  const title = fragment.querySelector(".tool-card__title");
+  const description = fragment.querySelector(".tool-card__description");
+  const meta = fragment.querySelector(".tool-card__meta");
+  const url = fragment.querySelector(".tool-card__url");
+  const launchButton = fragment.querySelector(".launch-button");
+  const moveUpButton = fragment.querySelector(".tool-card__move-up");
+  const moveDownButton = fragment.querySelector(".tool-card__move-down");
+  const editButton = fragment.querySelector(".tool-card__edit");
+  const deleteButton = fragment.querySelector(".tool-card__delete");
+
+  if (state.selectMode) {
+    card.classList.add("tool-card--select-mode");
+    selectWrap.hidden = isVirtualIntegration;
+    selectCheckbox.disabled = isVirtualIntegration;
+    if (!isVirtualIntegration) {
+      selectCheckbox.checked = state.selectedToolIds.has(tool.id);
+      selectCheckbox.addEventListener("change", () => {
+        if (selectCheckbox.checked) state.selectedToolIds.add(tool.id);
+        else state.selectedToolIds.delete(tool.id);
+        updateBatchActionBar();
+      });
+    }
+    card.querySelector(".tool-card__actions")?.classList.add("is-hidden");
+  } else {
+    card.classList.remove("tool-card--select-mode");
+    selectWrap.hidden = true;
+    card.querySelector(".tool-card__actions")?.classList.remove("is-hidden");
+  }
+
+  card.style.setProperty("--accent", accentToColor(tool.accent));
+  icon.innerHTML = getIconMarkup(tool);
+  category.textContent = tool.category;
+  pin.hidden = !tool.pinned;
+  title.textContent = tool.name;
+  description.textContent = tool.description;
+  url.textContent = tool.url;
+
+  const metaBits = [];
+  if (tool.shortcutLabel) metaBits.push({ label: `Shortcut ${tool.shortcutLabel}` });
+  if (tool.openMode === "same-tab") metaBits.push({ label: "Same tab" });
+  if (tool.surfaces.includes("hero")) metaBits.push({ label: "Hero" });
+  if (tool.surfaces.includes("spotlight")) metaBits.push({ label: "Spotlight" });
+
+  meta.innerHTML = "";
+  if (metaBits.length === 0) {
+    meta.hidden = true;
+  } else {
+    meta.hidden = false;
+    metaBits.forEach((item) => {
+      const badge = document.createElement("span");
+      badge.className = "tool-card__badge";
+      badge.textContent = item.label;
+      meta.appendChild(badge);
+    });
+  }
+
+  applyLaunchBehavior(launchButton, tool, `Launch ${tool.name}`);
+
+  const pinnedIndex = pinnedIds.indexOf(tool.id);
+  const isPinned = pinnedIndex >= 0 && !isVirtualIntegration;
+  moveUpButton.hidden = !isPinned;
+  moveDownButton.hidden = !isPinned;
+  moveUpButton.disabled = !isPinned || pinnedIndex === 0;
+  moveDownButton.disabled = !isPinned || pinnedIndex === pinnedIds.length - 1;
+
+  if (!isVirtualIntegration) {
+    moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
+    moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
+    editButton.addEventListener("click", (event) => {
+      event.preventDefault();
+      window.location.href = `registry.html?edit=${encodeURIComponent(tool.id)}`;
+    });
+    deleteButton.addEventListener("click", () => removeTool(tool.id));
+  } else {
+    editButton.hidden = true;
+    deleteButton.hidden = true;
+    moveUpButton.hidden = true;
+    moveDownButton.hidden = true;
+  }
+
+  return { fragment, card };
+}
+
+function renderVirtualizedCards(visibleTools) {
+  const pinnedIds = sortTools(state.tools)
+    .filter((tool) => tool.pinned)
+    .map((tool) => tool.id);
+
+  const { visibleStart, visibleEnd, rowHeight, cols, totalRows } = state.virtual;
+  const viewTop = Math.floor(visibleStart / cols) * rowHeight;
+
+  const wrap = elements.toolGridScrollWrap;
+  const grid = elements.toolGrid;
+  if (!wrap || !grid) return;
+
+  grid.style.height = `${totalRows * rowHeight}px`;
+  grid.style.setProperty("--tool-cols", String(cols));
+
+  let view = grid.querySelector(".tool-grid__view");
+  if (!view) {
+    view = document.createElement("div");
+    view.className = "tool-grid__view";
+    grid.appendChild(view);
+  }
+
+  view.style.top = `${viewTop}px`;
+  view.innerHTML = "";
+
+  for (let i = visibleStart; i <= visibleEnd; i++) {
+    const tool = visibleTools[i];
+    const { fragment, card } = createCardElement(tool, pinnedIds, {
+      dataIndex: i,
+    });
+    view.appendChild(fragment);
+  }
+
+  if (state.virtual.focusIndex != null) {
+    const idx = state.virtual.focusIndex;
+    if (idx >= visibleStart && idx <= visibleEnd) {
+      requestAnimationFrame(() => {
+        const focusCard = view.querySelector(`[data-index="${idx}"]`);
+        if (focusCard) focusCard.focus();
+        state.virtual.focusIndex = null;
+      });
+    }
+  }
+}
+
 function renderCards() {
   const visibleTools = getVisibleTools();
-  elements.toolGrid.innerHTML = "";
+  const wrap = elements.toolGridScrollWrap;
+  const grid = elements.toolGrid;
+
+  if (!grid) return;
+
+  const useVirtualization = visibleTools.length >= VIRTUALIZE_THRESHOLD;
+
+  if (wrap) {
+    wrap.classList.toggle("tool-grid-scroll-wrap--virtualized", useVirtualization);
+  }
+
+  grid.classList.toggle("tool-grid--virtualized", useVirtualization);
+  grid.innerHTML = "";
 
   if (visibleTools.length === 0) {
     const emptyState = document.createElement("div");
@@ -516,98 +983,30 @@ function renderCards() {
       emptyState.textContent = "No tools match that filter yet. Broaden the search or choose a different category.";
     } else {
       emptyState.innerHTML =
-        'No tools yet. <a href="registry.html">Add one from Tool Registry</a> or <a href="packs.html">apply a Starter Pack</a>.';
+        'No tools yet. Click <strong>Add tool</strong> above to add your first one, or <a href="registry.html">open Tool Registry</a> for full options.';
     }
-    elements.toolGrid.appendChild(emptyState);
+    grid.appendChild(emptyState);
     return;
   }
+
+  updateBatchActionBar();
 
   const pinnedIds = sortTools(state.tools)
     .filter((tool) => tool.pinned)
     .map((tool) => tool.id);
 
-  updateBatchActionBar();
+  if (useVirtualization) {
+    if (wrap) {
+      computeVirtualVisibleRange(visibleTools);
+      wrap.scrollTop = state.virtual.scrollTop;
+    }
+    renderVirtualizedCards(visibleTools);
+    return;
+  }
 
   visibleTools.forEach((tool) => {
-    const fragment = elements.toolCardTemplate.content.cloneNode(true);
-    const card = fragment.querySelector(".tool-card");
-    card.setAttribute("tabindex", "0");
-    const selectWrap = fragment.querySelector(".tool-card__select-wrap");
-    const selectCheckbox = fragment.querySelector(".tool-card__select");
-    const icon = fragment.querySelector(".tool-card__icon");
-    const category = fragment.querySelector(".tool-card__category");
-    const pin = fragment.querySelector(".tool-card__pin");
-    const title = fragment.querySelector(".tool-card__title");
-    const description = fragment.querySelector(".tool-card__description");
-    const meta = fragment.querySelector(".tool-card__meta");
-    const url = fragment.querySelector(".tool-card__url");
-    const launchButton = fragment.querySelector(".launch-button");
-    const moveUpButton = fragment.querySelector(".tool-card__move-up");
-    const moveDownButton = fragment.querySelector(".tool-card__move-down");
-    const editButton = fragment.querySelector(".tool-card__edit");
-    const deleteButton = fragment.querySelector(".tool-card__delete");
-
-    if (state.selectMode) {
-      card.classList.add("tool-card--select-mode");
-      selectWrap.hidden = false;
-      selectCheckbox.checked = state.selectedToolIds.has(tool.id);
-      selectCheckbox.addEventListener("change", () => {
-        if (selectCheckbox.checked) state.selectedToolIds.add(tool.id);
-        else state.selectedToolIds.delete(tool.id);
-        updateBatchActionBar();
-      });
-      card.querySelector(".tool-card__actions")?.classList.add("is-hidden");
-    } else {
-      card.classList.remove("tool-card--select-mode");
-      selectWrap.hidden = true;
-      card.querySelector(".tool-card__actions")?.classList.remove("is-hidden");
-    }
-
-    card.style.setProperty("--accent", accentToColor(tool.accent));
-    icon.innerHTML = getIconMarkup(tool);
-    category.textContent = tool.category;
-    pin.hidden = !tool.pinned;
-    title.textContent = tool.name;
-    description.textContent = tool.description;
-    url.textContent = tool.url;
-
-    const metaBits = [];
-    if (tool.shortcutLabel) metaBits.push({ label: `Shortcut ${tool.shortcutLabel}` });
-    if (tool.openMode === "same-tab") metaBits.push({ label: "Same tab" });
-    if (tool.surfaces.includes("hero")) metaBits.push({ label: "Hero" });
-    if (tool.surfaces.includes("spotlight")) metaBits.push({ label: "Spotlight" });
-
-    meta.innerHTML = "";
-    if (metaBits.length === 0) {
-      meta.hidden = true;
-    } else {
-      meta.hidden = false;
-      metaBits.forEach((item) => {
-        const badge = document.createElement("span");
-        badge.className = "tool-card__badge";
-        badge.textContent = item.label;
-        meta.appendChild(badge);
-      });
-    }
-
-    applyLaunchBehavior(launchButton, tool, `Launch ${tool.name}`);
-
-    const pinnedIndex = pinnedIds.indexOf(tool.id);
-    const isPinned = pinnedIndex >= 0;
-    moveUpButton.hidden = !isPinned;
-    moveDownButton.hidden = !isPinned;
-    moveUpButton.disabled = !isPinned || pinnedIndex === 0;
-    moveDownButton.disabled = !isPinned || pinnedIndex === pinnedIds.length - 1;
-    moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
-    moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
-
-    editButton.addEventListener("click", (event) => {
-      event.preventDefault();
-      window.location.href = `registry.html?edit=${encodeURIComponent(tool.id)}`;
-    });
-    deleteButton.addEventListener("click", () => removeTool(tool.id));
-
-    elements.toolGrid.appendChild(fragment);
+    const { fragment } = createCardElement(tool, pinnedIds);
+    grid.appendChild(fragment);
   });
 }
 

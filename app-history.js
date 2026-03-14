@@ -1,3 +1,4 @@
+import { fireLaunchHook } from "./lib/hooks.js";
 import { renderNav } from "./lib/nav.js";
 import {
   createFallbackMetadataMap,
@@ -109,6 +110,7 @@ function renderLaunchHistory() {
     link.addEventListener("click", () => {
       state.launchHistory = recordLaunch(state.launchHistory, tool.id);
       saveLaunchHistorySynced(state.launchHistory);
+      fireLaunchHook({ toolId: tool.id, toolName: tool.name, url: normalizeUrl(tool.url) });
       if (tool.openMode === "new-tab") renderLaunchHistory();
     });
 

@@ -1,4 +1,5 @@
 {
+  "buildCommand": "node scripts/build-firebase-config.js || true",
   "rewrites": [
     { "source": "/registry", "destination": "/registry.html" },
     { "source": "/agents", "destination": "/agents.html" },

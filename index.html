@@ -85,7 +85,7 @@
               </div>
               <label class="search">
                 <span class="visually-hidden">Search tools</span>
-                <input id="searchInput" type="search" placeholder="Search tools or categories" />
+                <input id="searchInput" type="search" placeholder="Search tools or categories (press /)" autocomplete="off" />
               </label>
               <button type="button" id="surfacesSettingsBtn" class="ghost-button" aria-label="Page layout settings" aria-expanded="false">⚙ Layout</button>
               <button type="button" id="addToolBtn" class="ghost-button">Add tool</button>
@@ -94,10 +94,29 @@
             </div>
             <input type="file" id="importBackupInput" accept=".json" hidden aria-hidden="true" />
           </div>
-          <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-label="Show hero and spotlight">
+          <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-label="Layout and launch settings">
             <div class="surfaces-settings-panel__content">
               <label class="checkbox"><input type="checkbox" id="surfacesShowHero" checked /> Show hero</label>
               <label class="checkbox"><input type="checkbox" id="surfacesShowSpotlight" checked /> Show spotlight</label>
+              <label class="surfaces-settings-panel__webhook">
+                <span>Launch webhook URL</span>
+                <input type="url" id="launchHookUrlInput" placeholder="https://…" />
+              </label>
+              <hr class="surfaces-settings-panel__divider" />
+              <p class="eyebrow">Integrations</p>
+              <label class="checkbox"><input type="checkbox" id="creativeHubEnabled" checked /> Enable Creative Hub</label>
+              <label class="checkbox"><input type="checkbox" id="creativeHubShowInNav" checked /> Show Creative Hub in nav</label>
+              <label class="checkbox"><input type="checkbox" id="creativeHubShowInPalette" checked /> Show Creative Hub in command palette</label>
+              <label class="checkbox"><input type="checkbox" id="creativeHubShowAsTool" checked /> Show Creative Hub as tool card</label>
+              <label class="stacked-label">Creative Hub URL
+                <input type="url" id="creativeHubUrl" placeholder="https://creativehub.com" />
+              </label>
+              <label class="stacked-label">Open mode
+                <select id="creativeHubOpenMode">
+                  <option value="new-tab">New tab</option>
+                  <option value="same-tab">Same tab</option>
+                </select>
+              </label>
             </div>
           </div>
           <div id="batchActionBar" class="batch-action-bar" hidden>
@@ -125,11 +144,13 @@
           </div>
 
           <div id="filterBar" class="filter-bar"></div>
-          <div id="toolGrid" class="tool-grid" aria-live="polite">
+          <div id="toolGridScrollWrap" class="tool-grid-scroll-wrap">
+            <div id="toolGrid" class="tool-grid" aria-live="polite">
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
+            </div>
           </div>
         </section>
       </main>

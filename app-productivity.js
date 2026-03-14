@@ -1,3 +1,4 @@
+import { fireLaunchHook } from "./lib/hooks.js";
 import { getIconMarkup } from "./lib/icons.js";
 import { renderNav } from "./lib/nav.js";
 import {
@@ -103,6 +104,8 @@ function applyLaunchBehavior(element, tool, label = `Open ${tool.name}`) {
   element.addEventListener("click", () => {
     state.launchHistory = recordLaunch(state.launchHistory, tool.id);
     saveLaunchHistorySynced(state.launchHistory);
+    const url = normalizeUrl(tool.url);
+    fireLaunchHook({ toolId: tool.id, toolName: tool.name, url });
   });
 }
 

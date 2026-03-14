@@ -1,3 +1,4 @@
 .vercel
 firebase.config.local.js
 config/firebase.config.local.js
+config/firebase.config.generated.js

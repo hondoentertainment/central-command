@@ -17,6 +17,11 @@ Central Command keeps tools (URLs, local paths, app protocols), quick links, pre
 - **PWA** — Installable; add to home screen and use offline
 - **Keyboard shortcuts** — Ctrl+letter for pinned tools (e.g. Ctrl+G, Ctrl+S)
 
+## Automatic Backup Loading
+
+- **`backup.json`** — Place a `backup.json` file in the project root (same format as Export backup). On first visit when storage is empty, the app auto-loads it. Add the file and deploy.
+- **`?import=URL`** — Add `?import=https://example.com/backup.json` to the URL to fetch and import from a remote JSON file. Clears the query after import.
+
 ## Running Locally
 
 Static site — use any HTTP server:
@@ -51,6 +56,8 @@ service cloud.firestore {
 
 Data (tools, notes, launch history) syncs to `users/{uid}/` in Firestore. **Offline persistence** is enabled: writes go to the local cache when offline and sync automatically when back online. Do not commit `firebase.config.local.js` (it is gitignored).
 
+**Deploy with Firebase from env**: Set these env vars in Vercel (Project → Settings → Environment Variables) or GitHub Actions secrets: `FIREBASE_API_KEY`, `FIREBASE_AUTH_DOMAIN`, `FIREBASE_PROJECT_ID`, `FIREBASE_STORAGE_BUCKET`, `FIREBASE_MESSAGING_SENDER_ID`, `FIREBASE_APP_ID`. Run `node scripts/build-firebase-config.js` before deploy to generate `config/firebase.config.generated.js`. The loader tries generated first, then local. Vercel runs the script via `buildCommand`; GitHub Actions runs it in the deploy workflow.
+
 ## Install as PWA
 
 Visit the deployed site and use your browser's **Add to home screen** (or **Install app**) option. Available when visiting the production URL.
@@ -66,6 +73,22 @@ Deploys to GitHub Pages and Vercel.
 - **Vanilla JS**, ES modules, no framework
 - Static HTML/CSS/JS; no build step
 - Deploys as a static site to GitHub Pages and Vercel
+
+## E2E Tests
+
+Playwright E2E tests live in `e2e/`. Run:
+
+```bash
+npm run test:e2e
+```
+
+For debugging with the UI:
+
+```bash
+npm run test:e2e:ui
+```
+
+Tests start a static server (`npx serve . -p 3000`) automatically. Ensure port 3000 is free, or run `npm run dev` first — Playwright will reuse an existing server. Fixture data is in `e2e/fixtures/sample-backup.json`.
 
 ## Project Structure
 

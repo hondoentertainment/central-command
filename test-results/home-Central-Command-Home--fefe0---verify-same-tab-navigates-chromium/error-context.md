@@ -1,0 +1,62 @@
+# Page snapshot
+
+```yaml
+- generic [ref=e2]:
+  - banner [ref=e3]:
+    - generic [ref=e4]:
+      - paragraph [ref=e5]: Operations Hub
+      - heading "Central Command" [level=1] [ref=e6]
+      - paragraph [ref=e7]: One place for the tools you reach for most. Launch faster, organize by workflow, and keep the day moving.
+      - paragraph [ref=e8]:
+        - text: "Data is stored in this browser. To bring tools from localhost or another device:"
+        - link "Export" [ref=e9] [cursor=pointer]:
+          - /url: registry.html
+        - text: on source →
+        - strong [ref=e10]: Import
+        - text: here.
+      - navigation "Main navigation"
+    - generic [ref=e11]:
+      - generic [ref=e12]:
+        - text: Pinned Tools
+        - strong [ref=e13]: "0"
+      - generic [ref=e14]:
+        - text: Total Tools
+        - strong [ref=e15]: "0"
+      - generic [ref=e16]:
+        - text: Recent Launches
+        - strong [ref=e17]: "0"
+  - generic [ref=e20]:
+    - paragraph [ref=e21]: Spotlight
+    - heading "Keep your core stack above the fold" [level=2] [ref=e22]
+  - main [ref=e23]:
+    - generic [ref=e24]:
+      - generic [ref=e25]:
+        - generic [ref=e26]:
+          - paragraph [ref=e27]: Quick Access
+          - heading "Your command deck" [level=2] [ref=e28]
+        - generic [ref=e29]:
+          - group "Grid layout" [ref=e30]:
+            - button "Grid" [ref=e31] [cursor=pointer]
+            - button "List" [ref=e32] [cursor=pointer]
+            - button "Compact" [ref=e33] [cursor=pointer]
+          - generic [ref=e34]:
+            - generic [ref=e35]: Search tools
+            - searchbox "Search tools" [ref=e36]
+          - button "Page layout settings" [ref=e37] [cursor=pointer]: ⚙ Layout
+          - button "Add tool" [ref=e38] [cursor=pointer]
+          - button "Import" [ref=e39] [cursor=pointer]
+          - button "Select" [ref=e40] [cursor=pointer]
+      - generic [ref=e41]:
+        - generic [ref=e42]: 0 selected
+        - generic [ref=e43]:
+          - button "Pin selected" [ref=e44] [cursor=pointer]
+          - button "Delete selected" [ref=e45] [cursor=pointer]
+          - combobox [ref=e46]:
+            - option "Change category…" [selected]
+          - button "Done" [ref=e47] [cursor=pointer]
+      - generic [ref=e49]:
+        - article [ref=e50]
+        - article [ref=e55]
+        - article [ref=e60]
+        - article [ref=e65]
+```
