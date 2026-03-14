@@ -35,7 +35,9 @@ import {
   buildCreativeHubTool,
   getCreativeHubConfig,
   sanitizeIntegrationsPreferences,
+  validateIntegrationUrl,
 } from "./lib/integrations.js";
+import { showToast } from "./lib/toast.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -234,16 +236,26 @@ function setupIntegrationSettings() {
   if (elements.creativeHubOpenMode) elements.creativeHubOpenMode.value = creativeHub.openMode;
 
   const savePrefs = () => {
+    const urlValidation = validateIntegrationUrl(elements.creativeHubUrl?.value);
+    if (!urlValidation.isValid) {
+      showToast("Creative Hub URL is invalid. Using default URL.", "error");
+    }
+
     const next = sanitizeIntegrationsPreferences({
       creativeHub: {
         enabled: elements.creativeHubEnabled?.checked ?? true,
         showInNav: elements.creativeHubShowInNav?.checked ?? true,
         showInCommandPalette: elements.creativeHubShowInPalette?.checked ?? true,
         showAsTool: elements.creativeHubShowAsTool?.checked ?? true,
-        url: elements.creativeHubUrl?.value,
+        url: urlValidation.url,
         openMode: elements.creativeHubOpenMode?.value,
       },
     });
+
+    if (elements.creativeHubUrl) {
+      elements.creativeHubUrl.value = next.creativeHub.url;
+    }
+
     saveIntegrationsPreferences(next);
     renderNav("command");
     render();
@@ -579,13 +591,16 @@ function renderCards() {
 
     if (state.selectMode) {
       card.classList.add("tool-card--select-mode");
-      selectWrap.hidden = false;
-      selectCheckbox.checked = state.selectedToolIds.has(tool.id);
-      selectCheckbox.addEventListener("change", () => {
-        if (selectCheckbox.checked) state.selectedToolIds.add(tool.id);
-        else state.selectedToolIds.delete(tool.id);
-        updateBatchActionBar();
-      });
+      selectWrap.hidden = isVirtualIntegration;
+      selectCheckbox.disabled = isVirtualIntegration;
+      if (!isVirtualIntegration) {
+        selectCheckbox.checked = state.selectedToolIds.has(tool.id);
+        selectCheckbox.addEventListener("change", () => {
+          if (selectCheckbox.checked) state.selectedToolIds.add(tool.id);
+          else state.selectedToolIds.delete(tool.id);
+          updateBatchActionBar();
+        });
+      }
       card.querySelector(".tool-card__actions")?.classList.add("is-hidden");
     } else {
       card.classList.remove("tool-card--select-mode");
@@ -623,19 +638,27 @@ function renderCards() {
     applyLaunchBehavior(launchButton, tool, `Launch ${tool.name}`);
 
     const pinnedIndex = pinnedIds.indexOf(tool.id);
-    const isPinned = pinnedIndex >= 0;
+    const isPinned = pinnedIndex >= 0 && !isVirtualIntegration;
     moveUpButton.hidden = !isPinned;
     moveDownButton.hidden = !isPinned;
     moveUpButton.disabled = !isPinned || pinnedIndex === 0;
     moveDownButton.disabled = !isPinned || pinnedIndex === pinnedIds.length - 1;
-    moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
-    moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
 
-    editButton.addEventListener("click", (event) => {
-      event.preventDefault();
-      window.location.href = `registry.html?edit=${encodeURIComponent(tool.id)}`;
-    });
-    deleteButton.addEventListener("click", () => removeTool(tool.id));
+    if (!isVirtualIntegration) {
+      moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
+      moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
+
+      editButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.location.href = `registry.html?edit=${encodeURIComponent(tool.id)}`;
+      });
+      deleteButton.addEventListener("click", () => removeTool(tool.id));
+    } else {
+      editButton.hidden = true;
+      deleteButton.hidden = true;
+      moveUpButton.hidden = true;
+      moveDownButton.hidden = true;
+    }
 
     elements.toolGrid.appendChild(fragment);
   });
