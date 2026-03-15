@@ -771,7 +771,10 @@ function computeVirtualCols() {
   const width = wrap.clientWidth || 400;
   const layout = getLayoutMode();
   const gap = 16;
-  if (layout === "list") return 1;
+  if (layout === "list") {
+    state.virtual.cols = 1;
+    return 1;
+  }
   const minCol = layout === "compact" ? 160 : 240;
   const cols = Math.max(1, Math.floor((width + gap) / (minCol + gap)));
   state.virtual.cols = cols;

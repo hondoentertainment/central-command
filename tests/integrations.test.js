@@ -1,5 +1,6 @@
 import assert from "node:assert";
 import {
+  CREATIVE_HUB_TOOL_ID,
   DEFAULT_INTEGRATIONS,
   INTEGRATION_EVENT_KEY,
   sanitizeIntegrationsPreferences,
@@ -107,6 +108,7 @@ assert.ok(errorMessage.includes("blocked"));
 
 const tool = buildCreativeHubTool(defaults.creativeHub);
 assert.strictEqual(tool?.name, "Creative Hub");
+assert.strictEqual(tool?.id, CREATIVE_HUB_TOOL_ID);
 assert.strictEqual(buildCreativeHubTool({ ...defaults.creativeHub, showAsTool: false }), null);
 
 localStorage.clear();

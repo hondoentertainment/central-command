@@ -43,12 +43,9 @@ test.describe('Central Command Home', () => {
   });
 
   test('b) Search filters tools - type in search, verify results change', async ({ page }) => {
-    const cards = page.locator('.tool-card');
-    const initialCount = await cards.count();
-    if (initialCount === 0) {
-      await page.locator('#importBackupInput').setInputFiles(FIXTURE_PATH);
-      await expect(page.locator('.tool-card').filter({ hasText: 'E2E Test Tool Alpha' })).toBeVisible({ timeout: 5000 });
-    }
+    // Use fixture data for deterministic search assertions.
+    await page.locator('#importBackupInput').setInputFiles(FIXTURE_PATH);
+    await expect(page.locator('.tool-card').filter({ hasText: 'E2E Test Tool Alpha' })).toBeVisible({ timeout: 5000 });
 
     const searchInput = page.getByPlaceholder('Search tools or categories');
     const countBefore = await page.locator('.tool-card').count();
@@ -79,7 +76,7 @@ test.describe('Central Command Home', () => {
     if (optionCount > 1) {
       await categorySelect.selectOption({ index: 1 });
     }
-    await page.getByRole('button', { name: 'Add' }).click();
+    await page.locator('#quickAddForm button[type="submit"]').click();
 
     await expect(page.locator('#quickAddFormWrap')).toBeHidden();
     await expect(page.locator('.tool-card').filter({ hasText: uniqueName })).toBeVisible({ timeout: 5000 });
