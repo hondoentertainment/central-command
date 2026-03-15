@@ -12,6 +12,8 @@ const testDir = join(__dirname);
 
 const testFiles = [
   "auth-security.test.js",
+  "theme.test.js",
+  "command-palette.test.js",
   "tool-model.test.js",
   "storage.test.js",
   "integrations.test.js",
