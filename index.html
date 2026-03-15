@@ -28,10 +28,15 @@
     <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
-    <div class="app-shell">
+    <div class="dashboard-shell">
+      <aside class="dashboard-sidebar">
+        <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+      </aside>
+
+      <div class="dashboard-main">
       <header class="hero" id="heroSection">
         <div class="hero__copy">
-          <p class="eyebrow">Operations Hub</p>
+          <p class="eyebrow">Profile Dashboard</p>
           <h1>Central Command</h1>
           <p class="hero__text">
             One place for the tools you reach for most. Launch faster, organize by workflow,
@@ -41,7 +46,6 @@
             Data is stored in this browser. To bring tools from localhost or another device:
             <a href="registry.html">Export</a> on source → <strong>Import</strong> here.
           </p>
-          <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
           <div id="heroQuickLinks" class="hero__quick-links" aria-live="polite"></div>
         </div>
         <div class="hero__status">
@@ -154,6 +158,7 @@
           </div>
         </section>
       </main>
+      </div>
     </div>
 
     <template id="toolCardTemplate">
