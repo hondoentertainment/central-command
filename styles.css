@@ -309,6 +309,7 @@ select,
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  align-items: center;
 }
 
 .page-nav__link {
@@ -339,7 +340,54 @@ select,
   display: flex;
   align-items: center;
   gap: 8px;
+  position: relative;
+  margin-left: 8px;
+}
+
+.profile-menu {
+  position: relative;
   margin-left: auto;
+}
+
+.profile-menu__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.profile-menu__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: var(--bg-elevated);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-menu__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 30;
+  min-width: 180px;
+  padding: 8px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 6px;
+}
+
+.profile-menu__panel .page-nav__link {
+  display: flex;
+}
+
+.profile-menu.is-open .profile-menu__button {
+  border-color: rgba(62, 180, 165, 0.35);
+  color: var(--text);
 }
 
 .auth-ui[hidden] {
@@ -355,6 +403,58 @@ select,
 .auth-ui__sign-out {
   padding: 8px 14px;
   font-size: 0.9rem;
+}
+
+.auth-ui__panel {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 40;
+  width: min(320px, 92vw);
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--panel-strong);
+  box-shadow: var(--shadow);
+  display: grid;
+  gap: 10px;
+}
+
+.auth-ui__input {
+  margin: 0;
+}
+
+.auth-ui__actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.auth-ui__action {
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+}
+
+.auth-ui__status {
+  margin: 0;
+  min-height: 1.1rem;
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.auth-ui__status.is-error {
+  color: #ffb7c3;
+}
+
+.auth-ui__status.is-success {
+  color: #9ff4d7;
+}
+
+.auth-ui__hint {
+  margin: 0;
+  font-size: 0.75rem;
+  color: var(--muted);
 }
 
 /* Hamburger button: hidden on desktop, shown on mobile */
@@ -1609,6 +1709,37 @@ html.theme-light .skeleton-item {
     opacity: 0;
     visibility: hidden;
     transition: max-height 220ms ease, opacity 180ms, visibility 180ms;
+  }
+
+  .profile-menu {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .profile-menu__button {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  .profile-menu__panel {
+    position: static;
+    min-width: 100%;
+    box-shadow: none;
+  }
+
+  .auth-ui {
+    margin-left: 0;
+    width: 100%;
+  }
+
+  .auth-ui .ghost-button {
+    width: 100%;
+  }
+
+  .auth-ui__panel {
+    position: static;
+    width: 100%;
+    box-shadow: none;
   }
 
   .page-nav-bar.is-open .page-nav {
