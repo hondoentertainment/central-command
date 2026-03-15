@@ -718,6 +718,27 @@ select,
   gap: 16px;
 }
 
+.settings-fieldset {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 16px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+
+.settings-fieldset legend {
+  padding: 0 8px;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+}
+
+.profile-grid {
+  display: grid;
+  gap: 12px;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+}
+
 .tool-form__row--split {
   grid-template-columns: repeat(2, minmax(0, 1fr));
 }
