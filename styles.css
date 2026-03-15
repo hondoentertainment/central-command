@@ -345,11 +345,13 @@ select,
 }
 
 .profile-menu {
-  position: relative;
   margin-left: auto;
+  display: grid;
+  gap: 6px;
+  justify-items: end;
 }
 
-.profile-menu__button {
+.profile-menu__header {
   display: inline-flex;
   align-items: center;
   gap: 8px;
@@ -366,28 +368,16 @@ select,
   justify-content: center;
 }
 
-.profile-menu__panel {
-  position: absolute;
-  top: calc(100% + 8px);
-  right: 0;
-  z-index: 30;
-  min-width: 180px;
-  padding: 8px;
-  border-radius: 12px;
-  border: 1px solid var(--line);
-  background: var(--panel-strong);
-  box-shadow: var(--shadow);
+.profile-menu__list {
+  min-width: 160px;
   display: grid;
   gap: 6px;
 }
 
-.profile-menu__panel .page-nav__link {
+.profile-menu__list .page-nav__link {
   display: flex;
-}
-
-.profile-menu.is-open .profile-menu__button {
-  border-color: rgba(62, 180, 165, 0.35);
-  color: var(--text);
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .auth-ui[hidden] {
@@ -1768,17 +1758,17 @@ html.theme-light .skeleton-item {
   .profile-menu {
     margin-left: 0;
     width: 100%;
+    justify-items: stretch;
   }
 
-  .profile-menu__button {
+  .profile-menu__header {
     width: 100%;
     justify-content: flex-start;
   }
 
-  .profile-menu__panel {
+  .profile-menu__list {
     position: static;
     min-width: 100%;
-    box-shadow: none;
   }
 
   .auth-ui {
