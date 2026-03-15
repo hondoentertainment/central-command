@@ -108,6 +108,10 @@ body::before {
   border-radius: 16px;
 }
 
+.hero__copy {
+  max-width: 68ch;
+}
+
 .eyebrow {
   margin: 0 0 6px;
   font-family: var(--font-sans);
@@ -158,6 +162,7 @@ h3 {
   font-size: 0.9375rem;
   line-height: 1.6;
   margin: 0 0 20px;
+  max-width: 62ch;
 }
 .hero__data-notice {
   font-size: 0.8125rem;
@@ -286,7 +291,8 @@ select,
 .panel--productivity,
 .panel--health,
 .panel--agents,
-.panel--games {
+.panel--games,
+.panel--admin {
   margin-top: 24px;
 }
 
@@ -544,6 +550,10 @@ select,
   margin-bottom: 24px;
 }
 
+.panel__header > div:first-child {
+  max-width: 64ch;
+}
+
 .panel__header-actions {
   display: flex;
   flex-wrap: wrap;
@@ -659,6 +669,7 @@ select,
   margin-bottom: 20px;
   font-size: 0.875rem;
   line-height: 1.5;
+  color: var(--text-secondary);
 }
 
 .preset-grid {
@@ -1092,7 +1103,7 @@ button:focus-visible,
   grid-template-columns: 42px 1fr auto;
   align-items: center;
   gap: 12px;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
 }
 
 .tool-card--select-mode .tool-card__top {
@@ -1139,7 +1150,7 @@ button:focus-visible,
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
-  margin: 14px 0 0;
+  margin: 10px 0 0;
 }
 
 .tool-card__badge {
@@ -1194,6 +1205,7 @@ button:focus-visible,
   gap: 4px;
   color: var(--text);
   text-decoration: none;
+  line-height: 1.4;
 }
 
 .history-item__count {
