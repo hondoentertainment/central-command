@@ -1,4 +1,4 @@
-const CACHE_NAME = "central-command-v2";
+const CACHE_NAME = "central-command-v3";
 
 const BASE = location.pathname.includes("/central-command") ? "/central-command" : "";
 
