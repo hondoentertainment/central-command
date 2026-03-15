@@ -11,6 +11,7 @@ const __dirname = dirname(fileURLToPath(import.meta.url));
 const testDir = join(__dirname);
 
 const testFiles = [
+  "auth-security.test.js",
   "tool-model.test.js",
   "storage.test.js",
   "integrations.test.js",

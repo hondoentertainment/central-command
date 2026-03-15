@@ -43,8 +43,16 @@
               <strong id="profileSyncStatus">Checking...</strong>
             </article>
             <article class="status-card">
+              <span class="status-card__label">Account tier</span>
+              <strong id="profileAccountTier">-</strong>
+            </article>
+            <article class="status-card">
               <span class="status-card__label">User ID</span>
               <strong id="profileUserId">-</strong>
+            </article>
+            <article class="status-card">
+              <span class="status-card__label">Last sign in</span>
+              <strong id="profileLastSignIn">-</strong>
             </article>
           </div>
         </section>
@@ -73,6 +81,15 @@
               <strong id="profileNotesEdited">-</strong>
             </article>
           </div>
+        </section>
+
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Security activity</h2>
+            </div>
+          </div>
+          <ul id="profileSecurityEvents" class="history-list"></ul>
         </section>
       </main>
     </div>

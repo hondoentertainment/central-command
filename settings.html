@@ -54,6 +54,40 @@
             <p id="themeStatus" class="form-message" role="status" aria-live="polite"></p>
           </form>
         </section>
+
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Account security</h2>
+            </div>
+          </div>
+          <form id="accountSecurityForm" class="tool-form">
+            <p id="accountSecurityMeta" class="form-message is-info">Sign in to manage account security settings.</p>
+
+            <fieldset class="settings-fieldset">
+              <legend>Email verification</legend>
+              <div class="tool-form__actions">
+                <button type="button" id="resendVerificationBtn" class="ghost-button">Resend verification email</button>
+                <button type="button" id="refreshAccountBtn" class="ghost-button">Refresh account status</button>
+              </div>
+            </fieldset>
+
+            <fieldset class="settings-fieldset">
+              <legend>Change password</legend>
+              <label>
+                Current password
+                <input type="password" id="currentPasswordInput" autocomplete="current-password" />
+              </label>
+              <label>
+                New password
+                <input type="password" id="newPasswordInput" autocomplete="new-password" />
+              </label>
+              <button type="button" id="changePasswordBtn" class="ghost-button">Update password (ends other sessions)</button>
+            </fieldset>
+
+            <p id="accountSecurityStatus" class="form-message" role="status" aria-live="polite"></p>
+          </form>
+        </section>
       </main>
     </div>
 

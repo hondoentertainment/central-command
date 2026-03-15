@@ -405,6 +405,32 @@ select,
   font-size: 0.9rem;
 }
 
+.auth-ui__badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 32px;
+  padding: 6px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-secondary);
+}
+
+.auth-ui__badge--verified {
+  color: #9ff4d7;
+}
+
+.auth-ui__badge--unverified {
+  color: #ffdf99;
+}
+
+.auth-ui__badge--guest {
+  color: var(--muted);
+}
+
 .auth-ui__panel {
   position: absolute;
   top: calc(100% + 8px);
@@ -455,6 +481,34 @@ select,
   margin: 0;
   font-size: 0.75rem;
   color: var(--muted);
+}
+
+.auth-ui__strength {
+  margin: 0;
+  font-size: 0.76rem;
+  color: var(--muted);
+}
+
+.auth-ui__strength.is-score-3,
+.auth-ui__strength.is-score-4 {
+  color: #9ff4d7;
+}
+
+.auth-ui__verify-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.auth-ui__verify-hint {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.auth-ui__verify-btn {
+  min-height: 34px;
+  padding: 6px 10px;
 }
 
 /* Hamburger button: hidden on desktop, shown on mobile */

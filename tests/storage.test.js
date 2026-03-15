@@ -21,7 +21,17 @@ global.localStorage = mockStorage;
 
 // Dynamic import after mock is set - storage uses firebase which may fail in Node.
 // We'll test only the parts that don't need Firebase.
-const { STORAGE_KEYS, loadCustomCategories, saveCustomCategories, loadLayoutPreference, saveLayoutPreference, loadIntegrationsPreferences, saveIntegrationsPreferences } = await import(
+const {
+  STORAGE_KEYS,
+  loadCustomCategories,
+  saveCustomCategories,
+  loadLayoutPreference,
+  saveLayoutPreference,
+  loadIntegrationsPreferences,
+  saveIntegrationsPreferences,
+  loadSecurityEvents,
+  recordSecurityEvent,
+} = await import(
   "../lib/storage.js"
 );
 
@@ -55,11 +65,22 @@ assert.strictEqual(loadIntegrationsPreferences(), null);
 saveIntegrationsPreferences({ creativeHub: { url: "https://example.com", enabled: true } });
 assert.deepStrictEqual(loadIntegrationsPreferences(), { creativeHub: { url: "https://example.com", enabled: true } });
 
+// --- security events ---
+assert.deepStrictEqual(loadSecurityEvents(), []);
+recordSecurityEvent("login_success", { method: "email" });
+recordSecurityEvent("password_reset_requested");
+const events = loadSecurityEvents();
+assert.strictEqual(events.length, 2);
+assert.strictEqual(events[0].type, "password_reset_requested");
+assert.strictEqual(events[1].type, "login_success");
+assert.strictEqual(events[1].details.method, "email");
+
 // --- STORAGE_KEYS ---
 assert.ok(STORAGE_KEYS.tools);
 assert.ok(STORAGE_KEYS.customCategories);
 assert.ok(STORAGE_KEYS.layout);
 assert.ok(STORAGE_KEYS.integrations);
+assert.ok(STORAGE_KEYS.securityEvents);
 
 console.log("storage.test.js: all assertions passed");
 export default { ok: true };
