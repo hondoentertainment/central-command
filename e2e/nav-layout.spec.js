@@ -13,7 +13,7 @@ test.describe("Navigation layout variants", () => {
     await expect(page.locator("#pageNav [data-key='admin']")).toBeVisible();
   });
 
-  for (const route of ["/registry.html", "/profile.html", "/settings.html", "/agents.html"]) {
+  for (const route of ["/registry.html", "/profile.html", "/settings.html", "/agents.html", "/music.html"]) {
     test(`${route} uses header navigation`, async ({ page }) => {
       await page.goto(route);
       await page.waitForLoadState("domcontentloaded");

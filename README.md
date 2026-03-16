@@ -10,7 +10,7 @@ Central Command keeps tools (URLs, local paths, app protocols), quick links, pre
 
 - **Command deck** — Full grid with search, category filters, and pinned tools
 - **Tool Registry** — Add, edit, and manage tools with custom URLs, icons, and shortcuts
-- **Category pages** — Sports, Games, Writing, Productivity, Agents, and more
+- **Category pages** — Sports, Games, Writing, Productivity, Agents, Music (Rolling Stone 500 → Spotify), and more
 - **Starter packs** — Apply preset packs to quickly populate your deck
 - **Recent history** — Track recent launches for quick re-access
 - **Runbook** — Daily notes and runbook-style text stored locally
@@ -113,5 +113,6 @@ Tests start a static server (`npx serve . -p 3000`) automatically. Ensure port 3
 | `index.html` | Shell, hero, spotlight, command deck |
 | `lib/` | `tool-model.js`, `storage.js`, `icons.js`, `nav.js` |
 | `data/presets.js` | Preset packs, category options, tool factory |
-| `*.html` | Category pages (sports, games, writing, etc.) |
+| `*.html` | Category pages (sports, games, writing, music, etc.) |
+| `data/rs500.js` | Rolling Stone 500 album data (genre/decade filters) |
 | `manifest.json` | PWA manifest |

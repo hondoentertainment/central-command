@@ -102,6 +102,8 @@ const elements = {
   launchHookUrlInput: document.querySelector("#launchHookUrlInput"),
   importBackupBtn: document.querySelector("#importBackupBtn"),
   importBackupInput: document.querySelector("#importBackupInput"),
+  toolsMoreBtn: document.querySelector("#toolsMoreBtn"),
+  toolsMoreMenu: document.querySelector("#toolsMoreMenu"),
   creativeHubEnabled: document.querySelector("#creativeHubEnabled"),
   creativeHubShowInNav: document.querySelector("#creativeHubShowInNav"),
   creativeHubShowInPalette: document.querySelector("#creativeHubShowInPalette"),
@@ -177,9 +179,17 @@ async function initialize() {
   elements.quickAddForm?.addEventListener("submit", handleQuickAddSubmit);
   elements.quickAddCancel?.addEventListener("click", hideQuickAddForm);
 
-  elements.importBackupBtn?.addEventListener("click", () => elements.importBackupInput?.click());
+  elements.importBackupBtn?.addEventListener("click", () => {
+    closeToolsMoreMenu();
+    elements.importBackupInput?.click();
+  });
   elements.importBackupInput?.addEventListener("change", handleImportBackup);
-  elements.selectModeBtn?.addEventListener("click", toggleSelectMode);
+  elements.selectModeBtn?.addEventListener("click", () => {
+    closeToolsMoreMenu();
+    toggleSelectMode();
+  });
+  elements.surfacesSettingsBtn?.addEventListener("click", () => closeToolsMoreMenu());
+  setupToolsMoreMenu();
   elements.batchPinBtn?.addEventListener("click", batchPinSelected);
   elements.batchDeleteBtn?.addEventListener("click", batchDeleteSelected);
   elements.batchCategorySelect?.addEventListener("change", batchChangeCategory);
@@ -188,6 +198,16 @@ async function initialize() {
   document.addEventListener("keydown", handleGlobalShortcuts);
   document.addEventListener("keydown", handleKeyboardShortcut);
   document.addEventListener("keydown", handleToolGridKeydown);
+  document.addEventListener("click", () => {
+    document.querySelectorAll(".tool-card__more-menu").forEach((m) => { m.hidden = true; });
+    document.querySelectorAll(".tool-card__more-trigger").forEach((b) => b.setAttribute("aria-expanded", "false"));
+  });
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      document.querySelectorAll(".tool-card__more-menu").forEach((m) => { m.hidden = true; });
+      document.querySelectorAll(".tool-card__more-trigger").forEach((b) => b.setAttribute("aria-expanded", "false"));
+    }
+  });
   render();
 }
 
@@ -249,6 +269,32 @@ function setupVirtualizationObservers() {
     }
   });
   ro.observe(wrap);
+}
+
+function closeToolsMoreMenu() {
+  const menu = elements.toolsMoreMenu;
+  const btn = elements.toolsMoreBtn;
+  if (menu && !menu.hidden) {
+    menu.hidden = true;
+    btn?.setAttribute("aria-expanded", "false");
+  }
+}
+
+function setupToolsMoreMenu() {
+  const btn = elements.toolsMoreBtn;
+  const menu = elements.toolsMoreMenu;
+  if (!btn || !menu) return;
+  btn.addEventListener("click", (e) => {
+    e.stopPropagation();
+    const isOpen = !menu.hidden;
+    menu.hidden = isOpen;
+    btn.setAttribute("aria-expanded", String(!isOpen));
+  });
+  menu.addEventListener("click", (e) => e.stopPropagation());
+  document.addEventListener("click", () => closeToolsMoreMenu());
+  document.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") closeToolsMoreMenu();
+  });
 }
 
 function setupLayoutToggle() {
@@ -491,6 +537,7 @@ async function handleQuickAddSubmit(event) {
   hideQuickAddForm();
   render();
   updateStatusCards();
+  showToast("Tool added.", "success");
 }
 
 /**
@@ -544,7 +591,7 @@ async function handleImportBackup(event) {
     }
     render();
     updateStatusCards();
-    showToast(`Imported ${importedTools.length} tools from ${file.name}.`);
+    showToast(`Imported ${importedTools.length} tools from ${file.name}.`, "success");
   } catch {
     showToast("Could not import that backup. Use a JSON file from Export.", "error");
   }
@@ -749,9 +796,11 @@ function renderSpotlight() {
   elements.spotlightGrid.innerHTML = "";
 
   if (spotlightTools.length === 0) {
-    elements.spotlightGrid.appendChild(
-      createInlineEmptyState("Mark tools for spotlight to keep your core stack visible.")
-    );
+    const wrap = document.createElement("div");
+    wrap.className = "spotlight-empty";
+    wrap.innerHTML =
+      '<p class="spotlight-empty__text">Mark tools for spotlight to keep your core stack visible.</p><p class="spotlight-empty__link"><a href="#toolGridScrollWrap">Add tools in the deck below</a> or <a href="registry.html">Registry</a> and turn on "Show in spotlight".</p>';
+    elements.spotlightGrid.appendChild(wrap);
     return;
   }
 
@@ -885,6 +934,8 @@ function createCardElement(tool, pinnedIds, opts = {}) {
   const meta = fragment.querySelector(".tool-card__meta");
   const url = fragment.querySelector(".tool-card__url");
   const launchButton = fragment.querySelector(".launch-button");
+  const moreTrigger = fragment.querySelector(".tool-card__more-trigger");
+  const moreMenu = fragment.querySelector(".tool-card__more-menu");
   const moveUpButton = fragment.querySelector(".tool-card__move-up");
   const moveDownButton = fragment.querySelector(".tool-card__move-down");
   const editButton = fragment.querySelector(".tool-card__edit");
@@ -938,26 +989,45 @@ function createCardElement(tool, pinnedIds, opts = {}) {
 
   applyLaunchBehavior(launchButton, tool, `Launch ${tool.name}`);
 
+  card.addEventListener("click", (e) => {
+    if (e.target.closest("a, button, [role='menu']")) return;
+    e.preventDefault();
+    launchButton?.click();
+  });
+
+  if (moreTrigger && moreMenu) {
+    moreTrigger.addEventListener("click", (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const isOpen = !moreMenu.hidden;
+      moreMenu.hidden = isOpen;
+      moreTrigger.setAttribute("aria-expanded", String(!isOpen));
+    });
+    const closeMore = () => {
+      moreMenu.hidden = true;
+      moreTrigger.setAttribute("aria-expanded", "false");
+    };
+    moreMenu.querySelectorAll("button").forEach((item) => item.addEventListener("click", closeMore));
+  }
+
   const pinnedIndex = pinnedIds.indexOf(tool.id);
   const isPinned = pinnedIndex >= 0 && !isVirtualIntegration;
-  moveUpButton.hidden = !isPinned;
-  moveDownButton.hidden = !isPinned;
-  moveUpButton.disabled = !isPinned || pinnedIndex === 0;
-  moveDownButton.disabled = !isPinned || pinnedIndex === pinnedIds.length - 1;
+  if (moveUpButton) { moveUpButton.hidden = !isPinned; moveUpButton.disabled = !isPinned || pinnedIndex === 0; }
+  if (moveDownButton) { moveDownButton.hidden = !isPinned; moveDownButton.disabled = !isPinned || pinnedIndex === pinnedIds.length - 1; }
 
   if (!isVirtualIntegration) {
-    moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
-    moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
-    editButton.addEventListener("click", (event) => {
+    moveUpButton?.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
+    moveDownButton?.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
+    editButton?.addEventListener("click", (event) => {
       event.preventDefault();
       window.location.href = `registry.html?edit=${encodeURIComponent(tool.id)}`;
     });
-    deleteButton.addEventListener("click", () => removeTool(tool.id));
+    deleteButton?.addEventListener("click", () => removeTool(tool.id));
   } else {
-    editButton.hidden = true;
-    deleteButton.hidden = true;
-    moveUpButton.hidden = true;
-    moveDownButton.hidden = true;
+    if (editButton) editButton.hidden = true;
+    if (deleteButton) deleteButton.hidden = true;
+    if (moveUpButton) moveUpButton.hidden = true;
+    if (moveDownButton) moveDownButton.hidden = true;
   }
 
   return { fragment, card };
@@ -1029,10 +1099,14 @@ function renderCards() {
     emptyState.className = "empty-state";
     const isFiltered = state.activeCategory !== "All" || state.query;
     if (isFiltered) {
-      emptyState.textContent = "No tools match that filter yet. Broaden the search or choose a different category.";
+      emptyState.innerHTML =
+        "<p class=\"empty-state__title\">No tools match that filter</p><p class=\"empty-state__text\">Broaden the search or choose a different category.</p>";
     } else {
       emptyState.innerHTML =
-        'No tools yet. Click <strong>Add tool</strong> above to add your first one, or <a href="registry.html">open Tool Registry</a> for full options.';
+        '<p class="empty-state__title">No tools yet</p><p class="empty-state__text">Add your first tool or start from a preset pack.</p>' +
+        '<div class="empty-state__actions"><button type="button" class="primary-button empty-state__cta">Add your first tool</button> <a href="packs.html" class="ghost-button">Choose a starter pack</a></div>';
+      const cta = emptyState.querySelector(".empty-state__cta");
+      if (cta) cta.addEventListener("click", () => showQuickAddForm());
     }
     grid.appendChild(emptyState);
     return;

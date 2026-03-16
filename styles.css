@@ -184,9 +184,20 @@ h3 {
   margin: 0 0 20px;
   max-width: 62ch;
 }
-.hero__data-notice {
+.hero__data-notice-wrap {
+  margin: 0 0 20px;
   font-size: 0.8125rem;
   color: var(--muted);
+}
+.hero__data-notice-summary {
+  cursor: pointer;
+  list-style: none;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+.hero__data-notice-summary::-webkit-details-marker { display: none; }
+.hero__data-notice {
+  margin: 8px 0 0;
 }
 .hero__data-notice a {
   color: var(--teal);
@@ -1754,14 +1765,248 @@ a:focus-visible {
   background: var(--panel-strong);
 }
 
+.empty-state__title {
+  margin: 0 0 8px;
+  font-family: var(--font-serif);
+  font-size: 1.25rem;
+  font-weight: 400;
+  color: var(--text);
+}
+.empty-state__text {
+  margin: 0 0 24px;
+  max-width: 36ch;
+  margin-left: auto;
+  margin-right: auto;
+}
+.empty-state__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  justify-content: center;
+  align-items: center;
+}
+.empty-state__cta {
+  min-height: 44px;
+  padding: 12px 24px;
+}
 .empty-state a {
   color: var(--teal);
   text-decoration: none;
   font-weight: 500;
 }
-
 .empty-state a:hover {
   text-decoration: underline;
+}
+
+.spotlight-empty {
+  padding: 24px;
+  border-radius: 12px;
+  border: 1px dashed var(--line);
+  background: rgba(255, 255, 255, 0.02);
+  text-align: center;
+}
+.spotlight-empty__text {
+  margin: 0 0 8px;
+  color: var(--text-secondary);
+  font-size: 0.9375rem;
+}
+.spotlight-empty__link {
+  margin: 0;
+  font-size: 0.875rem;
+}
+.spotlight-empty__link a {
+  color: var(--teal);
+  text-decoration: none;
+}
+.spotlight-empty__link a:hover {
+  text-decoration: underline;
+}
+
+/* Music — Rolling Stone 500 */
+.panel--music .panel__header {
+  margin-bottom: 1rem;
+}
+.rs500-panel__sub {
+  margin: 0.25rem 0 0;
+  font-size: 0.9375rem;
+}
+.rs500-spotify-link {
+  color: var(--teal);
+  text-decoration: none;
+}
+.rs500-spotify-link:hover {
+  text-decoration: underline;
+}
+.rs500-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 1rem;
+}
+.rs500-filter-group {
+  display: flex;
+  align-items: center;
+}
+.rs500-select {
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  background: var(--panel-strong);
+  color: var(--text);
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  min-height: 44px;
+  cursor: pointer;
+}
+.rs500-select:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+.rs500-count {
+  margin: 0 0 1rem;
+  font-size: 0.875rem;
+  color: var(--muted);
+}
+.rs500-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+.rs500-card {
+  display: block;
+  padding: 20px;
+  border-radius: 12px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  color: var(--text);
+  text-decoration: none;
+  transition: border-color 160ms ease, box-shadow 160ms ease;
+}
+.rs500-card:hover {
+  border-color: rgba(62, 180, 165, 0.25);
+  box-shadow: var(--shadow-soft);
+}
+.rs500-card:focus-visible {
+  outline: 2px solid var(--teal);
+  outline-offset: 2px;
+}
+.rs500-card__title {
+  margin: 0 0 8px;
+  font-family: var(--font-serif);
+  font-size: 1.1rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--text);
+}
+.rs500-card__meta {
+  margin: 0;
+  font-size: 0.8125rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+}
+.rs500-card__year {
+  color: var(--muted);
+}
+.rs500-card__genre {
+  display: inline-block;
+  margin-left: 0.25rem;
+  padding: 2px 8px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+}
+.rs500-footer {
+  margin: 1.5rem 0 0;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+  font-size: 0.8125rem;
+  color: var(--muted);
+}
+.rs500-footer cite {
+  font-style: normal;
+}
+
+.panel__header-actions-cta {
+  min-height: 44px;
+  padding: 10px 20px;
+}
+.panel__header-more-wrap {
+  position: relative;
+}
+.panel__header-more-btn {
+  min-height: 44px;
+}
+.panel__header-more-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  min-width: 180px;
+  padding: 8px;
+  border-radius: 12px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+  z-index: 100;
+}
+.panel__header-more-item {
+  display: block;
+  width: 100%;
+  padding: 10px 14px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.9rem;
+  text-align: left;
+  cursor: pointer;
+}
+.panel__header-more-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.tool-card__actions-more {
+  position: relative;
+}
+.tool-card__more-trigger {
+  min-width: 44px;
+  min-height: 44px;
+  padding: 8px;
+  border-radius: 10px;
+}
+.tool-card__more-menu {
+  position: absolute;
+  bottom: 100%;
+  right: 0;
+  margin-bottom: 4px;
+  min-width: 140px;
+  padding: 6px;
+  border-radius: 12px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow-soft);
+  z-index: 10;
+}
+.tool-card__more-menu button {
+  display: block;
+  width: 100%;
+  padding: 8px 12px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text);
+  font-size: 0.875rem;
+  text-align: left;
+  cursor: pointer;
+}
+.tool-card__more-menu button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.tool-card__more-menu button[hidden] {
+  display: none;
 }
 
 .inline-empty-state {
@@ -1955,6 +2200,12 @@ html.theme-light .skeleton-item {
     padding: 12px 16px;
     display: flex;
     align-items: center;
+  }
+
+  .panel__header-actions--tools .primary-button,
+  .panel__header-actions--tools .ghost-button,
+  .layout-toggle__btn {
+    min-height: 44px;
   }
 }
 
@@ -2332,6 +2583,19 @@ select,
   border-radius: 16px;
   color: var(--text-secondary);
   background: rgba(255, 255, 255, 0.02);
+}
+
+.command-palette-overlay {
+  animation: command-palette-in 120ms ease;
+}
+@media (prefers-reduced-motion: reduce) {
+  .command-palette-overlay {
+    animation-duration: 0.01ms;
+  }
+}
+@keyframes command-palette-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 
 .command-palette-panel {

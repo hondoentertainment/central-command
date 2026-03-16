@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="description"
+      content="Rolling Stone Top 500 — Greatest Albums of All Time, linked to Spotify."
+    />
+    <meta name="theme-color" content="#0f0f0f" />
+    <title>Music — Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
+  </head>
+  <body class="content-page">
+    <div class="content-shell">
+      <header class="content-header">
+        <div class="content-header__intro">
+          <p class="eyebrow">Music</p>
+          <h1>Rolling Stone Top 500</h1>
+          <p class="content-header__text">
+            Greatest Albums of All Time — browse by genre and decade, open any album in Spotify.
+          </p>
+        </div>
+        <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+      </header>
+
+      <main class="content-main layout">
+        <section class="panel panel--music">
+          <div class="panel__header">
+            <div>
+              <h2>Greatest Albums of All Time</h2>
+              <p class="rs500-panel__sub">
+                <a href="https://open.spotify.com" target="_blank" rel="noopener noreferrer" class="rs500-spotify-link">→ Spotify</a>
+              </p>
+            </div>
+          </div>
+          <div class="rs500-filters">
+            <div class="rs500-filter-group">
+              <label for="rs500Genre" class="visually-hidden">Filter by genre</label>
+              <select id="rs500Genre" class="rs500-select" aria-label="Filter by genre">
+                <!-- filled by JS -->
+              </select>
+            </div>
+            <div class="rs500-filter-group">
+              <label for="rs500Decade" class="visually-hidden">Filter by decade</label>
+              <select id="rs500Decade" class="rs500-select" aria-label="Filter by decade">
+                <!-- filled by JS -->
+              </select>
+            </div>
+          </div>
+          <p class="rs500-count" id="rs500Count" aria-live="polite">Showing 50 albums</p>
+          <div id="rs500Grid" class="rs500-grid" role="list" aria-label="Albums"></div>
+          <p class="rs500-footer">
+            Based on <cite>Rolling Stone&rsquo;s 500 Greatest Albums of All Time</cite> (2020 edition). Click any album to open in Spotify.
+          </p>
+        </section>
+      </main>
+    </div>
+
+    <script src="./sw-register.js"></script>
+    <script type="module" src="./app-music.js"></script>
+  </body>
+</html>

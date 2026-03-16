@@ -42,10 +42,13 @@
             One place for the tools you reach for most. Launch faster, organize by workflow,
             and move through the day with a calmer operating system.
           </p>
-          <p class="hero__data-notice">
-            Data is stored in this browser. To bring tools from localhost or another device:
-            <a href="registry.html">Export</a> on source → <strong>Import</strong> here.
-          </p>
+          <details class="hero__data-notice-wrap">
+            <summary class="hero__data-notice-summary">Data &amp; sync</summary>
+            <p class="hero__data-notice">
+              Data is stored in this browser. To bring tools from another device:
+              <a href="registry.html">Export</a> on source → <strong>Import</strong> here.
+            </p>
+          </details>
           <div id="heroQuickLinks" class="hero__quick-links" aria-live="polite"></div>
         </div>
         <div class="hero__status">
@@ -91,10 +94,15 @@
                 <span class="visually-hidden">Search tools</span>
                 <input id="searchInput" type="search" placeholder="Search tools or categories (press /)" autocomplete="off" />
               </label>
-              <button type="button" id="surfacesSettingsBtn" class="ghost-button" aria-label="Page layout settings" aria-expanded="false">⚙ Layout</button>
-              <button type="button" id="addToolBtn" class="ghost-button">Add tool</button>
-              <button type="button" id="importBackupBtn" class="ghost-button">Import</button>
-              <button type="button" id="selectModeBtn" class="ghost-button">Select</button>
+              <button type="button" id="addToolBtn" class="primary-button panel__header-actions-cta">Add tool</button>
+              <div class="panel__header-more-wrap">
+                <button type="button" id="toolsMoreBtn" class="ghost-button panel__header-more-btn" aria-expanded="false" aria-haspopup="true" aria-label="More actions">More</button>
+                <div id="toolsMoreMenu" class="panel__header-more-menu" hidden role="menu">
+                  <button type="button" id="surfacesSettingsBtn" class="panel__header-more-item" role="menuitem" aria-label="Page layout settings" aria-expanded="false">⚙ Layout</button>
+                  <button type="button" id="importBackupBtn" class="panel__header-more-item" role="menuitem">Import backup</button>
+                  <button type="button" id="selectModeBtn" class="panel__header-more-item" role="menuitem">Select</button>
+                </div>
+              </div>
             </div>
             <input type="file" id="importBackupInput" accept=".json" hidden aria-hidden="true" />
           </div>
@@ -143,7 +151,7 @@
               <label for="quickAddCategory" class="visually-hidden">Category</label>
               <select id="quickAddCategory" aria-required="true"></select>
               <div class="quick-add-form__actions">
-                <button type="submit" class="ghost-button">Add</button>
+                <button type="submit" class="primary-button">Add</button>
                 <button type="button" id="quickAddCancel" class="ghost-button">Cancel</button>
                 <a href="registry.html" class="ghost-button">Advanced options →</a>
               </div>
@@ -181,10 +189,15 @@
         <code class="tool-card__url"></code>
         <div class="tool-card__actions">
           <a class="launch-button" target="_blank" rel="noreferrer">Launch</a>
-          <button class="ghost-button tool-card__move-up" type="button">Pin up</button>
-          <button class="ghost-button tool-card__move-down" type="button">Pin down</button>
-          <button class="ghost-button tool-card__edit" type="button">Edit</button>
-          <button class="ghost-button tool-card__delete" type="button">Delete</button>
+          <div class="tool-card__actions-more">
+            <button type="button" class="ghost-button tool-card__more-trigger" aria-expanded="false" aria-haspopup="true" aria-label="More actions">⋮</button>
+            <div class="tool-card__more-menu" hidden role="menu">
+              <button type="button" class="tool-card__move-up" role="menuitem">Pin up</button>
+              <button type="button" class="tool-card__move-down" role="menuitem">Pin down</button>
+              <button type="button" class="tool-card__edit" role="menuitem">Edit</button>
+              <button type="button" class="tool-card__delete" role="menuitem">Delete</button>
+            </div>
+          </div>
         </div>
       </article>
     </template>
