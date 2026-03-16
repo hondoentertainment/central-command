@@ -1052,6 +1052,15 @@ select:focus,
   border-color: rgba(62, 180, 165, 0.4);
 }
 
+input:focus-visible,
+textarea:focus-visible,
+select:focus-visible,
+.search input:focus-visible {
+  outline: 2px solid rgba(62, 180, 165, 0.5);
+  outline-offset: 2px;
+  border-color: rgba(62, 180, 165, 0.4);
+}
+
 textarea {
   resize: vertical;
   min-height: 96px;
@@ -1130,7 +1139,15 @@ button:focus-visible,
 .hero__quick-link:focus-visible,
 .spotlight-card:focus-visible,
 .preset-card:focus-visible,
-.history-item__link:focus-visible {
+.history-item__link:focus-visible,
+.page-nav__palette-btn:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgba(62, 180, 165, 0.5);
+  outline-offset: 2px;
+}
+
+.command-palette-overlay .command-palette-input:focus-visible,
+.command-palette-overlay .command-palette-hint:focus-visible {
   outline: 2px solid rgba(62, 180, 165, 0.5);
   outline-offset: 2px;
 }

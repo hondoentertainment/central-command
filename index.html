@@ -29,7 +29,7 @@
   </head>
   <body>
     <div class="dashboard-shell">
-      <aside class="dashboard-sidebar">
+      <aside class="dashboard-sidebar" role="complementary" aria-label="Sidebar">
         <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
       </aside>
 
@@ -136,9 +136,12 @@
           </div>
           <div id="quickAddFormWrap" class="quick-add-form-wrap" hidden>
             <form id="quickAddForm" class="quick-add-form">
-              <input id="quickAddName" type="text" placeholder="Tool name" required />
-              <input id="quickAddUrl" type="text" placeholder="URL" required />
-              <select id="quickAddCategory"></select>
+              <label for="quickAddName" class="visually-hidden">Tool name</label>
+              <input id="quickAddName" type="text" placeholder="Tool name" required aria-required="true" />
+              <label for="quickAddUrl" class="visually-hidden">URL</label>
+              <input id="quickAddUrl" type="text" placeholder="URL" required aria-required="true" />
+              <label for="quickAddCategory" class="visually-hidden">Category</label>
+              <select id="quickAddCategory" aria-required="true"></select>
               <div class="quick-add-form__actions">
                 <button type="submit" class="ghost-button">Add</button>
                 <button type="button" id="quickAddCancel" class="ghost-button">Cancel</button>

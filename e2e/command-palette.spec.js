@@ -5,8 +5,9 @@ test.describe("Command palette navigation", () => {
   test("opens from header search button", async ({ page }) => {
     await page.goto("/registry.html");
     await page.waitForLoadState("domcontentloaded");
+    await expect(page.locator("#pageNav [data-action='open-palette']")).toBeVisible({ timeout: 10000 });
 
-    await page.getByRole("button", { name: /search/i }).first().click();
+    await page.locator("#pageNav [data-action='open-palette']").first().click();
     await expect(page.locator(".command-palette-overlay")).toBeVisible();
     await expect(page.locator(".command-palette-item").first()).toBeVisible();
   });

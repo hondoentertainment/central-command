@@ -64,15 +64,30 @@ Visit the deployed site and use your browser's **Add to home screen** (or **Inst
 
 ## Production
 
-**URL:** https://hondoentertainment.github.io/central-command/
+**URLs:** [GitHub Pages](https://hondoentertainment.github.io/central-command/) · [Vercel](https://central-command-self.vercel.app/)
 
-Deploys to GitHub Pages and Vercel.
+Deploys to GitHub Pages (on push to `master`) and Vercel.
+
+### Deploy on push (Vercel)
+
+To have every push to `master` update the live Vercel site automatically:
+
+1. In [Vercel Dashboard](https://vercel.com) → your project → **Settings** → **Git**
+2. Ensure the GitHub repo is connected and **Production Branch** is set to `master`
+3. Pushes to `master` will trigger a production deploy; other branches get preview URLs
 
 ## Tech
 
 - **Vanilla JS**, ES modules, no framework
 - Static HTML/CSS/JS; no build step
 - Deploys as a static site to GitHub Pages and Vercel
+
+## Tests & CI
+
+- **Unit tests:** `npm test` (runs `tests/*.test.js` with Node).
+- **E2E tests:** `npm run test:e2e` (Playwright; starts a static server automatically).
+
+On every push and pull request to `main`/`master`, the **CI** workflow runs both unit and E2E tests (see `.github/workflows/ci.yml`). Deploy workflows (GitHub Pages, Vercel) run after you push.
 
 ## E2E Tests
 
