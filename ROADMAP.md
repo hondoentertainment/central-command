@@ -7,4 +7,4 @@ Suggested next features for Central Command:
 - **Sharing & export** — Share a read-only or copyable deck link; improve backup/restore (e.g. import from URL, scheduled exports).
 - **Accessibility polish** — Full keyboard navigation for deck and runbook, focus management, and screen-reader announcements for dynamic updates.
 - **Performance** — Lazy-load heavy pages (e.g. runbook, history), virtualize long lists where needed, and defer non-critical scripts.
-- **Music / RS500** — Expand Rolling Stone 500 (e.g. load more albums, text search by title/artist) or link to full list.
+- **Music** — Music page links to external Rolling Stone 500 list; optional: add more curated music links.

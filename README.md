@@ -114,5 +114,4 @@ Tests start a static server (`npx serve . -p 3000`) automatically. Ensure port 3
 | `lib/` | `tool-model.js`, `storage.js`, `icons.js`, `nav.js` |
 | `data/presets.js` | Preset packs, category options, tool factory |
 | `*.html` | Category pages (sports, games, writing, music, etc.) |
-| `data/rs500.js` | Rolling Stone 500 album data (genre/decade filters) |
 | `manifest.json` | PWA manifest |

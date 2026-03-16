@@ -8,10 +8,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta
       name="description"
-      content="Music — link to Rolling Stone 500 Greatest Albums (Spotify)."
+      content="Movies — quick links to HSX and Letterboxd."
     />
     <meta name="theme-color" content="#0f0f0f" />
-    <title>Music — Central Command</title>
+    <title>Movies — Central Command</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -26,29 +26,43 @@
     <div class="content-shell">
       <header class="content-header">
         <div class="content-header__intro">
-          <p class="eyebrow">Music</p>
-          <h1>Music</h1>
+          <p class="eyebrow">Movies</p>
+          <h1>Movies</h1>
           <p class="content-header__text">
-            Quick link to the Rolling Stone 500 Greatest Albums list with Spotify integration.
+            Quick links to movie trading and film tracking: HSX and Letterboxd.
           </p>
         </div>
         <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
       </header>
 
       <main class="content-main layout">
-        <section class="panel panel--music">
+        <section class="panel panel--movies">
           <div class="music-link-block">
-            <h2 class="music-link-block__title">Rolling Stone 500 Greatest Albums</h2>
+            <h2 class="music-link-block__title">HSX</h2>
             <p class="music-link-block__text">
-              Browse the full list with genre and decade filters, and open any album in Spotify.
+              Hollywood Stock Exchange — trade movie stocks and star bonds.
             </p>
             <a
-              href="https://preview-rs500-spotify-b72679ab.viktor.space/"
+              href="https://www.hsx.com/"
               target="_blank"
               rel="noopener noreferrer"
               class="primary-button music-link-block__cta"
             >
-              Open Rolling Stone Top 500 →
+              Open HSX →
+            </a>
+          </div>
+          <div class="music-link-block">
+            <h2 class="music-link-block__title">Letterboxd</h2>
+            <p class="music-link-block__text">
+              Track what you watch, rate films, and discover what to see next.
+            </p>
+            <a
+              href="https://letterboxd.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="primary-button music-link-block__cta"
+            >
+              Open Letterboxd →
             </a>
           </div>
         </section>
@@ -56,6 +70,6 @@
     </div>
 
     <script src="./sw-register.js"></script>
-    <script type="module" src="./app-music.js"></script>
+    <script type="module" src="./app-movies.js"></script>
   </body>
 </html>

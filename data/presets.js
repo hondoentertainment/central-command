@@ -170,6 +170,14 @@ export const PRESET_PACKS = [
         iconKey: "openclaw",
       }),
       createTool({
+        name: "Lindy",
+        url: "https://app.lindy.ai",
+        category: "Agents",
+        description: "AI agents that automate tasks in your apps and workflows.",
+        accent: "cobalt",
+        iconKey: "lindy",
+      }),
+      createTool({
         name: "Grok",
         url: "https://grok.com",
         category: "AI",
@@ -463,6 +471,14 @@ export const PRESET_PACKS = [
         description: "Autonomous AI assistant that executes tasks locally.",
         accent: "teal",
         iconKey: "openclaw",
+      }),
+      createTool({
+        name: "Lindy",
+        url: "https://app.lindy.ai",
+        category: "Agents",
+        description: "AI agents that automate tasks in your apps and workflows.",
+        accent: "cobalt",
+        iconKey: "lindy",
       }),
       createTool({
         name: "GitHub",
