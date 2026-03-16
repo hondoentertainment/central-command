@@ -1,5 +1,35 @@
 {
   "buildCommand": "node scripts/build-firebase-config.js || true",
+  "headers": [
+    {
+      "source": "/",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/:path.html",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/:file.css",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/:file.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/:file.svg",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/:file.ico",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    }
+  ],
   "rewrites": [
     { "source": "/registry", "destination": "/registry.html" },
     { "source": "/agents", "destination": "/agents.html" },

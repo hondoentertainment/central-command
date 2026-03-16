@@ -203,9 +203,7 @@ function handleGlobalShortcuts(event) {
   if (event.key === "Escape") {
     if (elements.surfacesSettingsPanel && !elements.surfacesSettingsPanel.hidden) {
       event.preventDefault();
-      elements.surfacesSettingsPanel.hidden = true;
-      elements.surfacesSettingsBtn?.setAttribute("aria-expanded", "false");
-      elements.surfacesSettingsBtn?.focus();
+      closeSurfacesPanel();
       return;
     }
     if (elements.quickAddFormWrap && !elements.quickAddFormWrap.hidden) {
@@ -286,6 +284,52 @@ function applySurfacesVisibility(pageKey) {
   if (elements.spotlightSection) elements.spotlightSection.hidden = !surfaces.includes("spotlight");
 }
 
+let surfacesPanelTabTrapHandler = null;
+
+function getSurfacesPanelFocusables() {
+  const panel = elements.surfacesSettingsPanel;
+  if (!panel) return [];
+  const sel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  return Array.from(panel.querySelectorAll(sel));
+}
+
+function addSurfacesPanelTabTrap() {
+  if (surfacesPanelTabTrapHandler) return;
+  surfacesPanelTabTrapHandler = (e) => {
+    const panel = elements.surfacesSettingsPanel;
+    if (!panel || panel.hidden) return;
+    if (e.key !== "Tab") return;
+    if (!panel.contains(document.activeElement)) return;
+    const focusables = getSurfacesPanelFocusables();
+    if (focusables.length < 2) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+  document.addEventListener("keydown", surfacesPanelTabTrapHandler);
+}
+
+function removeSurfacesPanelTabTrap() {
+  if (surfacesPanelTabTrapHandler) {
+    document.removeEventListener("keydown", surfacesPanelTabTrapHandler);
+    surfacesPanelTabTrapHandler = null;
+  }
+}
+
+function closeSurfacesPanel() {
+  if (!elements.surfacesSettingsPanel) return;
+  elements.surfacesSettingsPanel.hidden = true;
+  elements.surfacesSettingsBtn?.setAttribute("aria-expanded", "false");
+  removeSurfacesPanelTabTrap();
+  elements.surfacesSettingsBtn?.focus();
+}
+
 function setupSurfacesSettings() {
   const prefs = loadSurfacesPreferences();
   const surfaces = prefs?.command ?? DEFAULT_SURFACES.command;
@@ -299,12 +343,14 @@ function setupSurfacesSettings() {
     panel.hidden = !panel.hidden;
     elements.surfacesSettingsBtn?.setAttribute("aria-expanded", String(!panel.hidden));
     if (!panel.hidden) {
+      addSurfacesPanelTabTrap();
       requestAnimationFrame(() => {
-        const firstFocusable = panel.querySelector(
-          'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
-        );
+        const firstFocusable = getSurfacesPanelFocusables()[0];
         firstFocusable?.focus();
       });
+    } else {
+      removeSurfacesPanelTabTrap();
+      elements.surfacesSettingsBtn?.focus();
     }
   });
 

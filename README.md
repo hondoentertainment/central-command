@@ -41,13 +41,13 @@ To enable cloud sync across devices:
 3. Add a web app and copy the config values into `firebase.config.local.js`
 4. Enable **Anonymous Auth** (or Email/Password) in Firebase Authentication
 5. Create a Firestore database
-6. Set Firestore rules so users can read/write only their own data, e.g.:
+6. Set Firestore rules so users can read/write only their own data. See `firestore.rules.example` (one document per user at `users/{userId}`):
 
 ```javascript
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/{document=**} {
+    match /users/{userId} {
       allow read, write: if request.auth != null && request.auth.uid == userId;
     }
   }
