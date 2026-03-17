@@ -260,11 +260,11 @@ select,
 }
 
 .status-card__label {
-  font-size: 0.6875rem;
-  color: var(--muted);
+  font-size: 0.75rem;
+  color: var(--text-secondary);
   text-transform: uppercase;
-  letter-spacing: 0.1em;
-  font-weight: 600;
+  letter-spacing: 0.12em;
+  font-weight: 700;
 }
 
 .hero__quick-links {
@@ -463,6 +463,28 @@ select,
 .sidebar-profile__child,
 .header-profile__child {
   font-size: 0.8rem;
+}
+
+/* Keep sidebar profile links compact and nav-like, not card-like */
+.sidebar-profile__children {
+  padding-left: 0;
+}
+
+.sidebar-profile__title,
+.sidebar-profile__children .page-nav__link {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+}
+
+.sidebar-profile__title {
+  gap: 8px;
+}
+
+.sidebar-profile__children .page-nav__link {
+  min-height: 40px;
+  padding: 8px 12px;
+  border-radius: 12px;
 }
 
 .header-profile {
