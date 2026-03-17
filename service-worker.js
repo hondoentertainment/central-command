@@ -1,4 +1,4 @@
-const CACHE_NAME = "central-command-v4";
+const CACHE_NAME = "central-command-v5";
 
 const BASE = location.pathname.includes("/central-command") ? "/central-command" : "";
 
@@ -9,6 +9,9 @@ const REWRITE_MAP = {
   "/sports": "/sports.html",
   "/games": "/games.html",
   "/health": "/health.html",
+  "/music": "/music.html",
+  "/movies": "/movies.html",
+  "/parties": "/parties.html",
   "/admin": "/admin.html",
   "/writing": "/writing.html",
   "/productivity": "/productivity.html",
@@ -32,6 +35,9 @@ const PRECACHE = [
   BASE + "/sports.html",
   BASE + "/games.html",
   BASE + "/health.html",
+  BASE + "/music.html",
+  BASE + "/movies.html",
+  BASE + "/parties.html",
   BASE + "/admin.html",
   BASE + "/writing.html",
   BASE + "/productivity.html",
@@ -48,6 +54,9 @@ const PRECACHE = [
   BASE + "/app-sports.js",
   BASE + "/app-games.js",
   BASE + "/app-health.js",
+  BASE + "/app-music.js",
+  BASE + "/app-movies.js",
+  BASE + "/app-parties.js",
   BASE + "/app-admin.js",
   BASE + "/app-writing.js",
   BASE + "/app-productivity.js",

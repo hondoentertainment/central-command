@@ -5,7 +5,7 @@
       (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
     </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="Health and wellness tools for Central Command."
@@ -23,6 +23,7 @@
     <link rel="manifest" href="./manifest.json" />
   </head>
   <body class="content-page">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
     <div class="content-shell">
       <header class="content-header">
         <div class="content-header__intro">
@@ -35,13 +36,13 @@
         <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
       </header>
 
-      <main class="content-main layout">
+      <main id="mainContent" class="content-main layout">
         <section class="panel panel--health">
           <div class="panel__header">
             <div>
-              <h2>Health tools</h2>
+              <h2>Health</h2>
               <p class="panel__intro-text">
-                Apple Fitness, Pedometer++, Nourish, I Am Sober, Fitbod, SuppCo, Bevel, and other tools with category Health appear here.
+                Tools with category Health appear here. Add Apple Fitness, Fitbod, and other wellness links in Tools.
               </p>
             </div>
           </div>
@@ -50,8 +51,11 @@
       </main>
     </div>
 
-    <script src="./sw-register.js"></script>
+    <script src="./sw-register.js" defer></script>
     <script type="module" src="./app-health.js"></script>
   </body>
 </html>
+
+
+
 

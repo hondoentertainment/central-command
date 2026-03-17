@@ -5,7 +5,7 @@
       (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
     </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="Central Command keeps your most-used tools, quick links, presets, and daily runbook in one place."
@@ -28,14 +28,14 @@
     <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
-    <a href="#toolGridScrollWrap" class="skip-link">Skip to main content</a>
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
     <div id="statusAnnouncer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
     <div class="dashboard-shell">
       <aside class="dashboard-sidebar" role="complementary" aria-label="Sidebar">
         <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
       </aside>
 
-      <div class="dashboard-main">
+      <div class="dashboard-main" id="mainContent">
       <header class="hero" id="heroSection">
         <div class="hero__copy">
           <p class="eyebrow">Command Center</p>
@@ -47,8 +47,8 @@
           <details class="hero__data-notice-wrap">
             <summary class="hero__data-notice-summary">Data &amp; sync</summary>
             <p class="hero__data-notice">
-              Data is stored in this browser. To bring tools from another device:
-              <a href="registry.html">Export</a> on source → <strong>Import</strong> here.
+              Data stays in this browser. To move your setup: export backup on the source device, then import it in
+              <a href="registry.html">Tools</a>.
             </p>
           </details>
           <div id="heroQuickLinks" class="hero__quick-links" aria-live="polite"></div>
@@ -141,6 +141,7 @@
             <div class="batch-action-bar__actions">
               <button type="button" id="batchPinBtn" class="ghost-button">Pin selected</button>
               <button type="button" id="batchDeleteBtn" class="ghost-button">Delete selected</button>
+              <label for="batchCategorySelect" class="visually-hidden">Change category for selected tools</label>
               <select id="batchCategorySelect">
                 <option value="">Change category…</option>
               </select>
@@ -212,3 +213,4 @@
     <script type="module" src="./app.js"></script>
   </body>
 </html>
+

@@ -5,7 +5,7 @@
       (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
     </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="Admin and site management tools for Central Command."
@@ -23,6 +23,7 @@
     <link rel="manifest" href="./manifest.json" />
   </head>
   <body class="content-page">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
     <div class="content-shell">
       <header class="content-header">
         <div class="content-header__intro">
@@ -35,14 +36,14 @@
         <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
       </header>
 
-      <main class="content-main layout">
+      <main id="mainContent" class="content-main layout">
         <section class="panel panel--admin">
           <div class="panel__header">
             <div>
-              <h2>Admin tools</h2>
+              <h2>Admin</h2>
               <p class="panel__intro-text">
                 Tools with category Admin appear here. Add links like GitHub repo, Vercel project,
-                and deployment dashboards in Tool Registry.
+                and deployment dashboards in Tools.
               </p>
             </div>
           </div>
@@ -51,8 +52,11 @@
       </main>
     </div>
 
-    <script src="./sw-register.js"></script>
+    <script src="./sw-register.js" defer></script>
     <script type="module" src="./app-admin.js"></script>
   </body>
 </html>
+
+
+
 

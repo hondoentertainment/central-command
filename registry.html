@@ -5,13 +5,13 @@
       (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
     </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="Add or update tools in Central Command."
     />
     <meta name="theme-color" content="#0f0f0f" />
-    <title>Tool Registry — Central Command</title>
+    <title>Tools — Central Command</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -23,30 +23,34 @@
     <link rel="manifest" href="./manifest.json" />
   </head>
   <body class="content-page">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
     <div class="content-shell">
       <header class="content-header">
         <div class="content-header__intro">
-          <p class="eyebrow">Tool Registry</p>
+          <p class="eyebrow">Tools</p>
           <h1>Add or update tools</h1>
           <p class="content-header__text">
-            Shape the command deck, import or export backups, and keep your starter set current from one editor.
+            Shape your command deck, manage links, and import or export backups from one place.
           </p>
         </div>
         <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
       </header>
 
-      <main class="content-main layout layout--form">
+      <main id="mainContent" class="content-main layout layout--form">
         <section class="panel panel--form">
           <div class="panel__header">
             <div>
               <h2>Tool form</h2>
+              <p class="panel__intro-text">
+                Add or update tools, adjust launch behavior, and keep your setup consistent across backups.
+              </p>
             </div>
             <div class="panel__header-actions">
               <a href="index.html" class="ghost-button">Back to deck</a>
               <button id="exportButton" class="ghost-button" type="button">Export backup</button>
               <button id="importButton" class="ghost-button" type="button">Import backup</button>
               <button id="resetDefaultsButton" class="ghost-button" type="button">
-                Restore starter set
+                Restore starter pack
               </button>
             </div>
           </div>
@@ -166,7 +170,9 @@
 
     <input id="importFileInput" type="file" accept="application/json,.json" hidden />
 
-    <script src="./sw-register.js"></script>
+    <script src="./sw-register.js" defer></script>
     <script type="module" src="./app-registry.js"></script>
   </body>
 </html>
+
+

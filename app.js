@@ -115,6 +115,7 @@ const elements = {
   creativeHubShowAsTool: document.querySelector("#creativeHubShowAsTool"),
   creativeHubUrl: document.querySelector("#creativeHubUrl"),
   creativeHubOpenMode: document.querySelector("#creativeHubOpenMode"),
+  mainContent: document.querySelector(".dashboard-main"),
 };
 
 initialize();
@@ -292,17 +293,43 @@ function setupToolsMoreMenu() {
   const btn = elements.toolsMoreBtn;
   const menu = elements.toolsMoreMenu;
   if (!btn || !menu) return;
+  const focusItem = (index) => {
+    const items = Array.from(menu.querySelectorAll('[role="menuitem"]:not([hidden])'));
+    if (items.length === 0) return;
+    const bounded = ((index % items.length) + items.length) % items.length;
+    items[bounded].focus();
+  };
   btn.addEventListener("click", (e) => {
     e.stopPropagation();
     const isOpen = !menu.hidden;
     menu.hidden = isOpen;
     btn.setAttribute("aria-expanded", String(!isOpen));
+    if (!isOpen) requestAnimationFrame(() => focusItem(0));
   });
   menu.addEventListener("click", (e) => e.stopPropagation());
+  menu.addEventListener("keydown", (event) => {
+    if (event.key !== "ArrowDown" && event.key !== "ArrowUp" && event.key !== "Home" && event.key !== "End") return;
+    event.preventDefault();
+    const items = Array.from(menu.querySelectorAll('[role="menuitem"]:not([hidden])'));
+    if (items.length === 0) return;
+    const currentIndex = Math.max(0, items.indexOf(document.activeElement));
+    if (event.key === "ArrowDown") focusItem(currentIndex + 1);
+    if (event.key === "ArrowUp") focusItem(currentIndex - 1);
+    if (event.key === "Home") focusItem(0);
+    if (event.key === "End") focusItem(items.length - 1);
+  });
   document.addEventListener("click", () => closeToolsMoreMenu());
   document.addEventListener("keydown", (e) => {
     if (e.key === "Escape") closeToolsMoreMenu();
   });
+}
+
+function setMainContentInert(inert) {
+  if (inert) {
+    document.body.classList.add("modal-open");
+  } else {
+    document.body.classList.remove("modal-open");
+  }
 }
 
 function setupLayoutToggle() {
@@ -419,6 +446,7 @@ function closeSurfacesPanel() {
   elements.surfacesSettingsPanel.hidden = true;
   elements.surfacesSettingsBtn?.setAttribute("aria-expanded", "false");
   removeSurfacesPanelTabTrap();
+  setMainContentInert(false);
   elements.surfacesSettingsBtn?.focus();
 }
 
@@ -435,12 +463,14 @@ function setupSurfacesSettings() {
     panel.hidden = !panel.hidden;
     elements.surfacesSettingsBtn?.setAttribute("aria-expanded", String(!panel.hidden));
     if (!panel.hidden) {
+      setMainContentInert(true);
       addSurfacesPanelTabTrap();
       requestAnimationFrame(() => {
         const firstFocusable = getSurfacesPanelFocusables()[0];
         firstFocusable?.focus();
       });
     } else {
+      setMainContentInert(false);
       removeSurfacesPanelTabTrap();
       elements.surfacesSettingsBtn?.focus();
     }
@@ -552,6 +582,7 @@ function showQuickAddForm() {
   elements.quickAddUrl.value = "";
   elements.quickAddCategory.value = categories[0] ?? "";
   wrap.hidden = false;
+  setMainContentInert(true);
   addQuickAddFormTabTrap();
   requestAnimationFrame(() => {
     elements.quickAddName?.focus();
@@ -560,6 +591,7 @@ function showQuickAddForm() {
 
 function hideQuickAddForm() {
   elements.quickAddFormWrap.hidden = true;
+  setMainContentInert(false);
   removeQuickAddFormTabTrap();
 }
 
@@ -1096,18 +1128,44 @@ function createCardElement(tool, pinnedIds, opts = {}) {
   });
 
   if (moreTrigger && moreMenu) {
+    const focusMenuItem = (index) => {
+      const items = Array.from(moreMenu.querySelectorAll("button:not([hidden])"));
+      if (items.length === 0) return;
+      const bounded = ((index % items.length) + items.length) % items.length;
+      items[bounded].focus();
+    };
     moreTrigger.addEventListener("click", (e) => {
       e.stopPropagation();
       e.preventDefault();
       const isOpen = !moreMenu.hidden;
       moreMenu.hidden = isOpen;
       moreTrigger.setAttribute("aria-expanded", String(!isOpen));
+      if (!isOpen) requestAnimationFrame(() => focusMenuItem(0));
     });
     const closeMore = () => {
       moreMenu.hidden = true;
       moreTrigger.setAttribute("aria-expanded", "false");
+      moreTrigger.focus();
     };
     moreMenu.querySelectorAll("button").forEach((item) => item.addEventListener("click", closeMore));
+    moreMenu.addEventListener("keydown", (event) => {
+      if (event.key === "Escape") {
+        event.preventDefault();
+        closeMore();
+        return;
+      }
+      if (event.key !== "ArrowDown" && event.key !== "ArrowUp" && event.key !== "Home" && event.key !== "End") {
+        return;
+      }
+      event.preventDefault();
+      const items = Array.from(moreMenu.querySelectorAll("button:not([hidden])"));
+      if (items.length === 0) return;
+      const currentIndex = Math.max(0, items.indexOf(document.activeElement));
+      if (event.key === "ArrowDown") focusMenuItem(currentIndex + 1);
+      if (event.key === "ArrowUp") focusMenuItem(currentIndex - 1);
+      if (event.key === "Home") focusMenuItem(0);
+      if (event.key === "End") focusMenuItem(items.length - 1);
+    });
   }
 
   const pinnedIndex = pinnedIds.indexOf(tool.id);
