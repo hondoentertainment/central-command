@@ -59,7 +59,8 @@
       </main>
     </div>
 
-    <script src="./sw-register.js"></script>
+    <!-- Lazy by route: this page loads only app-history.js (no main app.js). -->
+    <script src="./sw-register.js" defer></script>
     <script type="module" src="./app-history.js"></script>
   </body>
 </html>

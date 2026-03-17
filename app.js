@@ -23,6 +23,7 @@ import {
   loadCustomCategories,
   loadLayoutPreference,
   loadLaunchHistorySynced,
+  loadNotes,
   loadStoredToolsSynced,
   loadSurfacesPreferences,
   performInitialSync,
@@ -44,6 +45,7 @@ import { showToast } from "./lib/toast.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
+const EXPORT_VERSION = 2;
 const VIRTUALIZE_THRESHOLD = 50;
 const OVERSCAN_ROWS = 2;
 const ROW_HEIGHT = { grid: 180, list: 72, compact: 100 };
@@ -87,6 +89,7 @@ const elements = {
   batchDeleteBtn: document.querySelector("#batchDeleteBtn"),
   batchCategorySelect: document.querySelector("#batchCategorySelect"),
   batchDoneBtn: document.querySelector("#batchDoneBtn"),
+  statusAnnouncer: document.querySelector("#statusAnnouncer"),
   quickAddFormWrap: document.querySelector("#quickAddFormWrap"),
   quickAddForm: document.querySelector("#quickAddForm"),
   quickAddName: document.querySelector("#quickAddName"),
@@ -102,6 +105,8 @@ const elements = {
   launchHookUrlInput: document.querySelector("#launchHookUrlInput"),
   importBackupBtn: document.querySelector("#importBackupBtn"),
   importBackupInput: document.querySelector("#importBackupInput"),
+  importFromUrlBtn: document.querySelector("#importFromUrlBtn"),
+  copyBackupBtn: document.querySelector("#copyBackupBtn"),
   toolsMoreBtn: document.querySelector("#toolsMoreBtn"),
   toolsMoreMenu: document.querySelector("#toolsMoreMenu"),
   creativeHubEnabled: document.querySelector("#creativeHubEnabled"),
@@ -184,6 +189,8 @@ async function initialize() {
     elements.importBackupInput?.click();
   });
   elements.importBackupInput?.addEventListener("change", handleImportBackup);
+  elements.importFromUrlBtn?.addEventListener("click", handleImportFromUrl);
+  elements.copyBackupBtn?.addEventListener("click", handleCopyBackupToClipboard);
   elements.selectModeBtn?.addEventListener("click", () => {
     closeToolsMoreMenu();
     toggleSelectMode();
@@ -269,6 +276,7 @@ function setupVirtualizationObservers() {
     }
   });
   ro.observe(wrap);
+  // On wrap resize, cols and totalRows are recalc'd via computeVirtualCols (wrap.clientWidth, getLayoutMode()) and computeVirtualVisibleRange.
 }
 
 function closeToolsMoreMenu() {
@@ -365,6 +373,44 @@ function removeSurfacesPanelTabTrap() {
   if (surfacesPanelTabTrapHandler) {
     document.removeEventListener("keydown", surfacesPanelTabTrapHandler);
     surfacesPanelTabTrapHandler = null;
+  }
+}
+
+let quickAddFormTabTrapHandler = null;
+
+function getQuickAddFormFocusables() {
+  const wrap = elements.quickAddFormWrap;
+  if (!wrap || wrap.hidden) return [];
+  const sel = 'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])';
+  return Array.from(wrap.querySelectorAll(sel));
+}
+
+function addQuickAddFormTabTrap() {
+  if (quickAddFormTabTrapHandler) return;
+  quickAddFormTabTrapHandler = (e) => {
+    const wrap = elements.quickAddFormWrap;
+    if (!wrap || wrap.hidden) return;
+    if (e.key !== "Tab") return;
+    if (!wrap.contains(document.activeElement)) return;
+    const focusables = getQuickAddFormFocusables();
+    if (focusables.length < 2) return;
+    const first = focusables[0];
+    const last = focusables[focusables.length - 1];
+    if (e.shiftKey && document.activeElement === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && document.activeElement === last) {
+      e.preventDefault();
+      first.focus();
+    }
+  };
+  document.addEventListener("keydown", quickAddFormTabTrapHandler);
+}
+
+function removeQuickAddFormTabTrap() {
+  if (quickAddFormTabTrapHandler) {
+    document.removeEventListener("keydown", quickAddFormTabTrapHandler);
+    quickAddFormTabTrapHandler = null;
   }
 }
 
@@ -506,11 +552,15 @@ function showQuickAddForm() {
   elements.quickAddUrl.value = "";
   elements.quickAddCategory.value = categories[0] ?? "";
   wrap.hidden = false;
-  elements.quickAddName?.focus();
+  addQuickAddFormTabTrap();
+  requestAnimationFrame(() => {
+    elements.quickAddName?.focus();
+  });
 }
 
 function hideQuickAddForm() {
   elements.quickAddFormWrap.hidden = true;
+  removeQuickAddFormTabTrap();
 }
 
 async function handleQuickAddSubmit(event) {
@@ -594,6 +644,47 @@ async function handleImportBackup(event) {
     showToast(`Imported ${importedTools.length} tools from ${file.name}.`, "success");
   } catch {
     showToast("Could not import that backup. Use a JSON file from Export.", "error");
+  }
+}
+
+async function handleImportFromUrl() {
+  closeToolsMoreMenu();
+  const url = window.prompt("Enter backup JSON URL:", "https://");
+  if (!url || !url.trim()) return;
+  const trimmed = url.trim();
+  try {
+    const imported = await fetchAndImportBackup(trimmed);
+    if (!imported) {
+      showToast("Could not load backup from that URL. Check the URL and try again.", "error");
+      return;
+    }
+    state.tools = normalizePinRanks(imported.tools);
+    state.launchHistory = filterHistoryForTools(imported.history, state.tools);
+    await saveStoredToolsSynced(state.tools);
+    await saveLaunchHistorySynced(state.launchHistory);
+    if (imported.notes != null) saveNotesSynced(imported.notes);
+    render();
+    updateStatusCards();
+    showToast(`Imported ${state.tools.length} tools from URL.`, "success");
+  } catch {
+    showToast("Could not import from URL.", "error");
+  }
+}
+
+async function handleCopyBackupToClipboard() {
+  closeToolsMoreMenu();
+  const payload = {
+    version: EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    tools: state.tools,
+    notes: loadNotes(),
+    launchHistory: state.launchHistory,
+  };
+  try {
+    await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+    showToast("Backup copied to clipboard.", "success");
+  } catch {
+    showToast("Could not copy to clipboard.", "error");
   }
 }
 
@@ -879,12 +970,19 @@ function computeVirtualCols() {
 function computeVirtualVisibleRange(visibleTools) {
   const wrap = elements.toolGridScrollWrap;
   const grid = elements.toolGrid;
-  if (!wrap || !grid || visibleTools.length === 0) return;
+  if (!wrap || !grid || visibleTools.length === 0) {
+    state.virtual.totalRows = 0;
+    return;
+  }
 
   const layout = getLayoutMode();
   const rowHeight = ROW_HEIGHT[layout] ?? ROW_HEIGHT.grid;
   const cols = computeVirtualCols();
   const totalRows = Math.ceil(visibleTools.length / cols);
+  if (totalRows <= 0) {
+    state.virtual.totalRows = 0;
+    return;
+  }
 
   const scrollTop = wrap.scrollTop;
   const viewHeight = Math.max(1, wrap.clientHeight || 400);
@@ -894,6 +992,7 @@ function computeVirtualVisibleRange(visibleTools) {
     totalRows - 1,
     Math.ceil((scrollTop + viewHeight) / rowHeight) - 1 + OVERSCAN_ROWS
   );
+  endRow = Math.max(0, endRow);
 
   const visibleStart = Math.max(0, startRow * cols);
   const visibleEnd = Math.min(visibleTools.length - 1, (endRow + 1) * cols - 1);
@@ -1045,7 +1144,8 @@ function renderVirtualizedCards(visibleTools) {
   const grid = elements.toolGrid;
   if (!wrap || !grid) return;
 
-  grid.style.height = `${totalRows * rowHeight}px`;
+  const totalHeight = Math.max(0, totalRows * rowHeight);
+  grid.style.height = `${totalHeight}px`;
   grid.style.setProperty("--tool-cols", String(cols));
 
   let view = grid.querySelector(".tool-grid__view");
@@ -1154,6 +1254,15 @@ function removeTool(id) {
   updateStatusCards();
 }
 
+function announceStatus(message) {
+  const el = elements.statusAnnouncer;
+  if (!el) return;
+  el.textContent = "";
+  requestAnimationFrame(() => {
+    el.textContent = message;
+  });
+}
+
 function toggleSelectMode() {
   state.selectMode = !state.selectMode;
   if (!state.selectMode) {
@@ -1163,6 +1272,7 @@ function toggleSelectMode() {
   }
   elements.batchActionBar.hidden = false;
   elements.selectModeBtn.textContent = "Done";
+  announceStatus("Select mode. Use checkboxes to select tools, then use bulk actions.");
   render();
 }
 
@@ -1171,6 +1281,7 @@ function exitSelectMode() {
   state.selectedToolIds.clear();
   elements.batchActionBar.hidden = true;
   elements.selectModeBtn.textContent = "Select";
+  announceStatus("Select mode closed.");
   render();
 }
 
@@ -1206,6 +1317,7 @@ function batchPinSelected() {
   state.tools = normalizePinRanks(state.tools);
   saveStoredToolsSynced(state.tools);
   state.selectedToolIds.clear();
+  announceStatus(`${ids.length} tool(s) pinned.`);
   render();
   updateStatusCards();
 }
@@ -1213,13 +1325,16 @@ function batchPinSelected() {
 function batchDeleteSelected() {
   const ids = [...state.selectedToolIds];
   if (ids.length === 0) return;
-  const confirmed = window.confirm(`Delete ${ids.length} tool(s)?`);
+  const confirmed = window.confirm(
+    `Delete ${ids.length} tool(s)? This cannot be undone.`
+  );
   if (!confirmed) return;
   state.tools = state.tools.filter((t) => !ids.includes(t.id));
   state.launchHistory = filterHistoryForTools(state.launchHistory, state.tools);
   saveStoredToolsSynced(state.tools);
   saveLaunchHistorySynced(state.launchHistory);
   state.selectedToolIds.clear();
+  announceStatus(`${ids.length} tool(s) deleted.`);
   exitSelectMode();
   updateStatusCards();
 }

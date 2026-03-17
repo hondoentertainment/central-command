@@ -28,6 +28,8 @@
     <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
+    <a href="#toolGridScrollWrap" class="skip-link">Skip to main content</a>
+    <div id="statusAnnouncer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
     <div class="dashboard-shell">
       <aside class="dashboard-sidebar" role="complementary" aria-label="Sidebar">
         <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
@@ -100,13 +102,15 @@
                 <div id="toolsMoreMenu" class="panel__header-more-menu" hidden role="menu">
                   <button type="button" id="surfacesSettingsBtn" class="panel__header-more-item" role="menuitem" aria-label="Page layout settings" aria-expanded="false">⚙ Layout</button>
                   <button type="button" id="importBackupBtn" class="panel__header-more-item" role="menuitem">Import backup</button>
+                  <button type="button" id="importFromUrlBtn" class="panel__header-more-item" role="menuitem">Import from URL…</button>
+                  <button type="button" id="copyBackupBtn" class="panel__header-more-item" role="menuitem">Copy backup to clipboard</button>
                   <button type="button" id="selectModeBtn" class="panel__header-more-item" role="menuitem">Select</button>
                 </div>
               </div>
             </div>
             <input type="file" id="importBackupInput" accept=".json" hidden aria-hidden="true" />
           </div>
-          <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-label="Layout and launch settings">
+          <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-modal="true" aria-label="Layout and launch settings">
             <div class="surfaces-settings-panel__content">
               <label class="checkbox"><input type="checkbox" id="surfacesShowHero" checked /> Show hero</label>
               <label class="checkbox"><input type="checkbox" id="surfacesShowSpotlight" checked /> Show spotlight</label>
@@ -129,9 +133,10 @@
                   <option value="same-tab">Same tab</option>
                 </select>
               </label>
+              <p class="surfaces-settings-panel__hint">Add Calendar, Docs, and more from Starter Packs.</p>
             </div>
           </div>
-          <div id="batchActionBar" class="batch-action-bar" hidden>
+          <div id="batchActionBar" class="batch-action-bar" hidden role="status" aria-live="polite" aria-atomic="true" aria-label="Bulk actions">
             <span class="batch-action-bar__count"><span id="batchSelectedCount">0</span> selected</span>
             <div class="batch-action-bar__actions">
               <button type="button" id="batchPinBtn" class="ghost-button">Pin selected</button>
@@ -159,7 +164,7 @@
           </div>
 
           <div id="filterBar" class="filter-bar"></div>
-          <div id="toolGridScrollWrap" class="tool-grid-scroll-wrap">
+          <div id="toolGridScrollWrap" class="tool-grid-scroll-wrap" tabindex="-1">
             <div id="toolGrid" class="tool-grid" aria-live="polite">
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
@@ -202,7 +207,8 @@
       </article>
     </template>
 
-    <script src="./sw-register.js"></script>
+    <!-- Critical path: app.js and sw-register.js. Any future analytics or non-essential scripts should use defer or load after DOMContentLoaded. -->
+    <script src="./sw-register.js" defer></script>
     <script type="module" src="./app.js"></script>
   </body>
 </html>

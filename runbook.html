@@ -77,8 +77,9 @@
       </main>
     </div>
 
-    <script src="./sw-register.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Lazy by route: this page loads only app-runbook.js (no main app.js). -->
+    <script src="./sw-register.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
     <script type="module" src="./app-runbook.js"></script>
   </body>
 </html>
