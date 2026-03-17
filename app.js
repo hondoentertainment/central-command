@@ -926,6 +926,7 @@ function renderFilters() {
     button.type = "button";
     button.className = `filter-chip${state.activeCategory === category ? " is-active" : ""}`;
     button.textContent = category;
+    button.setAttribute("aria-pressed", state.activeCategory === category ? "true" : "false");
     button.addEventListener("click", () => {
       state.activeCategory = category;
       renderCards();

@@ -2,6 +2,7 @@
 
 ## Completed
 
+- **Production UX polish pass** — Shared tokens normalized, consistent panel/header rhythm, neutral component naming (`content-link-block`, `panel__intro-text`), and low-risk a11y semantics (`aria-current`, `aria-pressed`, dialog metadata, 44px touch targets).
 - **Bulk actions** — Multi-select on the command deck: bulk pin/unpin, change category, export selection, delete; confirmation copy and aria-live for screen readers.
 - **Accessibility polish** — Skip link, focus trap in Layout and Quick Add modals, Escape to close, aria-live announcements for select mode and batch actions, aria-modal on dialogs.
 - **Import from URL** — `?import=URL` query loads backup from remote JSON (see README).

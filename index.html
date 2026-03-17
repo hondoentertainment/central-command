@@ -88,9 +88,9 @@
             </div>
             <div class="panel__header-actions panel__header-actions--tools">
               <div id="layoutToggle" class="layout-toggle" role="group" aria-label="Grid layout">
-                <button type="button" class="layout-toggle__btn" data-layout="grid">Grid</button>
-                <button type="button" class="layout-toggle__btn" data-layout="list">List</button>
-                <button type="button" class="layout-toggle__btn" data-layout="compact">Compact</button>
+                <button type="button" class="layout-toggle__btn" data-layout="grid" aria-label="Show tools as grid">Grid</button>
+                <button type="button" class="layout-toggle__btn" data-layout="list" aria-label="Show tools as list">List</button>
+                <button type="button" class="layout-toggle__btn" data-layout="compact" aria-label="Show tools in compact view">Compact</button>
               </div>
               <label class="search">
                 <span class="visually-hidden">Search tools</span>
@@ -147,7 +147,7 @@
               <button type="button" id="batchDoneBtn" class="ghost-button">Done</button>
             </div>
           </div>
-          <div id="quickAddFormWrap" class="quick-add-form-wrap" hidden>
+          <div id="quickAddFormWrap" class="quick-add-form-wrap" hidden role="dialog" aria-modal="true" aria-label="Add new tool">
             <form id="quickAddForm" class="quick-add-form">
               <label for="quickAddName" class="visually-hidden">Tool name</label>
               <input id="quickAddName" type="text" placeholder="Tool name" required aria-required="true" />

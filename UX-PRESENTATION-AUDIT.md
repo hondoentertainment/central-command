@@ -1,13 +1,13 @@
 # UX Presentation Audit — Central Command
 
-**Date:** 2025-03-15  
+**Date:** 2026-03-15  
 **Scope:** Index, content pages (Movies, Music, Sports, Runbook), shared styles, tokens, and interaction patterns.
 
 ---
 
 ## Summary
 
-The app has a solid base: design tokens, focus-visible styles, 44px touch targets on primary controls, and consistent content shells. The main issues are **hardcoded colors** (sidebar, primary button text) that hurt theme consistency and light mode, **duplicate `:root`** blocks that make tokens harder to maintain, and a few **spacing/alignment** details. Addressing the high-priority items will remove the most noticeable presentation gaps.
+The app now has a production-grade polish baseline: shared tokens are normalized, content pages use neutral reusable classes, and accessibility semantics are stronger (`aria-current`, `aria-pressed`, dialog metadata, and visible keyboard focus). The major visual issues previously called out are now resolved, and remaining work is incremental feature polish rather than foundational UI cleanup.
 
 ---
 
@@ -56,15 +56,15 @@ The app has a solid base: design tokens, focus-visible styles, 44px touch target
 
 ## Prioritized action list
 
-**High**
+**High** (done)
 
-1. Replace sidebar hardcoded colors with tokens (`--bg` / `--bg-elevated` or `--sidebar-bg`) and set them for light theme.
+1. ~~Replace sidebar hardcoded colors with tokens~~ — Sidebar now uses theme tokens.
 
-**Medium**
+**Medium** (done)
 
-2. Add `--btn-on-primary` and use it for `.primary-button` / `.launch-button` text.  
-3. Add `--focus-ring` and use it for all `:focus-visible` outlines.  
-4. Verify and fix contrast for `--text-secondary` on `--bg` in both themes (WCAG AA).
+2. ~~Add `--btn-on-primary`~~ and use it for primary actions.  
+3. ~~Add `--focus-ring`~~ and use it for focus-visible outlines.  
+4. ~~Verify and improve contrast~~ for secondary text and interaction states.
 
 **Low** (done)
 
