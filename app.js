@@ -1,12 +1,10 @@
 import { ALL_PRESET_TOOLS, CATEGORY_OPTIONS, DEFAULT_TOOLS } from "./data/presets.js";
-import { getIconMarkup, ICON_OPTIONS } from "./lib/icons.js";
+import { getIconMarkup } from "./lib/icons.js";
 import { renderNav } from "./lib/nav.js";
 import {
   createFallbackMetadataMap,
   filterHistoryForTools,
-  formatLaunchTime,
   getNextPinRank,
-  getToolSignature,
   hydrateTools,
   isValidLaunchTarget,
   movePinnedTool,
@@ -22,22 +20,24 @@ import {
   loadLayoutPreference,
   loadLaunchHistorySynced,
   loadStoredToolsSynced,
-  loadSurfacesPreferences,
   performInitialSync,
   saveLayoutPreference,
   saveLaunchHistorySynced,
   saveStoredToolsSynced,
-  saveSurfacesPreferences,
-  loadIntegrationsPreferences,
-  saveIntegrationsPreferences,
 } from "./lib/storage.js";
 import {
   buildCreativeHubTool,
   getCreativeHubConfig,
-  sanitizeIntegrationsPreferences,
-  validateIntegrationUrl,
 } from "./lib/integrations.js";
 import { showToast } from "./lib/toast.js";
+import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
+import { createBatchActions } from "./lib/batch-actions.js";
+import {
+  applySurfacesVisibility,
+  getIntegrationPrefs,
+  setupIntegrationSettings,
+  setupSurfacesSettings,
+} from "./lib/surfaces-settings.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -89,6 +89,16 @@ const elements = {
   creativeHubOpenMode: document.querySelector("#creativeHubOpenMode"),
 };
 
+// --- Batch actions (delegated to module) ---
+const batch = createBatchActions({
+  state,
+  elements,
+  render,
+  updateStatusCards,
+  saveTools: (tools) => saveStoredToolsSynced(normalizePinRanks(tools)),
+  saveHistory: (history) => saveLaunchHistorySynced(history),
+});
+
 initialize();
 
 async function initialize() {
@@ -119,9 +129,9 @@ async function initialize() {
   });
   applyLayoutClass(loadLayoutPreference());
   setupLayoutToggle();
-  applySurfacesVisibility("command");
-  setupSurfacesSettings();
-  setupIntegrationSettings();
+  applySurfacesVisibility("command", elements);
+  setupSurfacesSettings(elements);
+  setupIntegrationSettings(elements, render);
   elements.searchInput.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     render();
@@ -131,14 +141,21 @@ async function initialize() {
   elements.quickAddForm?.addEventListener("submit", handleQuickAddSubmit);
   elements.quickAddCancel?.addEventListener("click", hideQuickAddForm);
 
-  elements.selectModeBtn?.addEventListener("click", toggleSelectMode);
-  elements.batchPinBtn?.addEventListener("click", batchPinSelected);
-  elements.batchDeleteBtn?.addEventListener("click", batchDeleteSelected);
-  elements.batchCategorySelect?.addEventListener("change", batchChangeCategory);
-  elements.batchDoneBtn?.addEventListener("click", exitSelectMode);
+  elements.selectModeBtn?.addEventListener("click", batch.toggleSelectMode);
+  elements.batchPinBtn?.addEventListener("click", batch.batchPinSelected);
+  elements.batchDeleteBtn?.addEventListener("click", batch.batchDeleteSelected);
+  elements.batchCategorySelect?.addEventListener("change", batch.batchChangeCategory);
+  elements.batchDoneBtn?.addEventListener("click", batch.exitSelectMode);
 
-  document.addEventListener("keydown", handleKeyboardShortcut);
-  document.addEventListener("keydown", handleToolGridKeydown);
+  setupKeyboardShortcuts({
+    getTools: () => state.tools,
+    getLaunchHistory: () => state.launchHistory,
+    setLaunchHistory: (h) => { state.launchHistory = h; },
+    saveLaunchHistory: (h) => saveLaunchHistorySynced(h),
+    onLaunch: updateStatusCards,
+  });
+  setupToolGridKeydown(elements.toolGrid);
+
   render();
 }
 
@@ -166,55 +183,6 @@ function setupLayoutToggle() {
   });
 }
 
-const DEFAULT_SURFACES = { command: ["hero", "spotlight"] };
-
-function getSurfacesForPage(pageKey) {
-  const prefs = loadSurfacesPreferences();
-  const surfaces = prefs?.[pageKey];
-  if (Array.isArray(surfaces)) return surfaces;
-  return DEFAULT_SURFACES[pageKey] ?? ["hero", "spotlight"];
-}
-
-function applySurfacesVisibility(pageKey) {
-  const surfaces = getSurfacesForPage(pageKey);
-  if (elements.heroSection) elements.heroSection.hidden = !surfaces.includes("hero");
-  if (elements.spotlightSection) elements.spotlightSection.hidden = !surfaces.includes("spotlight");
-}
-
-function setupSurfacesSettings() {
-  const prefs = loadSurfacesPreferences();
-  const surfaces = prefs?.command ?? DEFAULT_SURFACES.command;
-  if (elements.surfacesShowHero) elements.surfacesShowHero.checked = surfaces.includes("hero");
-  if (elements.surfacesShowSpotlight) elements.surfacesShowSpotlight.checked = surfaces.includes("spotlight");
-
-  elements.surfacesSettingsBtn?.addEventListener("click", () => {
-    const panel = elements.surfacesSettingsPanel;
-    if (!panel) return;
-    panel.hidden = !panel.hidden;
-    elements.surfacesSettingsBtn?.setAttribute("aria-expanded", String(!panel.hidden));
-  });
-
-  const updateFromCheckboxes = () => {
-    const showHero = elements.surfacesShowHero?.checked ?? true;
-    const showSpotlight = elements.surfacesShowSpotlight?.checked ?? true;
-    const surfaces = [];
-    if (showHero) surfaces.push("hero");
-    if (showSpotlight) surfaces.push("spotlight");
-    const prefs = loadSurfacesPreferences() ?? {};
-    prefs.command = surfaces;
-    saveSurfacesPreferences(prefs);
-    applySurfacesVisibility("command");
-  };
-
-  elements.surfacesShowHero?.addEventListener("change", updateFromCheckboxes);
-  elements.surfacesShowSpotlight?.addEventListener("change", updateFromCheckboxes);
-}
-
-
-function getIntegrationPrefs() {
-  return sanitizeIntegrationsPreferences(loadIntegrationsPreferences());
-}
-
 function getToolsWithIntegrationEntries() {
   const prefs = getIntegrationPrefs();
   const creativeHubTool = buildCreativeHubTool(getCreativeHubConfig(prefs));
@@ -222,54 +190,6 @@ function getToolsWithIntegrationEntries() {
   const hasCreativeHub = state.tools.some((tool) => tool.name.toLowerCase() === "creative hub");
   if (hasCreativeHub) return state.tools;
   return [...state.tools, sanitizeTool(creativeHubTool)].filter(Boolean);
-}
-
-function setupIntegrationSettings() {
-  const prefs = getIntegrationPrefs();
-  const creativeHub = prefs.creativeHub;
-
-  if (elements.creativeHubEnabled) elements.creativeHubEnabled.checked = creativeHub.enabled;
-  if (elements.creativeHubShowInNav) elements.creativeHubShowInNav.checked = creativeHub.showInNav;
-  if (elements.creativeHubShowInPalette) elements.creativeHubShowInPalette.checked = creativeHub.showInCommandPalette;
-  if (elements.creativeHubShowAsTool) elements.creativeHubShowAsTool.checked = creativeHub.showAsTool;
-  if (elements.creativeHubUrl) elements.creativeHubUrl.value = creativeHub.url;
-  if (elements.creativeHubOpenMode) elements.creativeHubOpenMode.value = creativeHub.openMode;
-
-  const savePrefs = () => {
-    const urlValidation = validateIntegrationUrl(elements.creativeHubUrl?.value);
-    if (!urlValidation.isValid) {
-      showToast("Creative Hub URL is invalid. Using default URL.", "error");
-    }
-
-    const next = sanitizeIntegrationsPreferences({
-      creativeHub: {
-        enabled: elements.creativeHubEnabled?.checked ?? true,
-        showInNav: elements.creativeHubShowInNav?.checked ?? true,
-        showInCommandPalette: elements.creativeHubShowInPalette?.checked ?? true,
-        showAsTool: elements.creativeHubShowAsTool?.checked ?? true,
-        url: urlValidation.url,
-        openMode: elements.creativeHubOpenMode?.value,
-      },
-    });
-
-    if (elements.creativeHubUrl) {
-      elements.creativeHubUrl.value = next.creativeHub.url;
-    }
-
-    saveIntegrationsPreferences(next);
-    renderNav("command");
-    render();
-  };
-
-  [
-    elements.creativeHubEnabled,
-    elements.creativeHubShowInNav,
-    elements.creativeHubShowInPalette,
-    elements.creativeHubShowAsTool,
-    elements.creativeHubOpenMode,
-  ].forEach((el) => el?.addEventListener("change", savePrefs));
-
-  elements.creativeHubUrl?.addEventListener("blur", savePrefs);
 }
 
 function showQuickAddForm() {
@@ -322,126 +242,6 @@ async function handleQuickAddSubmit(event) {
   hideQuickAddForm();
   render();
   updateStatusCards();
-}
-
-function handleKeyboardShortcut(event) {
-  const active = document.activeElement;
-  const isEditable =
-    active &&
-    (active.tagName === "INPUT" ||
-      active.tagName === "TEXTAREA" ||
-      active.tagName === "SELECT" ||
-      active.isContentEditable);
-  if (isEditable) return;
-
-  const modifierHeld = event.ctrlKey || event.metaKey;
-  if (!modifierHeld) return;
-
-  const key = event.key?.toLowerCase?.();
-  if (!key || key.length > 1) return;
-
-  const shiftHeld = event.shiftKey;
-  const pinnedWithShortcuts = sortTools(
-    state.tools.filter((tool) => tool.pinned && tool.shortcutLabel && tool.shortcutLabel.trim())
-  );
-
-  const toolsMatchingKey = pinnedWithShortcuts.filter((tool) => {
-    const label = tool.shortcutLabel.trim();
-    const labelKey = label.length === 1 ? label.toLowerCase() : parseShortcutKey(label);
-    return labelKey === key;
-  });
-
-  const withExplicitShift = toolsMatchingKey.filter((t) => parseShortcutUsesShift(t.shortcutLabel));
-  const plain = toolsMatchingKey.filter((t) => !parseShortcutUsesShift(t.shortcutLabel));
-
-  let match = null;
-  if (shiftHeld) {
-    match = withExplicitShift[0] ?? plain[1] ?? plain[0];
-  } else {
-    match = plain[0] ?? null;
-  }
-
-  if (!match) return;
-
-  event.preventDefault();
-  state.launchHistory = recordLaunch(state.launchHistory, match.id);
-  saveLaunchHistorySynced(state.launchHistory);
-  updateStatusCards();
-
-  const url = normalizeUrl(match.url);
-  if (match.openMode === "same-tab") {
-    window.location.href = url;
-  } else {
-    window.open(url, "_blank", "noreferrer");
-  }
-}
-
-function parseShortcutKey(label) {
-  const parts = label.split(/[\s+]+/);
-  const last = parts[parts.length - 1];
-  return last?.length === 1 ? last.toLowerCase() : null;
-}
-
-function parseShortcutUsesShift(label) {
-  const lower = label.toLowerCase();
-  return lower.includes("shift");
-}
-
-function handleToolGridKeydown(event) {
-  const active = document.activeElement;
-  if (
-    !active ||
-    active.tagName === "INPUT" ||
-    active.tagName === "TEXTAREA" ||
-    active.tagName === "SELECT" ||
-    active.isContentEditable
-  ) {
-    return;
-  }
-
-  if (!elements.toolGrid?.contains(active)) return;
-  const currentCard = active.classList?.contains("tool-card") ? active : active.closest(".tool-card");
-  if (!currentCard) return;
-
-  const cards = [...elements.toolGrid.querySelectorAll(".tool-card")];
-  if (cards.length === 0) return;
-
-  const key = event.key;
-  if (key === "Enter") {
-    if (active === currentCard) {
-      const launchBtn = currentCard.querySelector(".launch-button");
-      if (launchBtn) {
-        event.preventDefault();
-        launchBtn.click();
-      }
-    }
-    return;
-  }
-
-  const dirs = { ArrowUp: -1, ArrowDown: 1, ArrowLeft: -1, ArrowRight: 1 };
-  const step = dirs[key];
-  if (step === undefined) return;
-
-  event.preventDefault();
-
-  const rect = elements.toolGrid.getBoundingClientRect();
-  const firstCardRect = cards[0].getBoundingClientRect();
-  const gap = 16;
-  const cardWidth = firstCardRect.width + gap;
-  const cols = Math.max(1, Math.floor(rect.width / cardWidth));
-  const index = cards.indexOf(currentCard);
-  if (index === -1) return;
-
-  let nextIndex;
-  if (key === "ArrowUp" || key === "ArrowDown") {
-    nextIndex = index + step * cols;
-  } else {
-    nextIndex = index + step;
-  }
-  nextIndex = Math.max(0, Math.min(nextIndex, cards.length - 1));
-  if (nextIndex !== index) {
-    cards[nextIndex].focus();
-  }
 }
 
 function render() {
@@ -567,7 +367,7 @@ function renderCards() {
     .filter((tool) => tool.pinned)
     .map((tool) => tool.id);
 
-  updateBatchActionBar();
+  batch.updateBatchActionBar();
 
   visibleTools.forEach((tool) => {
     const isVirtualIntegration = !tool.id;
@@ -598,7 +398,7 @@ function renderCards() {
         selectCheckbox.addEventListener("change", () => {
           if (selectCheckbox.checked) state.selectedToolIds.add(tool.id);
           else state.selectedToolIds.delete(tool.id);
-          updateBatchActionBar();
+          batch.updateBatchActionBar();
         });
       }
       card.querySelector(".tool-card__actions")?.classList.add("is-hidden");
@@ -683,90 +483,6 @@ function removeTool(id) {
   saveLaunchHistorySynced(state.launchHistory);
   render();
   updateStatusCards();
-}
-
-function toggleSelectMode() {
-  state.selectMode = !state.selectMode;
-  if (!state.selectMode) {
-    state.selectedToolIds.clear();
-    exitSelectMode();
-    return;
-  }
-  elements.batchActionBar.hidden = false;
-  elements.selectModeBtn.textContent = "Done";
-  render();
-}
-
-function exitSelectMode() {
-  state.selectMode = false;
-  state.selectedToolIds.clear();
-  elements.batchActionBar.hidden = true;
-  elements.selectModeBtn.textContent = "Select";
-  render();
-}
-
-function updateBatchActionBar() {
-  if (!elements.batchActionBar || !elements.batchSelectedCount) return;
-  elements.batchSelectedCount.textContent = String(state.selectedToolIds.size);
-  const hasSelection = state.selectedToolIds.size > 0;
-  elements.batchPinBtn.disabled = !hasSelection;
-  elements.batchDeleteBtn.disabled = !hasSelection;
-  elements.batchCategorySelect.disabled = !hasSelection;
-
-  const customCats = loadCustomCategories();
-  const categories = [...new Set([...CATEGORY_OPTIONS, ...customCats, ...state.tools.map((t) => t.category)].sort())];
-  const currentVal = elements.batchCategorySelect.value;
-  elements.batchCategorySelect.innerHTML = '<option value="">Change category…</option>';
-  categories.forEach((cat) => {
-    const opt = document.createElement("option");
-    opt.value = cat;
-    opt.textContent = cat;
-    elements.batchCategorySelect.appendChild(opt);
-  });
-  elements.batchCategorySelect.value = currentVal && categories.includes(currentVal) ? currentVal : "";
-}
-
-function batchPinSelected() {
-  const ids = [...state.selectedToolIds];
-  if (ids.length === 0) return;
-  let nextRank = getNextPinRank(state.tools);
-  state.tools = state.tools.map((tool) => {
-    if (!ids.includes(tool.id)) return tool;
-    return { ...tool, pinned: true, pinRank: nextRank++ };
-  });
-  state.tools = normalizePinRanks(state.tools);
-  saveStoredToolsSynced(state.tools);
-  state.selectedToolIds.clear();
-  render();
-  updateStatusCards();
-}
-
-function batchDeleteSelected() {
-  const ids = [...state.selectedToolIds];
-  if (ids.length === 0) return;
-  const confirmed = window.confirm(`Delete ${ids.length} tool(s)?`);
-  if (!confirmed) return;
-  state.tools = state.tools.filter((t) => !ids.includes(t.id));
-  state.launchHistory = filterHistoryForTools(state.launchHistory, state.tools);
-  saveStoredToolsSynced(state.tools);
-  saveLaunchHistorySynced(state.launchHistory);
-  state.selectedToolIds.clear();
-  exitSelectMode();
-  updateStatusCards();
-}
-
-function batchChangeCategory() {
-  const newCategory = elements.batchCategorySelect?.value?.trim();
-  if (!newCategory) return;
-  const ids = [...state.selectedToolIds];
-  if (ids.length === 0) return;
-  state.tools = state.tools.map((tool) =>
-    ids.includes(tool.id) ? { ...tool, category: newCategory } : tool
-  );
-  saveStoredToolsSynced(state.tools);
-  state.selectedToolIds.clear();
-  elements.batchCategorySelect.value = "";
-  render();
 }
 
 function updateStatusCards() {
