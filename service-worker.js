@@ -1,4 +1,5 @@
-const CACHE_NAME = "central-command-v1";
+const CACHE_VERSION = 2;
+const CACHE_NAME = `central-command-v${CACHE_VERSION}`;
 
 const BASE = location.pathname.includes("/central-command") ? "/central-command" : "";
 
@@ -47,6 +48,15 @@ const PRECACHE = [
   BASE + "/lib/icons.js",
   BASE + "/lib/storage.js",
   BASE + "/lib/tool-model.js",
+  BASE + "/lib/debounce.js",
+  BASE + "/lib/keyboard-shortcuts.js",
+  BASE + "/lib/batch-actions.js",
+  BASE + "/lib/surfaces-settings.js",
+  BASE + "/lib/toast.js",
+  BASE + "/lib/integrations.js",
+  BASE + "/lib/command-palette.js",
+  BASE + "/lib/theme.js",
+  BASE + "/lib/auth-ui.js",
   BASE + "/data/presets.js",
   BASE + "/icons/icon-192.svg",
   BASE + "/icons/icon-512.svg",
@@ -85,16 +95,34 @@ self.addEventListener("fetch", (event) => {
 
   const altRequest = REWRITES[path] ? new Request(new URL(REWRITES[path], url.origin)) : null;
 
-  event.respondWith(
-    caches.match(event.request).then((cached) => {
-      if (cached) return cached;
-      if (altRequest) return caches.match(altRequest);
-      return fetch(event.request).then((response) => {
-        if (!response.ok) return response;
-        const clone = response.clone();
-        caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
-        return response;
-      });
-    })
-  );
+  const isCodeAsset = /\.(js|css)$/i.test(path);
+
+  if (isCodeAsset) {
+    // Network-first for JS/CSS: ensures fresh code after deploys
+    event.respondWith(
+      fetch(event.request)
+        .then((response) => {
+          if (response.ok) {
+            const clone = response.clone();
+            caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          }
+          return response;
+        })
+        .catch(() => caches.match(event.request).then((cached) => cached || new Response("Offline", { status: 503 })))
+    );
+  } else {
+    // Cache-first for HTML, images, fonts, etc.
+    event.respondWith(
+      caches.match(event.request).then((cached) => {
+        if (cached) return cached;
+        if (altRequest) return caches.match(altRequest);
+        return fetch(event.request).then((response) => {
+          if (!response.ok) return response;
+          const clone = response.clone();
+          caches.open(CACHE_NAME).then((cache) => cache.put(event.request, clone));
+          return response;
+        });
+      })
+    );
+  }
 });

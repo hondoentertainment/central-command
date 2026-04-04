@@ -1,0 +1,60 @@
+import prettier from "eslint-config-prettier";
+
+export default [
+  {
+    files: ["**/*.js"],
+    ignores: ["node_modules/**", "service-worker.js"],
+    languageOptions: {
+      ecmaVersion: 2022,
+      sourceType: "module",
+      globals: {
+        window: "readonly",
+        document: "readonly",
+        localStorage: "readonly",
+        sessionStorage: "readonly",
+        console: "readonly",
+        setTimeout: "readonly",
+        clearTimeout: "readonly",
+        crypto: "readonly",
+        URL: "readonly",
+        Request: "readonly",
+        Response: "readonly",
+        fetch: "readonly",
+        caches: "readonly",
+        Blob: "readonly",
+        File: "readonly",
+        HTMLElement: "readonly",
+        Node: "readonly",
+        Intl: "readonly",
+        alert: "readonly",
+        location: "readonly",
+        self: "readonly",
+        navigator: "readonly",
+        marked: "readonly",
+        structuredClone: "readonly",
+      },
+    },
+    rules: {
+      "no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+      "no-undef": "error",
+      "no-const-assign": "error",
+      "no-dupe-keys": "error",
+      "no-duplicate-case": "error",
+      "no-unreachable": "warn",
+      eqeqeq: ["warn", "smart"],
+      "no-eval": "error",
+      "no-implied-eval": "error",
+      "prefer-const": "warn",
+    },
+  },
+  {
+    files: ["tests/**/*.js"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
+        global: "readonly",
+      },
+    },
+  },
+  prettier,
+];

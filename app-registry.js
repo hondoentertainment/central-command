@@ -350,15 +350,41 @@ function exportBackup() {
   setFormMessage("Backup exported.", "success");
 }
 
+const MAX_IMPORT_SIZE_BYTES = 5 * 1024 * 1024; // 5 MB
+const MAX_IMPORT_TOOLS = 500;
+
 async function handleImport(event) {
   const file = event.target.files?.[0];
   event.target.value = "";
   if (!file) return;
 
+  if (file.size > MAX_IMPORT_SIZE_BYTES) {
+    setFormMessage(`File too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Max is 5 MB.`, "error");
+    return;
+  }
+
   try {
     const text = await file.text();
-    const payload = JSON.parse(text);
+    let payload;
+    try {
+      payload = JSON.parse(text);
+    } catch {
+      throw new Error("Invalid JSON. The file could not be parsed.");
+    }
+
+    if (payload === null || typeof payload !== "object") {
+      throw new Error("Unexpected format. Expected a JSON object or array.");
+    }
+
     const rawTools = Array.isArray(payload) ? payload : payload?.tools;
+    if (!Array.isArray(rawTools)) {
+      throw new Error("No tools array found in the backup file.");
+    }
+
+    if (rawTools.length > MAX_IMPORT_TOOLS) {
+      throw new Error(`Too many tools (${rawTools.length}). Max is ${MAX_IMPORT_TOOLS}.`);
+    }
+
     const importedTools = hydrateTools(rawTools, fallbackMetadataBySignature);
 
     if (importedTools.length === 0) {
