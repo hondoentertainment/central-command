@@ -35,6 +35,8 @@ jobs:
               - "app*.js"
               - "styles.css"
               - "data/**"
+              - "serve.json"
+              - "vercel.json"
       - uses: actions/setup-node@v4
         with:
           node-version: "20"

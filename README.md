@@ -24,13 +24,16 @@ Central Command keeps tools (URLs, local paths, app protocols), quick links, pre
 
 ## Running Locally
 
-Static site — use any HTTP server:
+Static site — use any HTTP server. For parity with **Vercel extensionless URLs** (`/music`, `/registry`, …), use the bundled config:
 
 ```bash
-npx serve .
-# or
-python -m http.server 8000
+npm run dev
+# same as: npx serve . -p 3000  (loads serve.json from the project root)
 ```
+
+`serve.json` defines rewrites that mirror `vercel.json`. Plain `python -m http.server` only serves `*.html` paths unless you add your own routing.
+
+**Note:** Save `serve.json` as UTF-8 **without BOM**. A BOM breaks the `serve` CLI JSON parser.
 
 ### Cross-Device Sync (Firebase)
 
@@ -66,7 +69,7 @@ Visit the deployed site and use your browser's **Add to home screen** (or **Inst
 
 **URLs:** [GitHub Pages](https://hondoentertainment.github.io/central-command/) · [Vercel](https://central-command-self.vercel.app/)
 
-Deploys to GitHub Pages (on push to `master`) and Vercel.
+Deploys to GitHub Pages (on push to `master`) and Vercel. On **Vercel**, `vercel.json` rewrites map extensionless paths to the matching `*.html` files (same rules as local `serve.json`).
 
 ### Deploy on push (Vercel)
 
@@ -79,7 +82,8 @@ To have every push to `master` update the live Vercel site automatically:
 ## Tech
 
 - **Vanilla JS**, ES modules, no framework
-- Static HTML/CSS/JS; no build step
+- Static HTML/CSS/JS; no app bundler or compile step
+- Optional **deploy-time** script: `node scripts/build-firebase-config.js` emits `config/firebase.config.generated.js` from environment variables (used by Vercel `buildCommand` and the GitHub Pages workflow)
 - Deploys as a static site to GitHub Pages and Vercel
 
 ## Tests & CI
@@ -111,7 +115,8 @@ Tests start a static server (`npx serve . -p 3000`) automatically. Ensure port 3
 |------|---------|
 | `app.js` | Main entry, state, render loop, event handlers |
 | `index.html` | Shell, hero, spotlight, command deck |
-| `lib/` | `tool-model.js`, `storage.js`, `icons.js`, `nav.js` |
+| `lib/` | `tool-model.js`, `storage.js`, `icons.js`, `nav.js`, `category-hub-page.js` |
+| `serve.json` | Local static-server rewrites (aligned with `vercel.json`) |
 | `data/presets.js` | Preset packs, category options, tool factory |
 | `*.html` | Category pages (sports, games, writing, music, etc.) |
 | `manifest.json` | PWA manifest |

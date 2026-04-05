@@ -39,6 +39,13 @@
     { "source": "/writing", "destination": "/writing.html" },
     { "source": "/productivity", "destination": "/productivity.html" },
     { "source": "/history", "destination": "/history.html" },
-    { "source": "/runbook", "destination": "/runbook.html" }
+    { "source": "/runbook", "destination": "/runbook.html" },
+    { "source": "/health", "destination": "/health.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/music", "destination": "/music.html" },
+    { "source": "/movies", "destination": "/movies.html" },
+    { "source": "/parties", "destination": "/parties.html" }
   ]
 }
