@@ -69,7 +69,7 @@ Visit the deployed site and use your browser's **Add to home screen** (or **Inst
 
 **URLs:** [GitHub Pages](https://hondoentertainment.github.io/central-command/) · [Vercel](https://central-command-self.vercel.app/)
 
-Deploys to GitHub Pages (on push to `master`) and Vercel. On **Vercel**, `vercel.json` rewrites map extensionless paths to the matching `*.html` files (same rules as local `serve.json`).
+Deploys to GitHub Pages (on push to `master`) and Vercel. On **Vercel**, `vercel.json` rewrites map extensionless paths to the matching `*.html` files (same rules as local `serve.json`). The Vercel **install** step uses `npm ci --omit=dev` so Playwright (a devDependency) is not installed on the edge network—this avoids install timeouts from browser downloads. Local development and CI should use a full `npm install` for tests.
 
 ### Deploy on push (Vercel)
 
