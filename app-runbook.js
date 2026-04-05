@@ -6,6 +6,7 @@ import {
   saveNotesSynced,
   saveRunbookTemplates,
 } from "./lib/storage.js";
+import { debounce } from "./lib/debounce.js";
 
 const MODE_KEY = "central-command.runbook-mode";
 const MODE_EDIT = "edit";
@@ -27,6 +28,8 @@ const elements = {
 
 let mode = MODE_EDIT;
 
+const debouncedSaveNotes = debounce((value) => saveNotesSynced(value), 800);
+
 initialize();
 
 function initialize() {
@@ -39,7 +42,7 @@ function initialize() {
   elements.tabEdit.addEventListener("click", () => setMode(MODE_EDIT));
   elements.tabPreview.addEventListener("click", () => setMode(MODE_PREVIEW));
   elements.notes.addEventListener("input", (event) => {
-    saveNotesSynced(event.target.value);
+    debouncedSaveNotes(event.target.value);
     updateLastEditedDisplay();
   });
 
@@ -159,6 +162,48 @@ function applyMode(m) {
   }
 }
 
+function sanitizeHtml(html) {
+  const ALLOWED_TAGS = new Set([
+    "h1", "h2", "h3", "h4", "h5", "h6", "p", "br", "hr",
+    "ul", "ol", "li", "blockquote", "pre", "code",
+    "em", "strong", "del", "a", "img", "table", "thead",
+    "tbody", "tr", "th", "td", "input", "span", "div", "sup", "sub",
+  ]);
+  const ALLOWED_ATTRS = new Set([
+    "href", "src", "alt", "title", "class", "id",
+    "type", "checked", "disabled", "align",
+  ]);
+  const div = document.createElement("div");
+  div.innerHTML = html;
+  function walk(node) {
+    for (const child of [...node.childNodes]) {
+      if (child.nodeType === Node.ELEMENT_NODE) {
+        const tag = child.tagName.toLowerCase();
+        if (!ALLOWED_TAGS.has(tag)) {
+          child.replaceWith(...child.childNodes);
+          continue;
+        }
+        for (const attr of [...child.attributes]) {
+          if (!ALLOWED_ATTRS.has(attr.name)) {
+            child.removeAttribute(attr.name);
+          } else if (attr.name === "href" || attr.name === "src") {
+            const val = attr.value.trim().toLowerCase();
+            if (val.startsWith("javascript:") || val.startsWith("data:text/html")) {
+              child.removeAttribute(attr.name);
+            }
+          }
+        }
+        if (tag === "a") {
+          child.setAttribute("rel", "noopener noreferrer");
+        }
+        walk(child);
+      }
+    }
+  }
+  walk(div);
+  return div.innerHTML;
+}
+
 function renderPreview() {
   const text = elements.notes.value.trim();
   if (typeof marked === "undefined") {
@@ -170,7 +215,8 @@ function renderPreview() {
     return;
   }
   try {
-    elements.previewDiv.innerHTML = marked.parse(text);
+    const rawHtml = marked.parse(text);
+    elements.previewDiv.innerHTML = sanitizeHtml(rawHtml);
   } catch (e) {
     elements.previewDiv.innerHTML = `<p class="notes-preview__fallback">Preview error: ${escapeHtml(String(e.message))}</p>`;
   }

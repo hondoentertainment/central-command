@@ -1,13 +1,11 @@
 import { ALL_PRESET_TOOLS, CATEGORY_OPTIONS, DEFAULT_TOOLS } from "./data/presets.js";
-import { getIconMarkup, ICON_OPTIONS } from "./lib/icons.js";
+import { getIconMarkup } from "./lib/icons.js";
 import { renderNav } from "./lib/nav.js";
 import { fireLaunchHook, loadLaunchHookUrl, saveLaunchHookUrl } from "./lib/hooks.js";
 import {
   createFallbackMetadataMap,
   filterHistoryForTools,
-  formatLaunchTime,
   getNextPinRank,
-  getToolSignature,
   hydrateTools,
   isValidLaunchTarget,
   movePinnedTool,
@@ -25,7 +23,6 @@ import {
   loadLaunchHistorySynced,
   loadNotes,
   loadStoredToolsSynced,
-  loadSurfacesPreferences,
   performInitialSync,
   saveLayoutPreference,
   saveLaunchHistorySynced,
@@ -42,6 +39,16 @@ import {
   validateIntegrationUrl,
 } from "./lib/integrations.js";
 import { showToast } from "./lib/toast.js";
+} from "./lib/integrations.js";
+import { showToast } from "./lib/toast.js";
+import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
+import { createBatchActions } from "./lib/batch-actions.js";
+import {
+  applySurfacesVisibility,
+  getIntegrationPrefs,
+  setupIntegrationSettings,
+  setupSurfacesSettings,
+} from "./lib/surfaces-settings.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -118,6 +125,16 @@ const elements = {
   mainContent: document.querySelector(".dashboard-main"),
 };
 
+// --- Batch actions (delegated to module) ---
+const batch = createBatchActions({
+  state,
+  elements,
+  render,
+  updateStatusCards,
+  saveTools: (tools) => saveStoredToolsSynced(normalizePinRanks(tools)),
+  saveHistory: (history) => saveLaunchHistorySynced(history),
+});
+
 initialize();
 
 async function initialize() {
@@ -176,6 +193,9 @@ async function initialize() {
   applySurfacesVisibility("command");
   setupSurfacesSettings();
   setupIntegrationSettings();
+  applySurfacesVisibility("command", elements);
+  setupSurfacesSettings(elements);
+  setupIntegrationSettings(elements, render);
   elements.searchInput.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     render();
@@ -216,6 +236,21 @@ async function initialize() {
       document.querySelectorAll(".tool-card__more-trigger").forEach((b) => b.setAttribute("aria-expanded", "false"));
     }
   });
+  elements.selectModeBtn?.addEventListener("click", batch.toggleSelectMode);
+  elements.batchPinBtn?.addEventListener("click", batch.batchPinSelected);
+  elements.batchDeleteBtn?.addEventListener("click", batch.batchDeleteSelected);
+  elements.batchCategorySelect?.addEventListener("change", batch.batchChangeCategory);
+  elements.batchDoneBtn?.addEventListener("click", batch.exitSelectMode);
+
+  setupKeyboardShortcuts({
+    getTools: () => state.tools,
+    getLaunchHistory: () => state.launchHistory,
+    setLaunchHistory: (h) => { state.launchHistory = h; },
+    saveLaunchHistory: (h) => saveLaunchHistorySynced(h),
+    onLaunch: updateStatusCards,
+  });
+  setupToolGridKeydown(elements.toolGrid);
+
   render();
 }
 
@@ -497,6 +532,13 @@ function setupSurfacesSettings() {
 
   elements.surfacesShowHero?.addEventListener("change", updateFromCheckboxes);
   elements.surfacesShowSpotlight?.addEventListener("change", updateFromCheckboxes);
+function getToolsWithIntegrationEntries() {
+  const prefs = getIntegrationPrefs();
+  const creativeHubTool = buildCreativeHubTool(getCreativeHubConfig(prefs));
+  if (!creativeHubTool) return state.tools;
+  const hasCreativeHub = state.tools.some((tool) => tool.name.toLowerCase() === "creative hub");
+  if (hasCreativeHub) return state.tools;
+  return [...state.tools, sanitizeTool(creativeHubTool)].filter(Boolean);
 }
 
 
@@ -1084,6 +1126,45 @@ function createCardElement(tool, pinnedIds, opts = {}) {
         else state.selectedToolIds.delete(tool.id);
         updateBatchActionBar();
       });
+  batch.updateBatchActionBar();
+
+  visibleTools.forEach((tool) => {
+    const isVirtualIntegration = !tool.id;
+    const fragment = elements.toolCardTemplate.content.cloneNode(true);
+    const card = fragment.querySelector(".tool-card");
+    card.setAttribute("tabindex", "0");
+    const selectWrap = fragment.querySelector(".tool-card__select-wrap");
+    const selectCheckbox = fragment.querySelector(".tool-card__select");
+    const icon = fragment.querySelector(".tool-card__icon");
+    const category = fragment.querySelector(".tool-card__category");
+    const pin = fragment.querySelector(".tool-card__pin");
+    const title = fragment.querySelector(".tool-card__title");
+    const description = fragment.querySelector(".tool-card__description");
+    const meta = fragment.querySelector(".tool-card__meta");
+    const url = fragment.querySelector(".tool-card__url");
+    const launchButton = fragment.querySelector(".launch-button");
+    const moveUpButton = fragment.querySelector(".tool-card__move-up");
+    const moveDownButton = fragment.querySelector(".tool-card__move-down");
+    const editButton = fragment.querySelector(".tool-card__edit");
+    const deleteButton = fragment.querySelector(".tool-card__delete");
+
+    if (state.selectMode) {
+      card.classList.add("tool-card--select-mode");
+      selectWrap.hidden = isVirtualIntegration;
+      selectCheckbox.disabled = isVirtualIntegration;
+      if (!isVirtualIntegration) {
+        selectCheckbox.checked = state.selectedToolIds.has(tool.id);
+        selectCheckbox.addEventListener("change", () => {
+          if (selectCheckbox.checked) state.selectedToolIds.add(tool.id);
+          else state.selectedToolIds.delete(tool.id);
+          batch.updateBatchActionBar();
+        });
+      }
+      card.querySelector(".tool-card__actions")?.classList.add("is-hidden");
+    } else {
+      card.classList.remove("tool-card--select-mode");
+      selectWrap.hidden = true;
+      card.querySelector(".tool-card__actions")?.classList.remove("is-hidden");
     }
     card.querySelector(".tool-card__actions")?.classList.add("is-hidden");
   } else {
@@ -1243,6 +1324,28 @@ function renderCards() {
   const grid = elements.toolGrid;
 
   if (!grid) return;
+    const pinnedIndex = pinnedIds.indexOf(tool.id);
+    const isPinned = pinnedIndex >= 0 && !isVirtualIntegration;
+    moveUpButton.hidden = !isPinned;
+    moveDownButton.hidden = !isPinned;
+    moveUpButton.disabled = !isPinned || pinnedIndex === 0;
+    moveDownButton.disabled = !isPinned || pinnedIndex === pinnedIds.length - 1;
+
+    if (!isVirtualIntegration) {
+      moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
+      moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
+
+      editButton.addEventListener("click", (event) => {
+        event.preventDefault();
+        window.location.href = `registry.html?edit=${encodeURIComponent(tool.id)}`;
+      });
+      deleteButton.addEventListener("click", () => removeTool(tool.id));
+    } else {
+      editButton.hidden = true;
+      deleteButton.hidden = true;
+      moveUpButton.hidden = true;
+      moveDownButton.hidden = true;
+    }
 
   const useVirtualization = visibleTools.length >= VIRTUALIZE_THRESHOLD;
 

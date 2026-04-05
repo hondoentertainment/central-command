@@ -15,8 +15,11 @@ const testFiles = [
   "theme.test.js",
   "command-palette.test.js",
   "tool-model.test.js",
+  "tool-model-extended.test.js",
   "storage.test.js",
   "integrations.test.js",
+  "debounce.test.js",
+  "nav.test.js",
 ];
 
 let passed = 0;
