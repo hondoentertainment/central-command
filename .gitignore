@@ -2,3 +2,10 @@ node_modules/
 .vercel
 firebase.config.local.js
 config/firebase.config.local.js
+config/firebase.config.generated.js
+
+# Playwright
+playwright-report/
+test-results/
+blob-report/
+playwright/.cache/

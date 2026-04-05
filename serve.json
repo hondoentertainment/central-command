@@ -1,0 +1,20 @@
+{
+  "rewrites": [
+    { "source": "/registry", "destination": "/registry.html" },
+    { "source": "/agents", "destination": "/agents.html" },
+    { "source": "/packs", "destination": "/packs.html" },
+    { "source": "/sports", "destination": "/sports.html" },
+    { "source": "/games", "destination": "/games.html" },
+    { "source": "/writing", "destination": "/writing.html" },
+    { "source": "/productivity", "destination": "/productivity.html" },
+    { "source": "/history", "destination": "/history.html" },
+    { "source": "/runbook", "destination": "/runbook.html" },
+    { "source": "/health", "destination": "/health.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/music", "destination": "/music.html" },
+    { "source": "/movies", "destination": "/movies.html" },
+    { "source": "/parties", "destination": "/parties.html" }
+  ]
+}

@@ -5,7 +5,7 @@
       (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
     </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="Central Command keeps your most-used tools, quick links, presets, and daily runbook in one place."
@@ -15,29 +15,42 @@
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary" />
     <meta name="twitter:title" content="Central Command" />
-    <meta name="theme-color" content="#09111f" />
+    <meta name="theme-color" content="#0f0f0f" />
     <title>Central Command</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="manifest" href="./manifest.json" />
   </head>
   <body>
-    <div class="app-shell">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <div id="statusAnnouncer" class="visually-hidden" aria-live="polite" aria-atomic="true"></div>
+    <div class="dashboard-shell">
+      <aside class="dashboard-sidebar" role="complementary" aria-label="Sidebar">
+        <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+      </aside>
+
+      <div class="dashboard-main" id="mainContent">
       <header class="hero" id="heroSection">
         <div class="hero__copy">
-          <p class="eyebrow">Operations Hub</p>
+          <p class="eyebrow">Command Center</p>
           <h1>Central Command</h1>
           <p class="hero__text">
             One place for the tools you reach for most. Launch faster, organize by workflow,
-            and keep the day moving.
+            and move through the day with a calmer operating system.
           </p>
-          <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+          <details class="hero__data-notice-wrap">
+            <summary class="hero__data-notice-summary">Data &amp; sync</summary>
+            <p class="hero__data-notice">
+              Data stays in this browser. To move your setup: export backup on the source device, then import it in
+              <a href="registry.html">Tools</a>.
+            </p>
+          </details>
           <div id="heroQuickLinks" class="hero__quick-links" aria-live="polite"></div>
         </div>
         <div class="hero__status">
@@ -60,7 +73,7 @@
         <div class="panel__header">
           <div>
             <p class="eyebrow">Spotlight</p>
-            <h2>Keep your core stack above the fold</h2>
+            <h2>Keep your core stack visible and ready</h2>
           </div>
         </div>
         <div id="spotlightGrid" class="spotlight-grid" aria-live="polite"></div>
@@ -75,23 +88,36 @@
             </div>
             <div class="panel__header-actions panel__header-actions--tools">
               <div id="layoutToggle" class="layout-toggle" role="group" aria-label="Grid layout">
-                <button type="button" class="layout-toggle__btn" data-layout="grid">Grid</button>
-                <button type="button" class="layout-toggle__btn" data-layout="list">List</button>
-                <button type="button" class="layout-toggle__btn" data-layout="compact">Compact</button>
+                <button type="button" class="layout-toggle__btn" data-layout="grid" aria-label="Show tools as grid">Grid</button>
+                <button type="button" class="layout-toggle__btn" data-layout="list" aria-label="Show tools as list">List</button>
+                <button type="button" class="layout-toggle__btn" data-layout="compact" aria-label="Show tools in compact view">Compact</button>
               </div>
               <label class="search">
                 <span class="visually-hidden">Search tools</span>
-                <input id="searchInput" type="search" placeholder="Search tools or categories" />
+                <input id="searchInput" type="search" placeholder="Search tools or categories (press /)" autocomplete="off" />
               </label>
-              <button type="button" id="surfacesSettingsBtn" class="ghost-button" aria-label="Page layout settings" aria-expanded="false">⚙ Layout</button>
-              <button type="button" id="addToolBtn" class="ghost-button">Add tool</button>
-              <button type="button" id="selectModeBtn" class="ghost-button">Select</button>
+              <button type="button" id="addToolBtn" class="primary-button panel__header-actions-cta">Add tool</button>
+              <div class="panel__header-more-wrap">
+                <button type="button" id="toolsMoreBtn" class="ghost-button panel__header-more-btn" aria-expanded="false" aria-haspopup="true" aria-label="More actions">More</button>
+                <div id="toolsMoreMenu" class="panel__header-more-menu" hidden role="menu">
+                  <button type="button" id="surfacesSettingsBtn" class="panel__header-more-item" role="menuitem" aria-label="Page layout settings" aria-expanded="false">⚙ Layout</button>
+                  <button type="button" id="importBackupBtn" class="panel__header-more-item" role="menuitem">Import backup</button>
+                  <button type="button" id="importFromUrlBtn" class="panel__header-more-item" role="menuitem">Import from URL…</button>
+                  <button type="button" id="copyBackupBtn" class="panel__header-more-item" role="menuitem">Copy backup to clipboard</button>
+                  <button type="button" id="selectModeBtn" class="panel__header-more-item" role="menuitem">Select</button>
+                </div>
+              </div>
             </div>
+            <input type="file" id="importBackupInput" accept=".json" hidden aria-hidden="true" />
           </div>
-          <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-label="Show hero and spotlight">
+          <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-modal="true" aria-label="Layout and launch settings">
             <div class="surfaces-settings-panel__content">
               <label class="checkbox"><input type="checkbox" id="surfacesShowHero" checked /> Show hero</label>
               <label class="checkbox"><input type="checkbox" id="surfacesShowSpotlight" checked /> Show spotlight</label>
+              <label class="surfaces-settings-panel__webhook">
+                <span>Launch webhook URL</span>
+                <input type="url" id="launchHookUrlInput" placeholder="https://…" />
+              </label>
               <hr class="surfaces-settings-panel__divider" />
               <p class="eyebrow">Integrations</p>
               <label class="checkbox"><input type="checkbox" id="creativeHubEnabled" checked /> Enable Creative Hub</label>
@@ -107,26 +133,31 @@
                   <option value="same-tab">Same tab</option>
                 </select>
               </label>
+              <p class="surfaces-settings-panel__hint">Add Calendar, Docs, and more from Starter Packs.</p>
             </div>
           </div>
-          <div id="batchActionBar" class="batch-action-bar" hidden>
+          <div id="batchActionBar" class="batch-action-bar" hidden role="status" aria-live="polite" aria-atomic="true" aria-label="Bulk actions">
             <span class="batch-action-bar__count"><span id="batchSelectedCount">0</span> selected</span>
             <div class="batch-action-bar__actions">
               <button type="button" id="batchPinBtn" class="ghost-button">Pin selected</button>
               <button type="button" id="batchDeleteBtn" class="ghost-button">Delete selected</button>
+              <label for="batchCategorySelect" class="visually-hidden">Change category for selected tools</label>
               <select id="batchCategorySelect">
                 <option value="">Change category…</option>
               </select>
               <button type="button" id="batchDoneBtn" class="ghost-button">Done</button>
             </div>
           </div>
-          <div id="quickAddFormWrap" class="quick-add-form-wrap" hidden>
+          <div id="quickAddFormWrap" class="quick-add-form-wrap" hidden role="dialog" aria-modal="true" aria-label="Add new tool">
             <form id="quickAddForm" class="quick-add-form">
-              <input id="quickAddName" type="text" placeholder="Tool name" required />
-              <input id="quickAddUrl" type="text" placeholder="URL" required />
-              <select id="quickAddCategory"></select>
+              <label for="quickAddName" class="visually-hidden">Tool name</label>
+              <input id="quickAddName" type="text" placeholder="Tool name" required aria-required="true" />
+              <label for="quickAddUrl" class="visually-hidden">URL</label>
+              <input id="quickAddUrl" type="text" placeholder="URL" required aria-required="true" />
+              <label for="quickAddCategory" class="visually-hidden">Category</label>
+              <select id="quickAddCategory" aria-required="true"></select>
               <div class="quick-add-form__actions">
-                <button type="submit" class="ghost-button">Add</button>
+                <button type="submit" class="primary-button">Add</button>
                 <button type="button" id="quickAddCancel" class="ghost-button">Cancel</button>
                 <a href="registry.html" class="ghost-button">Advanced options →</a>
               </div>
@@ -134,14 +165,17 @@
           </div>
 
           <div id="filterBar" class="filter-bar"></div>
-          <div id="toolGrid" class="tool-grid" aria-live="polite">
+          <div id="toolGridScrollWrap" class="tool-grid-scroll-wrap" tabindex="-1">
+            <div id="toolGrid" class="tool-grid" aria-live="polite">
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
+            </div>
           </div>
         </section>
       </main>
+      </div>
     </div>
 
     <template id="toolCardTemplate">
@@ -161,15 +195,22 @@
         <code class="tool-card__url"></code>
         <div class="tool-card__actions">
           <a class="launch-button" target="_blank" rel="noreferrer">Launch</a>
-          <button class="ghost-button tool-card__move-up" type="button">Pin up</button>
-          <button class="ghost-button tool-card__move-down" type="button">Pin down</button>
-          <button class="ghost-button tool-card__edit" type="button">Edit</button>
-          <button class="ghost-button tool-card__delete" type="button">Delete</button>
+          <div class="tool-card__actions-more">
+            <button type="button" class="ghost-button tool-card__more-trigger" aria-expanded="false" aria-haspopup="true" aria-label="More actions">⋮</button>
+            <div class="tool-card__more-menu" hidden role="menu">
+              <button type="button" class="tool-card__move-up" role="menuitem">Pin up</button>
+              <button type="button" class="tool-card__move-down" role="menuitem">Pin down</button>
+              <button type="button" class="tool-card__edit" role="menuitem">Edit</button>
+              <button type="button" class="tool-card__delete" role="menuitem">Delete</button>
+            </div>
+          </div>
         </div>
       </article>
     </template>
 
-    <script src="./sw-register.js"></script>
+    <!-- Critical path: app.js and sw-register.js. Any future analytics or non-essential scripts should use defer or load after DOMContentLoaded. -->
+    <script src="./sw-register.js" defer></script>
     <script type="module" src="./app.js"></script>
   </body>
 </html>
+

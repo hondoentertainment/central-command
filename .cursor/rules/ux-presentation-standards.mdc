@@ -1,0 +1,49 @@
+---
+description: UX and presentation standards for a professional website — typography, spacing, alignment, focus, and consistency. Apply when editing UI, HTML, or CSS to avoid noticeable presentation issues.
+globs: "**/*.html,**/*.css,**/app-*.js"
+alwaysApply: false
+---
+
+# UX Presentation Standards
+
+When editing UI, HTML, or CSS, enforce these so the site meets professional presentation standards.
+
+## Design tokens
+
+- Use existing CSS variables from `styles.css` (`--text`, `--text-secondary`, `--bg`, `--line`, `--amber`, etc.). No hardcoded hex/rgb for colors or arbitrary spacing unless a token does not exist.
+- Add new tokens to `:root` (and `html.theme-light` if needed) rather than magic numbers in components.
+
+## Spacing and alignment
+
+- Prefer a consistent rhythm (e.g. 8px base). Use multiples (8px, 16px, 24px) for margin/padding unless the design system specifies otherwise.
+- Keep horizontal padding and vertical spacing consistent between similar sections (e.g. all content panels, all cards).
+- Avoid single-off margins (e.g. `margin-left: 13px`) that break visual alignment with the rest of the app.
+
+## Typography
+
+- One logical `h1` per page; heading order must not skip levels (`h1` → `h2` → `h3`).
+- Body text: use `var(--font-sans)` (or serif/mono where defined); ensure line-height ≥ 1.5 for readability.
+- Secondary/caption text must use `var(--text-secondary)` or `var(--muted)` so hierarchy is clear.
+
+## Interactive elements
+
+- Buttons and links: minimum touch target ~44px (height or min-height) where they are primary actions.
+- Every focusable element must have a visible focus style (e.g. `:focus-visible` outline or ring). Do not remove focus outlines without replacing with a clear alternative.
+- Icon-only buttons must have `aria-label` or visible text/tooltip so purpose is clear.
+
+## Consistency
+
+- Reuse existing patterns: `.primary-button`, `.panel`, `.content-header`, `.music-link-block` (or equivalent) instead of inventing new class names that duplicate styles.
+- Match existing pages: new content pages (e.g. movies, music) should share the same shell, nav, and block styles so the experience feels unified.
+
+## States and feedback
+
+- Provide hover (and where relevant active/disabled) styles for buttons and links so interaction is clear.
+- Loading, empty, and error states must have explicit UI (message + optional action), not blank or unstyled content.
+
+## Before shipping UI changes
+
+- [ ] No layout shift or misaligned elements at common viewport widths.
+- [ ] Text contrast meets WCAG AA (e.g. `--text-secondary` on `--bg`).
+- [ ] Focus order and focus-visible styles work for keyboard users.
+- [ ] New sections match the spacing and typography of existing pages.

@@ -5,6 +5,8 @@ import {
   normalizeUrl,
   collapseWhitespace,
   sanitizeSurfaces,
+  getToolSignature,
+  getNextPinRank,
 } from "../lib/tool-model.js";
 
 // --- sanitizeTool ---
@@ -90,6 +92,24 @@ assert.deepStrictEqual(sanitizeSurfaces(["hero", "spotlight"]), ["hero", "spotli
 assert.deepStrictEqual(sanitizeSurfaces(["hero", "invalid", "spotlight"]), ["hero", "spotlight"]);
 assert.deepStrictEqual(sanitizeSurfaces(null), []);
 assert.deepStrictEqual(sanitizeSurfaces("not array"), []);
+
+// --- getToolSignature ---
+assert.strictEqual(
+  getToolSignature({ name: " Gmail ", url: "  https://mail.google.com  " }),
+  "gmail|https://mail.google.com"
+);
+assert.strictEqual(getToolSignature({ name: "A", url: "B" }), "a|b");
+
+// --- getNextPinRank ---
+assert.strictEqual(getNextPinRank([]), 1);
+assert.strictEqual(getNextPinRank([{ pinned: false }]), 1);
+assert.strictEqual(
+  getNextPinRank([
+    { id: "1", pinned: true, pinRank: 1 },
+    { id: "2", pinned: true, pinRank: 2 },
+  ]),
+  3
+);
 
 console.log("tool-model.test.js: all assertions passed");
 export default { ok: true };

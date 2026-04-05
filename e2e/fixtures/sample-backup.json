@@ -1,0 +1,50 @@
+{
+  "version": 2,
+  "exportedAt": "2025-01-01T00:00:00.000Z",
+  "tools": [
+    {
+      "id": "e2e-fixture-tool-1",
+      "name": "E2E Test Tool Alpha",
+      "url": "https://example.com/alpha",
+      "category": "Research",
+      "description": "Fixture tool for E2E import test.",
+      "accent": "amber",
+      "pinned": false,
+      "pinRank": null,
+      "surfaces": [],
+      "iconKey": "auto",
+      "shortcutLabel": "",
+      "openMode": "new-tab"
+    },
+    {
+      "id": "e2e-fixture-tool-2",
+      "name": "E2E Test Tool Beta",
+      "url": "https://example.com/beta",
+      "category": "Productivity",
+      "description": "Second fixture tool for import verification.",
+      "accent": "teal",
+      "pinned": false,
+      "pinRank": null,
+      "surfaces": [],
+      "iconKey": "auto",
+      "shortcutLabel": "",
+      "openMode": "new-tab"
+    },
+    {
+      "id": "e2e-fixture-tool-3",
+      "name": "E2E Searchable Gamma",
+      "url": "https://example.com/gamma",
+      "category": "Comms",
+      "description": "Third fixture for search/filter tests.",
+      "accent": "cobalt",
+      "pinned": false,
+      "pinRank": null,
+      "surfaces": [],
+      "iconKey": "auto",
+      "shortcutLabel": "",
+      "openMode": "same-tab"
+    }
+  ],
+  "notes": "",
+  "launchHistory": []
+}

@@ -5,39 +5,43 @@
       (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
     </script>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
     <meta
       name="description"
       content="Daily runbook notes for Central Command."
     />
-    <meta name="theme-color" content="#09111f" />
+    <meta name="theme-color" content="#0f0f0f" />
     <title>Runbook — Central Command</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
-      href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=JetBrains+Mono:wght@400;600&display=swap"
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
       rel="stylesheet"
     />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="manifest" href="./manifest.json" />
   </head>
-  <body>
-    <div class="app-shell">
-      <header class="hero hero--compact">
-        <div class="hero__copy">
+  <body class="content-page">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <div class="content-shell">
+      <header class="content-header">
+        <div class="content-header__intro">
           <p class="eyebrow">Runbook</p>
           <h1>Daily notes</h1>
-          <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+          <p class="content-header__text">
+            Capture checklists, templates, and day-start context in a calmer writing surface with fast preview.
+          </p>
         </div>
+        <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
       </header>
 
-      <main class="layout">
+      <main id="mainContent" class="content-main layout">
         <section class="panel panel--notes">
           <div class="panel__header">
             <div>
               <h2>Short checklists, reminders, launch sequences</h2>
-              <p class="preset-panel__text">
+              <p class="panel__intro-text">
                 Keep day-start notes, routines, or launch orders here. Auto-saved to your browser.
               </p>
             </div>
@@ -74,8 +78,12 @@
       </main>
     </div>
 
-    <script src="./sw-register.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Lazy by route: this page loads only app-runbook.js (no main app.js). -->
+    <script src="./sw-register.js" defer></script>
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js" defer></script>
     <script type="module" src="./app-runbook.js"></script>
   </body>
 </html>
+
+
+

@@ -1,3 +1,4 @@
+const CACHE_NAME = "central-command-v5";
 const CACHE_VERSION = 2;
 const CACHE_NAME = `central-command-v${CACHE_VERSION}`;
 
@@ -9,10 +10,17 @@ const REWRITE_MAP = {
   "/packs": "/packs.html",
   "/sports": "/sports.html",
   "/games": "/games.html",
+  "/health": "/health.html",
+  "/music": "/music.html",
+  "/movies": "/movies.html",
+  "/parties": "/parties.html",
+  "/admin": "/admin.html",
   "/writing": "/writing.html",
   "/productivity": "/productivity.html",
   "/history": "/history.html",
   "/runbook": "/runbook.html",
+  "/profile": "/profile.html",
+  "/settings": "/settings.html",
 };
 
 const REWRITES = {};
@@ -28,10 +36,17 @@ const PRECACHE = [
   BASE + "/packs.html",
   BASE + "/sports.html",
   BASE + "/games.html",
+  BASE + "/health.html",
+  BASE + "/music.html",
+  BASE + "/movies.html",
+  BASE + "/parties.html",
+  BASE + "/admin.html",
   BASE + "/writing.html",
   BASE + "/productivity.html",
   BASE + "/history.html",
   BASE + "/runbook.html",
+  BASE + "/profile.html",
+  BASE + "/settings.html",
   BASE + "/styles.css",
   BASE + "/manifest.json",
   BASE + "/app.js",
@@ -40,10 +55,17 @@ const PRECACHE = [
   BASE + "/app-packs.js",
   BASE + "/app-sports.js",
   BASE + "/app-games.js",
+  BASE + "/app-health.js",
+  BASE + "/app-music.js",
+  BASE + "/app-movies.js",
+  BASE + "/app-parties.js",
+  BASE + "/app-admin.js",
   BASE + "/app-writing.js",
   BASE + "/app-productivity.js",
   BASE + "/app-history.js",
   BASE + "/app-runbook.js",
+  BASE + "/app-profile.js",
+  BASE + "/app-settings.js",
   BASE + "/lib/nav.js",
   BASE + "/lib/icons.js",
   BASE + "/lib/storage.js",

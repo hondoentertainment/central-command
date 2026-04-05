@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Customize Central Command preferences and appearance." />
+    <meta name="theme-color" content="#0f0f0f" />
+    <title>Settings &mdash; Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
+  </head>
+  <body class="content-page">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <div class="content-shell">
+      <header class="content-header">
+        <div class="content-header__intro">
+          <p class="eyebrow">Settings</p>
+          <h1>Preferences and appearance</h1>
+          <p class="content-header__text">
+            Manage visual preferences, account security, and the defaults that shape the whole command center.
+          </p>
+        </div>
+        <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+      </header>
+
+      <main id="mainContent" class="content-main layout">
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Appearance</h2>
+            </div>
+          </div>
+
+          <form id="themeSettingsForm" class="tool-form">
+            <fieldset class="settings-fieldset">
+              <legend>Theme</legend>
+              <label class="checkbox">
+                <input type="radio" name="theme" value="dark" id="themeDark" />
+                <span>Dark</span>
+              </label>
+              <label class="checkbox">
+                <input type="radio" name="theme" value="light" id="themeLight" />
+                <span>Light</span>
+              </label>
+            </fieldset>
+
+            <p id="themeStatus" class="form-message" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Account security</h2>
+            </div>
+          </div>
+          <form id="accountSecurityForm" class="tool-form">
+            <p id="accountSecurityMeta" class="form-message is-info">Sign in to manage account security settings.</p>
+
+            <fieldset class="settings-fieldset">
+              <legend>Email verification</legend>
+              <div class="tool-form__actions">
+                <button type="button" id="resendVerificationBtn" class="ghost-button">Resend verification email</button>
+                <button type="button" id="refreshAccountBtn" class="ghost-button">Refresh account status</button>
+              </div>
+            </fieldset>
+
+            <fieldset class="settings-fieldset">
+              <legend>Change password</legend>
+              <label for="currentPasswordInput">Current password
+                <input type="password" id="currentPasswordInput" autocomplete="current-password" />
+              </label>
+              <label for="newPasswordInput">New password
+                <input type="password" id="newPasswordInput" autocomplete="new-password" />
+              </label>
+              <button type="button" id="changePasswordBtn" class="ghost-button">Update password (ends other sessions)</button>
+            </fieldset>
+
+            <p id="accountSecurityStatus" class="form-message" role="status" aria-live="polite"></p>
+          </form>
+        </section>
+      </main>
+    </div>
+
+    <script src="./sw-register.js" defer></script>
+    <script type="module" src="./app-settings.js"></script>
+  </body>
+</html>
+
+
+

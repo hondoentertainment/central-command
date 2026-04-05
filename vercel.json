@@ -1,4 +1,35 @@
 {
+  "buildCommand": "node scripts/build-firebase-config.js || true",
+  "headers": [
+    {
+      "source": "/",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/:path.html",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }]
+    },
+    {
+      "source": "/:file.css",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/:file.js",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/:file.svg",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/:file.ico",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    },
+    {
+      "source": "/manifest.json",
+      "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
+    }
+  ],
   "rewrites": [
     { "source": "/registry", "destination": "/registry.html" },
     { "source": "/agents", "destination": "/agents.html" },
@@ -8,6 +39,13 @@
     { "source": "/writing", "destination": "/writing.html" },
     { "source": "/productivity", "destination": "/productivity.html" },
     { "source": "/history", "destination": "/history.html" },
-    { "source": "/runbook", "destination": "/runbook.html" }
+    { "source": "/runbook", "destination": "/runbook.html" },
+    { "source": "/health", "destination": "/health.html" },
+    { "source": "/admin", "destination": "/admin.html" },
+    { "source": "/profile", "destination": "/profile.html" },
+    { "source": "/settings", "destination": "/settings.html" },
+    { "source": "/music", "destination": "/music.html" },
+    { "source": "/movies", "destination": "/movies.html" },
+    { "source": "/parties", "destination": "/parties.html" }
   ]
 }

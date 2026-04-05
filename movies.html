@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta
+      name="description"
+      content="Movies — quick links to HSX and Letterboxd."
+    />
+    <meta name="theme-color" content="#0f0f0f" />
+    <title>Movies — Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
+  </head>
+  <body class="content-page">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <div class="content-shell">
+      <header class="content-header">
+        <div class="content-header__intro">
+          <p class="eyebrow">Movies</p>
+          <h1>Movie tracking and markets</h1>
+          <p class="content-header__text">
+            Quick links to movie trading and film tracking: HSX and Letterboxd.
+          </p>
+        </div>
+        <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+      </header>
+
+      <main id="mainContent" class="content-main layout">
+        <section class="panel panel--movies">
+          <div class="content-link-block">
+            <h2 class="content-link-block__title">HSX</h2>
+            <p class="content-link-block__text">
+              Hollywood Stock Exchange — trade movie stocks and star bonds.
+            </p>
+            <a
+              href="https://www.hsx.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="primary-button content-link-block__cta"
+            >
+              Open HSX →
+            </a>
+          </div>
+          <div class="content-link-block">
+            <h2 class="content-link-block__title">Letterboxd</h2>
+            <p class="content-link-block__text">
+              Track what you watch, rate films, and discover what to see next.
+            </p>
+            <a
+              href="https://letterboxd.com/"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="primary-button content-link-block__cta"
+            >
+              Open Letterboxd →
+            </a>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./sw-register.js" defer></script>
+    <script type="module" src="./app-movies.js"></script>
+  </body>
+</html>
+
+
+
+

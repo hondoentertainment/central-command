@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="View profile and account status in Central Command." />
+    <meta name="theme-color" content="#0f0f0f" />
+    <title>Profile &mdash; Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
+  </head>
+  <body class="content-page">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <div class="content-shell">
+      <header class="content-header">
+        <div class="content-header__intro">
+          <p class="eyebrow">Profile</p>
+          <h1>Your command profile</h1>
+          <p class="content-header__text">
+            Review sync state, activity, and workspace footprint in one account-focused dashboard.
+          </p>
+        </div>
+        <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
+      </header>
+
+      <main id="mainContent" class="content-main layout">
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Account</h2>
+            </div>
+          </div>
+          <div class="profile-grid">
+            <article class="status-card">
+              <span class="status-card__label">Sync status</span>
+              <strong id="profileSyncStatus">Checking...</strong>
+            </article>
+            <article class="status-card">
+              <span class="status-card__label">Account tier</span>
+              <strong id="profileAccountTier">-</strong>
+            </article>
+            <article class="status-card">
+              <span class="status-card__label">User ID</span>
+              <strong id="profileUserId">-</strong>
+            </article>
+            <article class="status-card">
+              <span class="status-card__label">Last sign in</span>
+              <strong id="profileLastSignIn">-</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Workspace stats</h2>
+            </div>
+          </div>
+          <div class="profile-grid">
+            <article class="status-card">
+              <span class="status-card__label">Total tools</span>
+              <strong id="profileToolCount">0</strong>
+            </article>
+            <article class="status-card">
+              <span class="status-card__label">Pinned tools</span>
+              <strong id="profilePinnedCount">0</strong>
+            </article>
+            <article class="status-card">
+              <span class="status-card__label">Launches</span>
+              <strong id="profileLaunchCount">0</strong>
+            </article>
+            <article class="status-card">
+              <span class="status-card__label">Notes edited</span>
+              <strong id="profileNotesEdited">-</strong>
+            </article>
+          </div>
+        </section>
+
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Security activity</h2>
+            </div>
+          </div>
+          <ul id="profileSecurityEvents" class="history-list"></ul>
+        </section>
+      </main>
+    </div>
+
+    <script src="./sw-register.js" defer></script>
+    <script type="module" src="./app-profile.js"></script>
+  </body>
+</html>
+
+
+
