@@ -1,4 +1,3 @@
-const CACHE_NAME = "central-command-v5";
 const CACHE_VERSION = 2;
 const CACHE_NAME = `central-command-v${CACHE_VERSION}`;
 
