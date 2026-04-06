@@ -15,6 +15,10 @@ export default [
         console: "readonly",
         setTimeout: "readonly",
         clearTimeout: "readonly",
+        requestAnimationFrame: "readonly",
+        ResizeObserver: "readonly",
+        URLSearchParams: "readonly",
+        HTMLInputElement: "readonly",
         crypto: "readonly",
         URL: "readonly",
         Request: "readonly",
@@ -30,6 +34,7 @@ export default [
         location: "readonly",
         self: "readonly",
         navigator: "readonly",
+        CustomEvent: "readonly",
         marked: "readonly",
         structuredClone: "readonly",
       },
@@ -48,11 +53,19 @@ export default [
     },
   },
   {
-    files: ["tests/**/*.js"],
+    files: ["tests/**/*.js", "scripts/**/*.js"],
     languageOptions: {
       globals: {
         process: "readonly",
         global: "readonly",
+      },
+    },
+  },
+  {
+    files: ["e2e/**/*.js"],
+    languageOptions: {
+      globals: {
+        process: "readonly",
       },
     },
   },

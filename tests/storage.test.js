@@ -34,10 +34,7 @@ const {
   loadRunbookTemplates,
   saveRunbookTemplates,
   loadNotesMeta,
-} = await import(
-const { STORAGE_KEYS, loadCustomCategories, saveCustomCategories, loadLayoutPreference, saveLayoutPreference, loadIntegrationsPreferences, saveIntegrationsPreferences } = await import(
-  "../lib/storage.js"
-);
+} = await import("../lib/storage.js");
 
 // Reset before each test
 mockStorage.clear();
