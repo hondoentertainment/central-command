@@ -77,6 +77,14 @@
               <input id="projectUrl" type="text" placeholder="Link (optional)" />
               <label for="projectTags" class="visually-hidden">Tags (comma-separated)</label>
               <input id="projectTags" type="text" placeholder="Tags (comma-separated)" />
+              <div class="project-tools-picker">
+                <label class="project-tools-picker__label">Tools used</label>
+                <div id="projectToolsSelected" class="project-tools-picker__selected"></div>
+                <div class="project-tools-picker__search-wrap">
+                  <input id="projectToolsSearch" type="text" placeholder="Search tools to add..." autocomplete="off" />
+                  <div id="projectToolsDropdown" class="project-tools-picker__dropdown" hidden></div>
+                </div>
+              </div>
               <div class="quick-add-form__actions">
                 <button type="submit" class="primary-button" id="projectSubmitBtn">Add</button>
                 <button type="button" id="projectCancelBtn" class="ghost-button">Cancel</button>

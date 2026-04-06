@@ -2970,6 +2970,217 @@ select,
   font: 400 0.6875rem / 1.4 var(--mono);
 }
 
+/* Project card tools */
+.project-card__tools {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.project-card__tools-label {
+  font-size: 0.68rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--muted);
+  margin-right: 4px;
+}
+
+.project-card__tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 3px 10px 3px 6px;
+  border-radius: 999px;
+  background: rgba(62, 180, 165, 0.1);
+  border: 1px solid rgba(62, 180, 165, 0.2);
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: background 160ms ease, border-color 160ms ease, transform 160ms ease;
+}
+
+.project-card__tool-chip:hover {
+  background: rgba(62, 180, 165, 0.18);
+  border-color: rgba(62, 180, 165, 0.35);
+  transform: translateY(-1px);
+  color: var(--text);
+}
+
+.project-card__tool-icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.project-card__tool-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+/* Project form tool picker */
+.project-tools-picker {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.project-tools-picker__label {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: var(--text-secondary);
+}
+
+.project-tools-picker__selected {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  min-height: 32px;
+  align-items: center;
+}
+
+.project-tools-picker__hint {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.project-tools-picker__search-wrap {
+  position: relative;
+}
+
+.project-tools-picker__dropdown {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  margin-top: 4px;
+  max-height: 240px;
+  overflow-y: auto;
+  border-radius: 12px;
+  background: var(--panel-strong);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-float);
+  animation: menu-pop 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+}
+
+.project-tools-picker__option {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  background: transparent;
+  border: none;
+  color: var(--text);
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: background 120ms ease;
+}
+
+.project-tools-picker__option:hover {
+  background: var(--surface-hover);
+}
+
+.project-tools-picker__option-icon {
+  width: 20px;
+  height: 20px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.project-tools-picker__option-icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.project-tools-picker__option-name {
+  flex: 1;
+  text-align: left;
+}
+
+.project-tools-picker__option-cat {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.project-tools-picker__empty {
+  padding: 12px 14px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.project-tool-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 8px 4px 6px;
+  border-radius: 999px;
+  background: rgba(62, 180, 165, 0.1);
+  border: 1px solid rgba(62, 180, 165, 0.2);
+  color: var(--text-secondary);
+  font-size: 0.78rem;
+  font-weight: 500;
+}
+
+.project-tool-chip__icon {
+  width: 16px;
+  height: 16px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.project-tool-chip__icon svg {
+  width: 100%;
+  height: 100%;
+}
+
+.project-tool-chip__remove {
+  background: none;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+  font-size: 0.9rem;
+  line-height: 1;
+  padding: 0 2px;
+  min-height: auto;
+  transition: color 120ms;
+}
+
+.project-tool-chip__remove:hover {
+  color: var(--crimson);
+  transform: none;
+}
+
+html.theme-light .project-card__tool-chip {
+  background: rgba(62, 180, 165, 0.08);
+  border-color: rgba(62, 180, 165, 0.15);
+}
+
+html.theme-light .project-card__tool-chip:hover {
+  background: rgba(62, 180, 165, 0.14);
+  border-color: rgba(62, 180, 165, 0.3);
+}
+
+html.theme-light .project-tool-chip {
+  background: rgba(62, 180, 165, 0.06);
+  border-color: rgba(62, 180, 165, 0.12);
+}
+
+html.theme-light .project-tools-picker__dropdown {
+  background: var(--bg-elevated);
+}
+
 .project-card__footer {
   display: flex;
   align-items: center;

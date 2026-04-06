@@ -1,8 +1,13 @@
 import { renderNav } from "./lib/nav.js";
 import { showToast } from "./lib/toast.js";
 import { showConfirmDialog } from "./lib/confirm-dialog.js";
+import { loadStoredTools } from "./lib/storage.js";
+import { hydrateTools, createFallbackMetadataMap } from "./lib/tool-model.js";
+import { ALL_PRESET_TOOLS, DEFAULT_TOOLS } from "./data/presets.js";
+import { getIconMarkup } from "./lib/icons.js";
 
 const STORAGE_KEY = "central-command.projects";
+const fallbackMetadata = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
 const STATUS_CONFIG = {
   "idea":        { label: "Idea",        color: "#8f8b82", icon: "💡" },
@@ -23,6 +28,8 @@ const PRIORITY_CONFIG = {
 let projects = [];
 let activeFilter = "all";
 let editingId = null;
+let allTools = [];
+let selectedToolIds = [];
 
 function loadProjects() {
   try {
@@ -42,10 +49,15 @@ function generateId() {
 function init() {
   renderNav("projects");
   projects = loadProjects();
+  allTools = loadStoredTools(
+    (value) => hydrateTools(value, fallbackMetadata),
+    DEFAULT_TOOLS
+  );
 
   document.getElementById("addProjectBtn")?.addEventListener("click", showForm);
   document.getElementById("projectCancelBtn")?.addEventListener("click", hideForm);
   document.getElementById("projectForm")?.addEventListener("submit", handleSubmit);
+  initToolPicker();
 
   render();
 }
@@ -63,12 +75,15 @@ function showForm(project = null) {
     document.getElementById("projectPriority").value = project.priority || "medium";
     document.getElementById("projectUrl").value = project.url || "";
     document.getElementById("projectTags").value = (project.tags || []).join(", ");
+    selectedToolIds = Array.isArray(project.toolIds) ? [...project.toolIds] : [];
     submitBtn.textContent = "Save";
   } else {
     editingId = null;
     document.getElementById("projectForm").reset();
+    selectedToolIds = [];
     submitBtn.textContent = "Add";
   }
+  renderSelectedTools();
 
   wrap.hidden = false;
   requestAnimationFrame(() => document.getElementById("projectName")?.focus());
@@ -93,6 +108,7 @@ function handleSubmit(e) {
     url: document.getElementById("projectUrl")?.value?.trim() || "",
     tags: (document.getElementById("projectTags")?.value || "")
       .split(",").map(t => t.trim()).filter(Boolean),
+    toolIds: [...selectedToolIds],
   };
 
   if (editingId) {
@@ -197,6 +213,7 @@ function renderProjects() {
         <h3 class="project-card__title">${escapeHtml(project.name)}</h3>
         ${project.description ? `<p class="project-card__desc">${escapeHtml(project.description)}</p>` : ""}
         ${tagsHtml ? `<div class="project-card__tags">${tagsHtml}</div>` : ""}
+        ${renderProjectTools(project)}
         <div class="project-card__footer">
           <span class="project-card__date">${updatedLabel}</span>
           <div class="project-card__actions">
@@ -231,6 +248,18 @@ function renderProjects() {
   });
 }
 
+function renderProjectTools(project) {
+  const tools = getToolsForProject(project);
+  if (tools.length === 0) return "";
+  const chips = tools.map(t =>
+    `<a href="${escapeHtml(t.url)}" class="project-card__tool-chip" target="_blank" rel="noreferrer" title="${escapeHtml(t.name)}">
+      <span class="project-card__tool-icon">${getIconMarkup(t)}</span>
+      <span>${escapeHtml(t.name)}</span>
+    </a>`
+  ).join("");
+  return `<div class="project-card__tools"><span class="project-card__tools-label">Tools</span>${chips}</div>`;
+}
+
 function render() {
   renderStats();
   renderProjects();
@@ -254,6 +283,99 @@ function formatRelativeDate(iso) {
   const days = Math.floor(hrs / 24);
   if (days < 7) return `${days}d ago`;
   return d.toLocaleDateString();
+}
+
+// --- Tool picker ---
+
+function initToolPicker() {
+  const searchInput = document.getElementById("projectToolsSearch");
+  const dropdown = document.getElementById("projectToolsDropdown");
+  if (!searchInput || !dropdown) return;
+
+  searchInput.addEventListener("input", () => {
+    const query = searchInput.value.trim().toLowerCase();
+    if (!query) {
+      dropdown.hidden = true;
+      return;
+    }
+    const matches = allTools
+      .filter(t => !selectedToolIds.includes(t.id))
+      .filter(t => `${t.name} ${t.category}`.toLowerCase().includes(query))
+      .slice(0, 8);
+
+    if (matches.length === 0) {
+      dropdown.innerHTML = '<div class="project-tools-picker__empty">No matching tools</div>';
+      dropdown.hidden = false;
+      return;
+    }
+
+    dropdown.innerHTML = matches.map(t => `
+      <button type="button" class="project-tools-picker__option" data-tool-id="${t.id}">
+        <span class="project-tools-picker__option-icon">${getIconMarkup(t)}</span>
+        <span class="project-tools-picker__option-name">${escapeHtml(t.name)}</span>
+        <span class="project-tools-picker__option-cat">${escapeHtml(t.category)}</span>
+      </button>
+    `).join("");
+    dropdown.hidden = false;
+
+    dropdown.querySelectorAll("[data-tool-id]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        selectedToolIds.push(btn.dataset.toolId);
+        searchInput.value = "";
+        dropdown.hidden = true;
+        renderSelectedTools();
+      });
+    });
+  });
+
+  searchInput.addEventListener("keydown", (e) => {
+    if (e.key === "Escape") {
+      dropdown.hidden = true;
+      searchInput.value = "";
+    }
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!e.target.closest(".project-tools-picker__search-wrap")) {
+      dropdown.hidden = true;
+    }
+  });
+}
+
+function renderSelectedTools() {
+  const container = document.getElementById("projectToolsSelected");
+  if (!container) return;
+
+  if (selectedToolIds.length === 0) {
+    container.innerHTML = '<span class="project-tools-picker__hint">No tools linked yet</span>';
+    return;
+  }
+
+  container.innerHTML = selectedToolIds.map(id => {
+    const tool = allTools.find(t => t.id === id);
+    if (!tool) return "";
+    return `
+      <span class="project-tool-chip">
+        <span class="project-tool-chip__icon">${getIconMarkup(tool)}</span>
+        <span>${escapeHtml(tool.name)}</span>
+        <button type="button" class="project-tool-chip__remove" data-remove-id="${id}" aria-label="Remove ${escapeHtml(tool.name)}">&times;</button>
+      </span>
+    `;
+  }).join("");
+
+  container.querySelectorAll("[data-remove-id]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      selectedToolIds = selectedToolIds.filter(id => id !== btn.dataset.removeId);
+      renderSelectedTools();
+    });
+  });
+}
+
+function getToolsForProject(project) {
+  if (!Array.isArray(project.toolIds) || project.toolIds.length === 0) return [];
+  return project.toolIds
+    .map(id => allTools.find(t => t.id === id))
+    .filter(Boolean);
 }
 
 document.addEventListener("DOMContentLoaded", init);
