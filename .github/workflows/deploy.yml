@@ -20,9 +20,24 @@ jobs:
     environment: github-pages
     steps:
       - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          cache: "npm"
+      - run: npm ci
+
+      - name: Syntax check JS files
+        run: |
+          exit_code=0
+          for f in *.js lib/*.js data/*.js; do
+            if ! node -c "$f" 2>&1; then
+              exit_code=1
+            fi
+          done
+          exit $exit_code
 
       - name: Run tests
-        run: node tests/run.js
+        run: npm test
 
       - name: Build Firebase config
         env:
