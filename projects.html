@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function(){var t=localStorage.getItem("central-command.theme")||"dark";document.documentElement.classList.add("theme-"+t);})();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+    <meta name="description" content="Master project list — track all projects, status, and progress in one place." />
+    <meta name="theme-color" content="#0f0f0f" />
+    <title>Projects · Central Command</title>
+    <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./styles.css" />
+    <link rel="manifest" href="./manifest.json" />
+  </head>
+  <body class="content-page">
+    <a href="#mainContent" class="skip-link">Skip to main content</a>
+    <div class="content-shell">
+      <header class="content-header">
+        <div>
+          <p class="eyebrow">Operations</p>
+          <h1>Projects</h1>
+          <p class="hero__text">Track every project from idea to completion. Your master list, always current.</p>
+        </div>
+        <nav id="pageNav" aria-label="Main navigation"></nav>
+      </header>
+
+      <main id="mainContent" class="content-main layout">
+        <section class="panel panel--projects">
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Master List</p>
+              <h2>All Projects</h2>
+            </div>
+            <div class="panel__header-actions">
+              <div id="projectFilterBar" class="filter-bar"></div>
+              <button type="button" id="addProjectBtn" class="primary-button">Add project</button>
+            </div>
+          </div>
+
+          <div id="projectFormWrap" class="quick-add-form-wrap" hidden role="dialog" aria-modal="true" aria-label="Add or edit project">
+            <form id="projectForm" class="quick-add-form">
+              <label for="projectName" class="visually-hidden">Project name</label>
+              <input id="projectName" type="text" placeholder="Project name" required aria-required="true" />
+              <label for="projectDescription" class="visually-hidden">Description</label>
+              <input id="projectDescription" type="text" placeholder="Short description" />
+              <div class="form-row-split">
+                <div>
+                  <label for="projectStatus" class="visually-hidden">Status</label>
+                  <select id="projectStatus">
+                    <option value="idea">Idea</option>
+                    <option value="planning">Planning</option>
+                    <option value="in-progress">In Progress</option>
+                    <option value="review">Review</option>
+                    <option value="done">Done</option>
+                    <option value="on-hold">On Hold</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="projectPriority" class="visually-hidden">Priority</label>
+                  <select id="projectPriority">
+                    <option value="low">Low Priority</option>
+                    <option value="medium" selected>Medium Priority</option>
+                    <option value="high">High Priority</option>
+                    <option value="critical">Critical</option>
+                  </select>
+                </div>
+              </div>
+              <label for="projectUrl" class="visually-hidden">Link (optional)</label>
+              <input id="projectUrl" type="text" placeholder="Link (optional)" />
+              <label for="projectTags" class="visually-hidden">Tags (comma-separated)</label>
+              <input id="projectTags" type="text" placeholder="Tags (comma-separated)" />
+              <div class="quick-add-form__actions">
+                <button type="submit" class="primary-button" id="projectSubmitBtn">Add</button>
+                <button type="button" id="projectCancelBtn" class="ghost-button">Cancel</button>
+              </div>
+            </form>
+          </div>
+
+          <div id="projectStats" class="project-stats"></div>
+          <div id="projectGrid" class="project-grid" aria-live="polite"></div>
+          <div id="projectEmpty" class="empty-state" hidden>
+            <p class="empty-state__title">No projects yet</p>
+            <p class="empty-state__text">Add your first project to start tracking.</p>
+          </div>
+        </section>
+      </main>
+    </div>
+
+    <script src="./sw-register.js" defer></script>
+    <script type="module" src="./app-projects.js"></script>
+  </body>
+</html>
