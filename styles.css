@@ -3345,3 +3345,526 @@ select,
 .hero {
   animation: page-enter 600ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
+
+/* ── More-menu entrance animation ──────────────────────── */
+@keyframes menu-pop {
+  from { opacity: 0; transform: scale(0.9) translateY(-4px); }
+  to   { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+.tool-card__more-menu:not([hidden]) {
+  animation: menu-pop 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: top right;
+}
+
+#toolsMoreMenu:not([hidden]),
+.panel__header-more-menu:not([hidden]) {
+  animation: menu-pop 200ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  transform-origin: top right;
+}
+
+.tool-card__more-menu button:focus-visible {
+  background: rgba(62, 180, 165, 0.15);
+  border-radius: 8px;
+  outline: none;
+}
+
+.tool-card__more-menu button:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* ══════════════════════════════════════════════════════════
+   MOBILE RESPONSIVE IMPROVEMENTS
+   ══════════════════════════════════════════════════════════ */
+
+/* ── 1. More-menu overflow safety (all screens) ──────── */
+.tool-card__more-menu {
+  right: 0;
+  max-width: calc(100vw - 32px);
+}
+
+/* ── 2. Filter bar horizontal scroll on mobile ───────── */
+@media (max-width: 640px) {
+  .filter-bar {
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  .filter-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .filter-chip {
+    flex-shrink: 0;
+  }
+
+  /* ── 3. Hero status cards: horizontal scroll at small screens ── */
+  .hero__status {
+    grid-template-columns: repeat(3, minmax(100px, 1fr));
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    gap: 10px;
+  }
+
+  .hero__status::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* ── 4. Spotlight grid: ensure min 2 columns ──────── */
+  .spotlight-grid {
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+
+  /* ── 5. Project card footer: stack date and actions ── */
+  .project-card__footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .project-card__actions {
+    width: 100%;
+    justify-content: flex-start;
+  }
+
+  /* ── 6. Quick-add dialog viewport height safety ───── */
+  .quick-add-form-wrap[role="dialog"]:not([hidden]) {
+    max-height: calc(100vh - 32px);
+    max-height: calc(100dvh - 32px);
+  }
+
+  /* ── 7. Touch targets: 44px minimum on mobile ─────── */
+  .filter-chip,
+  .tool-card__more-menu button,
+  .project-card__link,
+  .project-card__edit,
+  .project-card__delete,
+  .project-card__status-badge,
+  .tab-button,
+  .topbar__search-btn,
+  .topbar__link,
+  .topbar__profile-link,
+  .auth-ui__badge,
+  .notes-tabs .tab-button,
+  .history-item__count,
+  .panel__header-more-item,
+  .layout-toggle__btn {
+    min-height: 44px;
+  }
+
+  .project-card__link,
+  .project-card__edit,
+  .project-card__delete {
+    padding: 10px 14px;
+  }
+
+  .tool-card__more-menu button {
+    padding: 12px 14px;
+  }
+}
+
+/* ── 8. Very small screens (<=480px) ─────────────────── */
+@media (max-width: 480px) {
+  /* Tool card actions: stack into grid layout */
+  .tool-card__actions {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .tool-card__actions > * {
+    min-height: 44px;
+    justify-content: center;
+  }
+
+  /* Topbar: hide brand name, show only mark */
+  .topbar__brand-name {
+    display: none;
+  }
+
+  /* Topbar: hide search button text, show only icon */
+  .topbar__search-btn {
+    padding: 6px 10px;
+    gap: 0;
+  }
+
+  .topbar__search-btn .topbar__search-text,
+  .topbar__search-btn span {
+    display: none;
+  }
+
+  /* Tighter app shell padding */
+  .app-shell {
+    width: min(100% - 16px, 100%);
+    padding: 16px 8px 40px;
+  }
+
+  /* Hero quick links: full width stack */
+  .hero__quick-links {
+    flex-direction: column;
+  }
+
+  .hero__quick-link {
+    width: 100%;
+    min-width: unset;
+  }
+
+  /* Status cards: single column on very small screens */
+  .hero__status {
+    grid-template-columns: 1fr;
+  }
+
+  /* Spotlight grid: 2 columns minimum */
+  .spotlight-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  /* Tool grid: single column */
+  .tool-grid {
+    grid-template-columns: 1fr;
+  }
+
+  /* Project grid: tighter padding */
+  .project-card {
+    padding: 16px;
+  }
+
+  /* Batch action bar: stack */
+  .batch-action-bar {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+  }
+
+  .batch-action-bar__actions {
+    justify-content: stretch;
+  }
+
+  .batch-action-bar__actions > * {
+    flex: 1;
+  }
+
+  /* Panel header actions: full width buttons */
+  .panel__header-actions > * {
+    min-height: 44px;
+  }
+
+  /* Tab bar: horizontal scroll */
+  .tab-bar {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+
+  .tab-bar::-webkit-scrollbar {
+    display: none;
+  }
+
+  .tab-button {
+    flex-shrink: 0;
+    white-space: nowrap;
+  }
+}
+
+/* ── Light theme polish ───────────────────────────────────────
+   Comprehensive overrides for components that use hard-coded
+   dark-mode values (rgba(255,255,255,…) backgrounds, dark
+   box-shadows, gradient text, etc.).
+   Existing html.theme-light rules above are NOT duplicated.
+   ──────────────────────────────────────────────────────────── */
+
+/* 1. Tool cards ─ hover shadow + accent bar */
+html.theme-light .tool-card:hover {
+  box-shadow:
+    0 12px 40px rgba(44, 39, 32, 0.10),
+    0 4px 12px rgba(44, 39, 32, 0.06),
+    0 0 0 1px var(--line-strong),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+html.theme-light .tool-card::after {
+  opacity: 0.7;
+}
+
+html.theme-light .tool-card:hover::after {
+  opacity: 0.9;
+}
+
+/* 2. Tool card icon ─ light gradient background */
+html.theme-light .tool-card__icon {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.05), rgba(0, 0, 0, 0.02));
+}
+
+html.theme-light .tool-card:hover .tool-card__icon {
+  box-shadow: 0 0 16px color-mix(in srgb, var(--accent, var(--amber)) 12%, transparent);
+}
+
+/* 3. Status card value ─ solid dark text instead of white→teal gradient */
+html.theme-light .status-card strong {
+  background: none;
+  -webkit-background-clip: unset;
+  -webkit-text-fill-color: var(--text);
+  background-clip: unset;
+  color: var(--text);
+}
+
+/* 4. Status card ─ lighter background + hover glow */
+html.theme-light .status-card {
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.02), rgba(0, 0, 0, 0.005));
+}
+
+html.theme-light .status-card::before {
+  background: radial-gradient(circle at 50% 100%, rgba(62, 180, 165, 0.06), transparent 70%);
+}
+
+html.theme-light .status-card:hover {
+  box-shadow: 0 4px 16px rgba(44, 39, 32, 0.08), 0 1px 4px rgba(44, 39, 32, 0.04);
+}
+
+/* 5. More-menu ─ visible border + light background */
+html.theme-light .tool-card__more-menu {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-float);
+}
+
+html.theme-light .tool-card__more-menu button:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html.theme-light .tool-card__more-menu button:focus-visible {
+  background: rgba(62, 180, 165, 0.10);
+}
+
+html.theme-light .panel__header-more-menu {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-float);
+}
+
+html.theme-light .panel__header-more-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+/* 6. Skeleton loading ─ light shimmer */
+html.theme-light .skeleton {
+  background: linear-gradient(90deg, rgba(0, 0, 0, 0.06) 0%, rgba(0, 0, 0, 0.02) 50%, rgba(0, 0, 0, 0.06) 100%);
+  background-size: 200px 100%;
+  animation: shimmer 1.4s ease infinite;
+}
+
+/* 7. Batch action bar ─ lighter gradient */
+html.theme-light .batch-action-bar {
+  background: linear-gradient(135deg, rgba(62, 180, 165, 0.06), rgba(91, 127, 219, 0.04));
+  border-color: rgba(62, 180, 165, 0.15);
+}
+
+/* 8. Empty states ─ lighter radial pseudo-element */
+html.theme-light .inline-empty-state::before {
+  background: radial-gradient(ellipse at 50% 80%, rgba(62, 180, 165, 0.03), transparent 60%);
+}
+
+html.theme-light .inline-empty-state,
+html.theme-light .history-list__empty,
+html.theme-light .notes-preview__empty {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+html.theme-light .empty-state {
+  background: var(--bg-elevated);
+}
+
+html.theme-light .spotlight-empty {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+/* 9. Filter chips active state ─ lighter glow */
+html.theme-light .filter-chip.is-active {
+  background: rgba(62, 180, 165, 0.10);
+  border-color: rgba(62, 180, 165, 0.35);
+  box-shadow: 0 0 12px rgba(62, 180, 165, 0.06), inset 0 0 0 1px rgba(62, 180, 165, 0.08);
+}
+
+/* 10. Auth UI panel ─ light background */
+html.theme-light .auth-ui__panel {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  box-shadow: var(--shadow-float);
+}
+
+html.theme-light .page-nav__auth-slot {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+/* 11. Command palette ─ light bg, border, shadow */
+html.theme-light .command-palette-overlay {
+  background: rgba(244, 241, 234, 0.55);
+}
+
+html.theme-light .command-palette-panel {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.99) 0%, rgba(249, 246, 239, 0.99) 100%);
+  border: 1px solid var(--line-strong);
+  box-shadow:
+    0 24px 80px rgba(44, 39, 32, 0.14),
+    0 8px 32px rgba(44, 39, 32, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+html.theme-light .command-palette-item[aria-selected="true"] {
+  background: rgba(62, 180, 165, 0.08);
+}
+
+html.theme-light .command-palette-item mark {
+  background: rgba(62, 180, 165, 0.18);
+}
+
+/* 12. Topbar links ─ dark-on-light hover/active */
+html.theme-light .topbar__link:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+}
+
+html.theme-light .topbar__link.is-active {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text);
+}
+
+html.theme-light .topbar__profile-link:hover {
+  background: rgba(0, 0, 0, 0.06);
+  color: var(--text);
+}
+
+html.theme-light .topbar__profile-link.is-active {
+  background: rgba(0, 0, 0, 0.05);
+  color: var(--text);
+}
+
+html.theme-light .topbar__search-btn {
+  background: rgba(0, 0, 0, 0.03);
+  border-color: var(--line);
+}
+
+html.theme-light .topbar__search-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+  border-color: var(--line-strong);
+}
+
+/* 13. Import URL dialog & scheduled export dialog ─ light bg
+       (both use .import-url-dialog-wrap / .import-url-dialog) */
+html.theme-light .import-url-dialog-wrap {
+  background: rgba(244, 241, 234, 0.55);
+}
+
+html.theme-light .import-url-dialog {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  box-shadow:
+    0 24px 80px rgba(44, 39, 32, 0.14),
+    0 8px 24px rgba(44, 39, 32, 0.08),
+    inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+/* 14. Project cards ─ lighter hover shadow */
+html.theme-light .project-card:hover {
+  box-shadow:
+    0 12px 40px rgba(44, 39, 32, 0.10),
+    0 4px 12px rgba(44, 39, 32, 0.06);
+}
+
+html.theme-light .project-card__status-badge {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+html.theme-light .project-card__status-badge:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html.theme-light .project-card__tag {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html.theme-light .project-stat-chip:hover {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+/* Misc dark-bg helpers that leak in light mode */
+html.theme-light .tool-card__category,
+html.theme-light .tool-card__pin,
+html.theme-light .tool-card__badge {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html.theme-light .notes-tabs {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html.theme-light .notes-preview {
+  background: var(--bg-elevated);
+  border: 1px solid var(--line);
+}
+
+html.theme-light .notes-preview code {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html.theme-light .notes-preview pre {
+  background: rgba(0, 0, 0, 0.04);
+}
+
+html.theme-light .notes-hint code {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html.theme-light .notes-templates-item {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+html.theme-light .notes-templates-item:hover {
+  background: rgba(0, 0, 0, 0.05);
+}
+
+html.theme-light .settings-fieldset {
+  background: rgba(0, 0, 0, 0.02);
+}
+
+html.theme-light .page-nav__menu-btn {
+  background: rgba(0, 0, 0, 0.03);
+}
+
+html.theme-light .page-nav__menu-btn:hover {
+  background: rgba(0, 0, 0, 0.06);
+}
+
+html.theme-light .quick-add-form-wrap[role="dialog"]:not([hidden]) {
+  box-shadow: 0 0 0 100vmax rgba(244, 241, 234, 0.55), var(--shadow);
+}
+
+html.theme-light .surfaces-settings-panel[role="dialog"]:not([hidden]) {
+  box-shadow: 0 0 0 100vmax rgba(244, 241, 234, 0.55), var(--shadow);
+}
+
+html.theme-light .spotlight-card:hover {
+  box-shadow:
+    0 12px 40px rgba(44, 39, 32, 0.10),
+    0 4px 12px rgba(44, 39, 32, 0.06),
+    inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+html.theme-light .history-item__count {
+  background: rgba(62, 180, 165, 0.08);
+}
+
+/*
+ * 15. Toast notifications
+ *     Toast styles are injected at runtime by lib/toast.js and are NOT
+ *     governed by this stylesheet.  To add light-theme overrides for
+ *     toasts, edit the `injectStyles()` function inside lib/toast.js
+ *     and wrap the dark-mode values in a
+ *       html.theme-light .central-toast { … }
+ *     block within that injected <style> tag.
+ */

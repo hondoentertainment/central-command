@@ -1,4 +1,5 @@
 import { PRESET_PACKS } from "./data/presets.js";
+import { showConfirmDialog } from "./lib/confirm-dialog.js";
 import { renderNav } from "./lib/nav.js";
 import {
   hydrateTools,
@@ -77,14 +78,19 @@ function renderPresetCards() {
   });
 }
 
-function applyPreset(presetId, isRestore = false) {
+async function applyPreset(presetId, isRestore = false) {
   const preset = PRESET_PACKS.find((entry) => entry.id === presetId);
   if (!preset) return;
 
   const message = isRestore
-    ? "Restore the full starter deck and replace your current tools?"
-    : `Replace your current tools with the ${preset.title} preset?`;
-  const confirmed = window.confirm(message);
+    ? "This will restore the full starter deck and replace your current tools."
+    : `This will replace your current tools with the ${preset.title} preset.`;
+  const confirmed = await showConfirmDialog({
+    title: isRestore ? "Restore starter deck?" : `Apply ${preset.title}?`,
+    message,
+    confirmLabel: isRestore ? "Restore" : "Apply preset",
+    destructive: true,
+  });
   if (!confirmed) return;
 
   state.tools = normalizePinRanks(structuredClone(preset.tools));

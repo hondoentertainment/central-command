@@ -40,6 +40,7 @@ import {
   validateIntegrationUrl,
 } from "./lib/integrations.js";
 import { showToast } from "./lib/toast.js";
+import { showConfirmDialog, showAlertDialog } from "./lib/confirm-dialog.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
 
@@ -680,7 +681,7 @@ async function handleQuickAddSubmit(event) {
   if (!isValidLaunchTarget(url)) {
     const normalized = normalizeUrl(url);
     if (!isValidLaunchTarget(normalized)) {
-      alert("Please enter a valid URL or path.");
+      showAlertDialog({ title: "Invalid URL", message: "Please enter a valid URL or path." });
       return;
     }
   }
@@ -1514,11 +1515,16 @@ function reorderPinnedTool(id, direction) {
   render();
 }
 
-function removeTool(id) {
+async function removeTool(id) {
   const tool = state.tools.find((entry) => entry.id === id);
   if (!tool) return;
 
-  const confirmed = window.confirm(`Delete ${tool.name} from your command deck?`);
+  const confirmed = await showConfirmDialog({
+    title: `Delete ${tool.name}?`,
+    message: "This tool will be removed from your command deck. This cannot be undone.",
+    confirmLabel: "Delete",
+    destructive: true,
+  });
   if (!confirmed) return;
 
   state.tools = state.tools.filter((entry) => entry.id !== id);
@@ -1597,12 +1603,15 @@ function batchPinSelected() {
   updateStatusCards();
 }
 
-function batchDeleteSelected() {
+async function batchDeleteSelected() {
   const ids = [...state.selectedToolIds];
   if (ids.length === 0) return;
-  const confirmed = window.confirm(
-    `Delete ${ids.length} tool(s)? This cannot be undone.`
-  );
+  const confirmed = await showConfirmDialog({
+    title: `Delete ${ids.length} tool(s)?`,
+    message: "Selected tools will be permanently removed. This cannot be undone.",
+    confirmLabel: "Delete all",
+    destructive: true,
+  });
   if (!confirmed) return;
   state.tools = state.tools.filter((t) => !ids.includes(t.id));
   state.launchHistory = filterHistoryForTools(state.launchHistory, state.tools);
