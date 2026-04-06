@@ -1267,28 +1267,6 @@ function renderCards() {
   const grid = elements.toolGrid;
 
   if (!grid) return;
-    const pinnedIndex = pinnedIds.indexOf(tool.id);
-    const isPinned = pinnedIndex >= 0 && !isVirtualIntegration;
-    moveUpButton.hidden = !isPinned;
-    moveDownButton.hidden = !isPinned;
-    moveUpButton.disabled = !isPinned || pinnedIndex === 0;
-    moveDownButton.disabled = !isPinned || pinnedIndex === pinnedIds.length - 1;
-
-    if (!isVirtualIntegration) {
-      moveUpButton.addEventListener("click", () => reorderPinnedTool(tool.id, "up"));
-      moveDownButton.addEventListener("click", () => reorderPinnedTool(tool.id, "down"));
-
-      editButton.addEventListener("click", (event) => {
-        event.preventDefault();
-        window.location.href = `registry.html?edit=${encodeURIComponent(tool.id)}`;
-      });
-      deleteButton.addEventListener("click", () => removeTool(tool.id));
-    } else {
-      editButton.hidden = true;
-      deleteButton.hidden = true;
-      moveUpButton.hidden = true;
-      moveDownButton.hidden = true;
-    }
 
   const useVirtualization = visibleTools.length >= VIRTUALIZE_THRESHOLD;
 
