@@ -1,4 +1,5 @@
 import { fireLaunchHook } from "./lib/hooks.js";
+import { showConfirmDialog } from "./lib/confirm-dialog.js";
 import { renderNav } from "./lib/nav.js";
 import {
   createFallbackMetadataMap,
@@ -123,10 +124,15 @@ function renderLaunchHistory() {
   });
 }
 
-function clearLaunchHistory() {
+async function clearLaunchHistory() {
   if (state.launchHistory.length === 0) return;
 
-  const confirmed = window.confirm("Clear recent launch history?");
+  const confirmed = await showConfirmDialog({
+    title: "Clear launch history?",
+    message: "All recent launch records will be removed.",
+    confirmLabel: "Clear history",
+    destructive: true,
+  });
   if (!confirmed) return;
 
   state.launchHistory = [];

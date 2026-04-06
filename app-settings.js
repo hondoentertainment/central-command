@@ -9,7 +9,8 @@ import {
   changePassword,
 } from "./lib/firebase.js";
 import { evaluatePasswordStrength, getAccountTier, mapAuthError } from "./lib/auth-policy.js";
-import { recordSecurityEvent } from "./lib/storage.js";
+import { recordSecurityEvent, loadIntegrationsPreferences, saveIntegrationsPreferences } from "./lib/storage.js";
+import { sanitizeIntegrationsPreferences, validateIntegrationUrl, checkIntegrationHealth } from "./lib/integrations.js";
 
 const elements = {
   themeSettingsForm: document.querySelector("#themeSettingsForm"),
@@ -23,6 +24,14 @@ const elements = {
   currentPasswordInput: document.querySelector("#currentPasswordInput"),
   newPasswordInput: document.querySelector("#newPasswordInput"),
   changePasswordBtn: document.querySelector("#changePasswordBtn"),
+  settingsCreativeHubEnabled: document.querySelector("#settingsCreativeHubEnabled"),
+  settingsCreativeHubShowInNav: document.querySelector("#settingsCreativeHubShowInNav"),
+  settingsCreativeHubShowInPalette: document.querySelector("#settingsCreativeHubShowInPalette"),
+  settingsCreativeHubShowAsTool: document.querySelector("#settingsCreativeHubShowAsTool"),
+  settingsCreativeHubUrl: document.querySelector("#settingsCreativeHubUrl"),
+  settingsCreativeHubOpenMode: document.querySelector("#settingsCreativeHubOpenMode"),
+  integrationsStatus: document.querySelector("#integrationsStatus"),
+  integrationUrlHealth: document.querySelector("#integrationUrlHealth"),
 };
 
 let accountControlsEnabled = false;
@@ -36,6 +45,7 @@ async function initialize() {
   applyThemeSelection(getTheme());
 
   elements.themeSettingsForm?.addEventListener("change", handleThemeChange);
+  initializeIntegrations();
   await initializeAccountSecurity();
 }
 
@@ -178,4 +188,81 @@ function applyAccountControlDisabledState() {
     if (!el) return;
     el.disabled = disabled;
   });
+}
+
+function initializeIntegrations() {
+  const prefs = sanitizeIntegrationsPreferences(loadIntegrationsPreferences());
+  const ch = prefs.creativeHub;
+
+  if (elements.settingsCreativeHubEnabled) elements.settingsCreativeHubEnabled.checked = ch.enabled;
+  if (elements.settingsCreativeHubShowInNav) elements.settingsCreativeHubShowInNav.checked = ch.showInNav;
+  if (elements.settingsCreativeHubShowInPalette) elements.settingsCreativeHubShowInPalette.checked = ch.showInCommandPalette;
+  if (elements.settingsCreativeHubShowAsTool) elements.settingsCreativeHubShowAsTool.checked = ch.showAsTool;
+  if (elements.settingsCreativeHubUrl) elements.settingsCreativeHubUrl.value = ch.url;
+  if (elements.settingsCreativeHubOpenMode) elements.settingsCreativeHubOpenMode.value = ch.openMode;
+
+  const saveIntegration = () => {
+    const urlValidation = validateIntegrationUrl(elements.settingsCreativeHubUrl?.value);
+    const next = sanitizeIntegrationsPreferences({
+      creativeHub: {
+        enabled: elements.settingsCreativeHubEnabled?.checked ?? true,
+        showInNav: elements.settingsCreativeHubShowInNav?.checked ?? true,
+        showInCommandPalette: elements.settingsCreativeHubShowInPalette?.checked ?? true,
+        showAsTool: elements.settingsCreativeHubShowAsTool?.checked ?? true,
+        url: urlValidation.url,
+        openMode: elements.settingsCreativeHubOpenMode?.value,
+      },
+    });
+
+    if (elements.settingsCreativeHubUrl) {
+      elements.settingsCreativeHubUrl.value = next.creativeHub.url;
+    }
+
+    saveIntegrationsPreferences(next);
+
+    if (!urlValidation.isValid) {
+      setIntegrationsStatus("URL is invalid. Default URL applied.", "error");
+    } else {
+      setIntegrationsStatus("Integration settings saved.", "success");
+    }
+  };
+
+  [
+    elements.settingsCreativeHubEnabled,
+    elements.settingsCreativeHubShowInNav,
+    elements.settingsCreativeHubShowInPalette,
+    elements.settingsCreativeHubShowAsTool,
+    elements.settingsCreativeHubOpenMode,
+  ].forEach((el) => el?.addEventListener("change", saveIntegration));
+
+  elements.settingsCreativeHubUrl?.addEventListener("blur", () => {
+    saveIntegration();
+    runHealthCheck();
+  });
+
+  runHealthCheck();
+}
+
+function setIntegrationsStatus(message, tone = "info") {
+  if (!elements.integrationsStatus) return;
+  elements.integrationsStatus.textContent = message;
+  elements.integrationsStatus.className = `form-message is-${tone}`;
+  setTimeout(() => {
+    if (elements.integrationsStatus) elements.integrationsStatus.textContent = "";
+  }, 4000);
+}
+
+async function runHealthCheck() {
+  const url = elements.settingsCreativeHubUrl?.value;
+  if (!url || !elements.integrationUrlHealth) return;
+  elements.integrationUrlHealth.textContent = "Checking URL…";
+  elements.integrationUrlHealth.className = "form-message is-info";
+  const result = await checkIntegrationHealth(url);
+  if (result.ok) {
+    elements.integrationUrlHealth.textContent = "URL is reachable.";
+    elements.integrationUrlHealth.className = "form-message is-success";
+  } else {
+    elements.integrationUrlHealth.textContent = result.message || "URL may be unreachable.";
+    elements.integrationUrlHealth.className = "form-message is-warning";
+  }
 }

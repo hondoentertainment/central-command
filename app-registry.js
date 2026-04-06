@@ -1,4 +1,5 @@
 import { ALL_PRESET_TOOLS, CATEGORY_OPTIONS, DEFAULT_TOOLS, PRESET_PACKS } from "./data/presets.js";
+import { showConfirmDialog, showPromptDialog } from "./lib/confirm-dialog.js";
 import { ICON_OPTIONS } from "./lib/icons.js";
 import { renderNav } from "./lib/nav.js";
 import {
@@ -272,9 +273,14 @@ function renderCategoryOptions(currentCategory = elements.categorySelect.value) 
   elements.categorySelect.value = currentCategory || "";
 }
 
-function handleCategoryChange() {
+async function handleCategoryChange() {
   if (elements.categorySelect.value === "__add__") {
-    const name = window.prompt("New category name:");
+    const name = await showPromptDialog({
+      title: "New category",
+      message: "Enter a name for the new category.",
+      placeholder: "Category name",
+      confirmLabel: "Add",
+    });
     if (name && name.trim()) {
       const trimmed = name.trim();
       const customCategories = loadCustomCategories();
@@ -303,14 +309,19 @@ function renderIconOptions() {
   });
 }
 
-function applyPreset(presetId, isRestore = false) {
+async function applyPreset(presetId, isRestore = false) {
   const preset = PRESET_PACKS.find((entry) => entry.id === presetId);
   if (!preset) return;
 
   const message = isRestore
-    ? "Restore the full starter deck and replace your current tools?"
-    : `Replace your current tools with the ${preset.title} preset?`;
-  const confirmed = window.confirm(message);
+    ? "This will restore the full starter deck and replace your current tools."
+    : `This will replace your current tools with the ${preset.title} preset.`;
+  const confirmed = await showConfirmDialog({
+    title: isRestore ? "Restore starter deck?" : `Apply ${preset.title}?`,
+    message,
+    confirmLabel: isRestore ? "Restore" : "Apply preset",
+    destructive: true,
+  });
   if (!confirmed) return;
 
   state.tools = normalizePinRanks(structuredClone(preset.tools));

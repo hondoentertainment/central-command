@@ -1,5 +1,6 @@
 import { renderNav } from "./lib/nav.js";
 import { showToast } from "./lib/toast.js";
+import { showConfirmDialog } from "./lib/confirm-dialog.js";
 
 const STORAGE_KEY = "central-command.projects";
 
@@ -218,8 +219,14 @@ function renderProjects() {
     });
   });
   grid.querySelectorAll("[data-delete]").forEach(btn => {
-    btn.addEventListener("click", () => {
-      if (confirm("Delete this project?")) deleteProject(btn.dataset.delete);
+    btn.addEventListener("click", async () => {
+      const confirmed = await showConfirmDialog({
+        title: "Delete this project?",
+        message: "This project will be permanently removed.",
+        confirmLabel: "Delete",
+        destructive: true,
+      });
+      if (confirmed) deleteProject(btn.dataset.delete);
     });
   });
 }

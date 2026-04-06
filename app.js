@@ -40,6 +40,7 @@ import {
   validateIntegrationUrl,
 } from "./lib/integrations.js";
 import { showToast } from "./lib/toast.js";
+import { showConfirmDialog, showAlertDialog } from "./lib/confirm-dialog.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
 
@@ -116,6 +117,18 @@ const elements = {
   creativeHubUrl: document.querySelector("#creativeHubUrl"),
   creativeHubOpenMode: document.querySelector("#creativeHubOpenMode"),
   mainContent: document.querySelector(".dashboard-main"),
+  importUrlDialogWrap: document.querySelector("#importUrlDialogWrap"),
+  importUrlInput: document.querySelector("#importUrlInput"),
+  importUrlConfirmBtn: document.querySelector("#importUrlConfirmBtn"),
+  importUrlCancelBtn: document.querySelector("#importUrlCancelBtn"),
+  importUrlStatus: document.querySelector("#importUrlStatus"),
+  shareDeckBtn: document.querySelector("#shareDeckBtn"),
+  scheduleExportBtn: document.querySelector("#scheduleExportBtn"),
+  scheduledExportDialogWrap: document.querySelector("#scheduledExportDialogWrap"),
+  scheduledExportInterval: document.querySelector("#scheduledExportInterval"),
+  scheduledExportSaveBtn: document.querySelector("#scheduledExportSaveBtn"),
+  scheduledExportCancelBtn: document.querySelector("#scheduledExportCancelBtn"),
+  scheduledExportStatus: document.querySelector("#scheduledExportStatus"),
 };
 
 // --- Batch actions (delegated to module) ---
@@ -136,7 +149,9 @@ async function initialize() {
     DEFAULT_TOOLS
   );
 
-  const importUrl = new URLSearchParams(location.search).get("import");
+  const params = new URLSearchParams(location.search);
+  const importUrl = params.get("import");
+  const deckParam = params.get("deck");
   if (importUrl) {
     const imported = await fetchAndImportBackup(importUrl);
     if (imported) {
@@ -148,6 +163,26 @@ async function initialize() {
       showToast(`Imported ${tools.length} tools from URL.`);
       history.replaceState(null, "", location.pathname + location.hash);
     }
+  } else if (deckParam) {
+    try {
+      const decoded = JSON.parse(decodeURIComponent(escape(globalThis.atob(deckParam))));
+      const rawTools = Array.isArray(decoded) ? decoded : decoded?.tools;
+      const deckTools = hydrateTools(rawTools, fallbackMetadataBySignature);
+      if (deckTools.length) {
+        tools = normalizePinRanks(deckTools);
+        state.launchHistory = filterHistoryForTools(
+          sanitizeLaunchHistory(decoded?.launchHistory),
+          tools
+        );
+        await saveStoredToolsSynced(tools);
+        await saveLaunchHistorySynced(state.launchHistory);
+        if (typeof decoded?.notes === "string") saveNotesSynced(decoded.notes);
+        showToast(`Imported ${tools.length} tools from shared deck link.`, "success");
+      }
+    } catch {
+      showToast("Could not load shared deck. The link may be corrupted.", "error");
+    }
+    history.replaceState(null, "", location.pathname + location.hash);
   } else if (!hasSavedTools()) {
     const fromFile = await fetchAndImportBackup("./backup.json");
     if (fromFile?.tools?.length) {
@@ -200,8 +235,14 @@ async function initialize() {
     elements.importBackupInput?.click();
   });
   elements.importBackupInput?.addEventListener("change", handleImportBackup);
-  elements.importFromUrlBtn?.addEventListener("click", handleImportFromUrl);
+  elements.importFromUrlBtn?.addEventListener("click", openImportUrlDialog);
+  elements.importUrlConfirmBtn?.addEventListener("click", handleImportUrlConfirm);
+  elements.importUrlCancelBtn?.addEventListener("click", closeImportUrlDialog);
   elements.copyBackupBtn?.addEventListener("click", handleCopyBackupToClipboard);
+  elements.shareDeckBtn?.addEventListener("click", handleShareDeckLink);
+  elements.scheduleExportBtn?.addEventListener("click", openScheduledExportDialog);
+  elements.scheduledExportSaveBtn?.addEventListener("click", handleScheduledExportSave);
+  elements.scheduledExportCancelBtn?.addEventListener("click", closeScheduledExportDialog);
   elements.selectModeBtn?.addEventListener("click", () => {
     closeToolsMoreMenu();
     toggleSelectMode();
@@ -242,6 +283,7 @@ async function initialize() {
   setupToolGridKeydown(elements.toolGrid);
 
   render();
+  checkScheduledExport();
 }
 
 function handleGlobalShortcuts(event) {
@@ -257,6 +299,16 @@ function handleGlobalShortcuts(event) {
     if (elements.surfacesSettingsPanel && !elements.surfacesSettingsPanel.hidden) {
       event.preventDefault();
       closeSurfacesPanel();
+      return;
+    }
+    if (elements.importUrlDialogWrap && !elements.importUrlDialogWrap.hidden) {
+      event.preventDefault();
+      closeImportUrlDialog();
+      return;
+    }
+    if (elements.scheduledExportDialogWrap && !elements.scheduledExportDialogWrap.hidden) {
+      event.preventDefault();
+      closeScheduledExportDialog();
       return;
     }
     if (elements.quickAddFormWrap && !elements.quickAddFormWrap.hidden) {
@@ -629,7 +681,7 @@ async function handleQuickAddSubmit(event) {
   if (!isValidLaunchTarget(url)) {
     const normalized = normalizeUrl(url);
     if (!isValidLaunchTarget(normalized)) {
-      alert("Please enter a valid URL or path.");
+      showAlertDialog({ title: "Invalid URL", message: "Please enter a valid URL or path." });
       return;
     }
   }
@@ -703,15 +755,36 @@ async function handleImportBackup(event) {
   }
 }
 
-async function handleImportFromUrl() {
+function openImportUrlDialog() {
   closeToolsMoreMenu();
-  const url = window.prompt("Enter backup JSON URL:", "https://");
-  if (!url || !url.trim()) return;
-  const trimmed = url.trim();
+  const wrap = elements.importUrlDialogWrap;
+  if (!wrap) return;
+  if (elements.importUrlInput) elements.importUrlInput.value = "";
+  if (elements.importUrlStatus) elements.importUrlStatus.textContent = "";
+  wrap.hidden = false;
+  setMainContentInert(true);
+  requestAnimationFrame(() => elements.importUrlInput?.focus());
+}
+
+function closeImportUrlDialog() {
+  const wrap = elements.importUrlDialogWrap;
+  if (wrap) wrap.hidden = true;
+  setMainContentInert(false);
+}
+
+async function handleImportUrlConfirm() {
+  const url = elements.importUrlInput?.value?.trim();
+  if (!url) {
+    if (elements.importUrlStatus) elements.importUrlStatus.textContent = "Please enter a URL.";
+    return;
+  }
+  if (elements.importUrlStatus) elements.importUrlStatus.textContent = "Importing…";
+  elements.importUrlConfirmBtn.disabled = true;
   try {
-    const imported = await fetchAndImportBackup(trimmed);
+    const imported = await fetchAndImportBackup(url);
     if (!imported) {
-      showToast("Could not load backup from that URL. Check the URL and try again.", "error");
+      if (elements.importUrlStatus) elements.importUrlStatus.textContent = "Could not load backup from that URL.";
+      elements.importUrlConfirmBtn.disabled = false;
       return;
     }
     state.tools = normalizePinRanks(imported.tools);
@@ -719,12 +792,132 @@ async function handleImportFromUrl() {
     await saveStoredToolsSynced(state.tools);
     await saveLaunchHistorySynced(state.launchHistory);
     if (imported.notes != null) saveNotesSynced(imported.notes);
+    closeImportUrlDialog();
     render();
     updateStatusCards();
     showToast(`Imported ${state.tools.length} tools from URL.`, "success");
   } catch {
-    showToast("Could not import from URL.", "error");
+    if (elements.importUrlStatus) elements.importUrlStatus.textContent = "Could not import from URL.";
+  } finally {
+    elements.importUrlConfirmBtn.disabled = false;
   }
+}
+
+async function handleShareDeckLink() {
+  closeToolsMoreMenu();
+  const payload = {
+    version: EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    tools: state.tools,
+    notes: loadNotes(),
+    launchHistory: state.launchHistory,
+  };
+  const encoded = globalThis.btoa(unescape(encodeURIComponent(JSON.stringify(payload))));
+  const shareUrl = `${location.origin}${location.pathname}?deck=${encoded}`;
+
+  if (encoded.length > 6000) {
+    try {
+      await navigator.clipboard.writeText(JSON.stringify(payload, null, 2));
+      showToast("Deck is too large for a URL. Backup JSON copied to clipboard instead.", "info");
+    } catch {
+      showToast("Deck is too large to share as a link.", "error");
+    }
+    return;
+  }
+
+  try {
+    await navigator.clipboard.writeText(shareUrl);
+    showToast("Shareable deck link copied to clipboard.", "success");
+  } catch {
+    showToast("Could not copy share link.", "error");
+  }
+}
+
+const SCHEDULED_EXPORT_KEY = "central-command.scheduled-export";
+
+function loadScheduledExport() {
+  try {
+    const raw = localStorage.getItem(SCHEDULED_EXPORT_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch { return null; }
+}
+
+function saveScheduledExport(config) {
+  try {
+    if (config) {
+      localStorage.setItem(SCHEDULED_EXPORT_KEY, JSON.stringify(config));
+    } else {
+      localStorage.removeItem(SCHEDULED_EXPORT_KEY);
+    }
+  } catch {}
+}
+
+function openScheduledExportDialog() {
+  closeToolsMoreMenu();
+  const wrap = elements.scheduledExportDialogWrap;
+  if (!wrap) return;
+  const config = loadScheduledExport();
+  if (elements.scheduledExportInterval) {
+    elements.scheduledExportInterval.value = config?.interval || "";
+  }
+  if (elements.scheduledExportStatus) {
+    elements.scheduledExportStatus.textContent = config?.lastExport
+      ? `Last export: ${new Date(config.lastExport).toLocaleString()}`
+      : "";
+  }
+  wrap.hidden = false;
+  setMainContentInert(true);
+}
+
+function closeScheduledExportDialog() {
+  const wrap = elements.scheduledExportDialogWrap;
+  if (wrap) wrap.hidden = true;
+  setMainContentInert(false);
+}
+
+function handleScheduledExportSave() {
+  const interval = elements.scheduledExportInterval?.value || "";
+  if (!interval) {
+    saveScheduledExport(null);
+    closeScheduledExportDialog();
+    showToast("Scheduled export disabled.", "info");
+    return;
+  }
+  const config = loadScheduledExport() || {};
+  config.interval = interval;
+  saveScheduledExport(config);
+  closeScheduledExportDialog();
+  showToast(`Export scheduled: ${interval}.`, "success");
+  checkScheduledExport();
+}
+
+function checkScheduledExport() {
+  const config = loadScheduledExport();
+  if (!config?.interval) return;
+
+  const now = Date.now();
+  const last = config.lastExport ? new Date(config.lastExport).getTime() : 0;
+  const intervals = { daily: 86400000, weekly: 604800000, monthly: 2592000000 };
+  const ms = intervals[config.interval];
+  if (!ms || (now - last) < ms) return;
+
+  const payload = {
+    version: EXPORT_VERSION,
+    exportedAt: new Date().toISOString(),
+    tools: state.tools,
+    notes: loadNotes(),
+    launchHistory: state.launchHistory,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const a = document.createElement("a");
+  a.href = URL.createObjectURL(blob);
+  a.download = `central-command-backup-${new Date().toISOString().slice(0, 10)}.json`;
+  a.click();
+  URL.revokeObjectURL(a.href);
+
+  config.lastExport = new Date().toISOString();
+  saveScheduledExport(config);
+  showToast("Scheduled backup exported.", "success");
 }
 
 async function handleCopyBackupToClipboard() {
@@ -1322,11 +1515,16 @@ function reorderPinnedTool(id, direction) {
   render();
 }
 
-function removeTool(id) {
+async function removeTool(id) {
   const tool = state.tools.find((entry) => entry.id === id);
   if (!tool) return;
 
-  const confirmed = window.confirm(`Delete ${tool.name} from your command deck?`);
+  const confirmed = await showConfirmDialog({
+    title: `Delete ${tool.name}?`,
+    message: "This tool will be removed from your command deck. This cannot be undone.",
+    confirmLabel: "Delete",
+    destructive: true,
+  });
   if (!confirmed) return;
 
   state.tools = state.tools.filter((entry) => entry.id !== id);
@@ -1405,12 +1603,15 @@ function batchPinSelected() {
   updateStatusCards();
 }
 
-function batchDeleteSelected() {
+async function batchDeleteSelected() {
   const ids = [...state.selectedToolIds];
   if (ids.length === 0) return;
-  const confirmed = window.confirm(
-    `Delete ${ids.length} tool(s)? This cannot be undone.`
-  );
+  const confirmed = await showConfirmDialog({
+    title: `Delete ${ids.length} tool(s)?`,
+    message: "Selected tools will be permanently removed. This cannot be undone.",
+    confirmLabel: "Delete all",
+    destructive: true,
+  });
   if (!confirmed) return;
   state.tools = state.tools.filter((t) => !ids.includes(t.id));
   state.launchHistory = filterHistoryForTools(state.launchHistory, state.tools);

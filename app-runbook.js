@@ -1,4 +1,5 @@
 import { renderNav } from "./lib/nav.js";
+import { showPromptDialog } from "./lib/confirm-dialog.js";
 import {
   loadNotes,
   loadNotesMeta,
@@ -108,8 +109,14 @@ function renderTemplatesList() {
   });
 }
 
-function saveAsTemplate() {
-  const name = window.prompt("Template name", "My template");
+async function saveAsTemplate() {
+  const name = await showPromptDialog({
+    title: "Save as template",
+    message: "Give this template a name so you can reuse it later.",
+    placeholder: "Template name",
+    defaultValue: "My template",
+    confirmLabel: "Save",
+  });
   if (!name || !name.trim()) return;
   const content = elements.notes.value;
   const templates = loadRunbookTemplates();

@@ -20,6 +20,9 @@ const testFiles = [
   "integrations.test.js",
   "debounce.test.js",
   "nav.test.js",
+  "hooks.test.js",
+  "surfaces-settings.test.js",
+  "integration-health.test.js",
 ];
 
 let passed = 0;
