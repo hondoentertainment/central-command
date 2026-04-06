@@ -52,8 +52,8 @@ jobs:
       - name: Copy site files
         run: |
           mkdir -p deploy deploy/icons deploy/config
-          cp index.html registry.html agents.html packs.html sports.html games.html health.html admin.html writing.html productivity.html history.html runbook.html profile.html settings.html music.html movies.html parties.html deploy/
-          cp app.js app-registry.js app-agents.js app-packs.js app-sports.js app-games.js app-health.js app-admin.js app-writing.js app-productivity.js app-history.js app-runbook.js app-profile.js app-settings.js app-music.js app-movies.js app-parties.js deploy/
+          cp index.html registry.html agents.html packs.html sports.html games.html health.html admin.html writing.html productivity.html history.html runbook.html profile.html settings.html music.html movies.html parties.html projects.html deploy/
+          cp app.js app-registry.js app-agents.js app-packs.js app-sports.js app-games.js app-health.js app-admin.js app-writing.js app-productivity.js app-history.js app-runbook.js app-profile.js app-settings.js app-music.js app-movies.js app-parties.js app-projects.js deploy/
           cp styles.css deploy/
           cp -r data lib deploy/
           cp config/firebase.config.example.js deploy/config/

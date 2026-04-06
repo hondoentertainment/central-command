@@ -1,4 +1,4 @@
-const CACHE_VERSION = 2;
+const CACHE_VERSION = 3;
 const CACHE_NAME = `central-command-v${CACHE_VERSION}`;
 
 const BASE = location.pathname.includes("/central-command") ? "/central-command" : "";
@@ -20,6 +20,7 @@ const REWRITE_MAP = {
   "/runbook": "/runbook.html",
   "/profile": "/profile.html",
   "/settings": "/settings.html",
+  "/projects": "/projects.html",
 };
 
 const REWRITES = {};
@@ -46,6 +47,7 @@ const PRECACHE = [
   BASE + "/runbook.html",
   BASE + "/profile.html",
   BASE + "/settings.html",
+  BASE + "/projects.html",
   BASE + "/styles.css",
   BASE + "/manifest.json",
   BASE + "/app.js",
@@ -65,6 +67,7 @@ const PRECACHE = [
   BASE + "/app-runbook.js",
   BASE + "/app-profile.js",
   BASE + "/app-settings.js",
+  BASE + "/app-projects.js",
   BASE + "/lib/nav.js",
   BASE + "/lib/icons.js",
   BASE + "/lib/storage.js",

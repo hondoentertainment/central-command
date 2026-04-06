@@ -31,6 +31,7 @@ export default [
         Node: "readonly",
         Intl: "readonly",
         alert: "readonly",
+        confirm: "readonly",
         location: "readonly",
         self: "readonly",
         navigator: "readonly",
