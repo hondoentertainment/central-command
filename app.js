@@ -1044,7 +1044,7 @@ function computeVirtualVisibleRange(visibleTools) {
   const scrollTop = wrap.scrollTop;
   const viewHeight = Math.max(1, wrap.clientHeight || 400);
 
-  let startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - OVERSCAN_ROWS);
+  const startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - OVERSCAN_ROWS);
   let endRow = Math.min(
     totalRows - 1,
     Math.ceil((scrollTop + viewHeight) / rowHeight) - 1 + OVERSCAN_ROWS
@@ -1243,7 +1243,7 @@ function renderVirtualizedCards(visibleTools) {
 
   for (let i = visibleStart; i <= visibleEnd; i++) {
     const tool = visibleTools[i];
-    const { fragment, card } = createCardElement(tool, pinnedIds, {
+    const { fragment } = createCardElement(tool, pinnedIds, {
       dataIndex: i,
     });
     view.appendChild(fragment);
