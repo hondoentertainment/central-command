@@ -12,7 +12,16 @@
 - **More integrations** — Google Docs and Google Drive in Full Command preset; Layout panel hint: “Add Calendar, Docs, and more from Starter Packs.”
 - **Music** — Music page: Rolling Stone 500, AllMusic, and Pitchfork link blocks; meta and header copy updated.
 
+## Recently Completed
+
+- **Sharing & export (advanced)** — Shareable deck links (base64 encoded URL), scheduled exports (daily/weekly/monthly auto-download), and in-app “Import from URL” modal dialog replacing the browser prompt.
+- **Browse nav grouping** — Sidebar browse section grouped into collapsible Work, Play, and Media categories for reduced cognitive load.
+- **Empty category page hints** — Contextual per-category hints with links to relevant starter packs and the tool registry when a category page is empty.
+- **Integration settings panel** — Dedicated Integrations section on the Settings page for managing Creative Hub and future integrations (URL, visibility, open mode).
+- **Integration reliability** — URL health checks for integration endpoints, friendly fallback messages, and unit tests for health-check logic.
+- **Test coverage expansion** — New unit tests for hooks, surfaces-settings, and integration health check modules (12 total test files).
+
 ## Next
 
-- **Sharing & export (advanced)** — Share a read-only or copyable deck link; scheduled exports; optional in-app “Import from URL” dialog (beyond prompt).
 - **More integrations** — Additional linkable services (e.g. dashboards, Notion) and optional Creative Hub–style quick actions.
+- **Advanced sync indicator** — Lightweight UI indicator when Firebase sync is in progress or slow.
