@@ -13,6 +13,8 @@ const MODE_KEY = "central-command.runbook-mode";
 const MODE_EDIT = "edit";
 const MODE_PREVIEW = "preview";
 
+const ACTIVE_STATUSES = new Set(["idea", "planning", "in-progress", "review"]);
+
 const elements = {
   notes: document.querySelector("#notes"),
   notesLastEdited: document.querySelector("#notesLastEdited"),
@@ -25,6 +27,9 @@ const elements = {
   templatesPanel: document.querySelector("#templatesPanel"),
   saveAsTemplateBtn: document.querySelector("#saveAsTemplateBtn"),
   templatesList: document.querySelector("#templatesList"),
+  dailyStandupBtn: document.querySelector("#dailyStandupBtn"),
+  projectRefList: document.querySelector("#projectRefList"),
+  projectRefPanel: document.querySelector("#projectRefPanel"),
 };
 
 let mode = MODE_EDIT;
@@ -57,6 +62,10 @@ function initialize() {
 
   updateLastEditedDisplay();
   renderTemplatesList();
+
+  elements.dailyStandupBtn?.addEventListener("click", insertDailyStandup);
+  renderProjectRefPanel();
+  setupMentionSupport();
 }
 
 function toggleTemplatesPanel() {
@@ -256,4 +265,220 @@ function updateLastEditedDisplay() {
   const meta = loadNotesMeta();
   const text = meta?.lastEdited ? formatLastEdited(meta.lastEdited) : null;
   elements.notesLastEdited.textContent = text ? `Last edited: ${text}` : "";
+}
+
+/* --- Project linking helpers --- */
+
+function loadActiveProjects() {
+  try {
+    const raw = localStorage.getItem("central-command.projects");
+    const projects = raw ? JSON.parse(raw) : [];
+    return projects.filter((p) => ACTIVE_STATUSES.has(p.status));
+  } catch {
+    return [];
+  }
+}
+
+function insertTextAtCursor(text) {
+  const textarea = elements.notes;
+  if (!textarea) return;
+  const start = textarea.selectionStart;
+  const end = textarea.selectionEnd;
+  const before = textarea.value.slice(0, start);
+  const after = textarea.value.slice(end);
+  textarea.value = before + text + after;
+  textarea.selectionStart = textarea.selectionEnd = start + text.length;
+  saveNotesSynced(textarea.value);
+  textarea.focus();
+}
+
+/* Daily standup template */
+
+function insertDailyStandup() {
+  const today = new Date().toLocaleDateString("en-US", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+  const activeProjects = loadActiveProjects();
+  const projectLines =
+    activeProjects.length > 0
+      ? activeProjects
+          .map((p) => `- **${p.name}** (${p.status})${p.description ? " — " + p.description : ""}`)
+          .join("\n")
+      : "- _No active projects_";
+
+  const template = `## Daily Standup — ${today}
+
+### What I did yesterday
+-
+
+### What I'm doing today
+-
+
+### Blockers
+-
+
+### Active Projects
+${projectLines}
+`;
+
+  const textarea = elements.notes;
+  if (!textarea) return;
+  const start = textarea.selectionStart;
+  if (start === 0 && textarea.selectionEnd === 0) {
+    // Prepend
+    textarea.value = template + "\n" + textarea.value;
+    textarea.selectionStart = textarea.selectionEnd = template.length;
+  } else {
+    insertTextAtCursor(template);
+  }
+  saveNotesSynced(textarea.value);
+  textarea.focus();
+}
+
+/* Project reference chip panel */
+
+function renderProjectRefPanel() {
+  const list = elements.projectRefList;
+  if (!list) return;
+  const projects = loadActiveProjects();
+  list.innerHTML = "";
+  if (projects.length === 0) {
+    list.innerHTML = '<span style="font-size:0.8rem;color:var(--muted)">No active projects</span>';
+    return;
+  }
+  projects.forEach((p) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "runbook-project-ref";
+    btn.innerHTML = `${escapeHtml(p.name)} <span class="runbook-project-ref__status">${escapeHtml(p.status)}</span>`;
+    btn.addEventListener("click", () => {
+      insertTextAtCursor(`**${p.name}**`);
+    });
+    list.appendChild(btn);
+  });
+}
+
+/* @mention autocomplete */
+
+let mentionDropdown = null;
+let mentionStartIndex = -1;
+let mentionActiveIndex = 0;
+
+function setupMentionSupport() {
+  const textarea = elements.notes;
+  if (!textarea) return;
+
+  textarea.addEventListener("input", handleMentionInput);
+  textarea.addEventListener("keydown", handleMentionKeydown);
+  textarea.addEventListener("blur", () => {
+    // Delay so click on dropdown registers first
+    setTimeout(closeMentionDropdown, 150);
+  });
+}
+
+function handleMentionInput() {
+  const textarea = elements.notes;
+  const cursorPos = textarea.selectionStart;
+  const textBefore = textarea.value.slice(0, cursorPos);
+
+  // Find the last @ that starts a mention (preceded by start-of-text or whitespace)
+  const mentionMatch = textBefore.match(/(^|[\s])@([^\s]*)$/);
+  if (!mentionMatch) {
+    closeMentionDropdown();
+    return;
+  }
+
+  const query = mentionMatch[2].toLowerCase();
+  mentionStartIndex = cursorPos - mentionMatch[2].length - 1; // position of @
+
+  const projects = loadActiveProjects();
+  const filtered = projects.filter((p) => p.name.toLowerCase().includes(query));
+
+  if (filtered.length === 0) {
+    closeMentionDropdown();
+    return;
+  }
+
+  mentionActiveIndex = 0;
+  showMentionDropdown(filtered);
+}
+
+function handleMentionKeydown(e) {
+  if (!mentionDropdown) return;
+  const options = mentionDropdown.querySelectorAll(".runbook-mention-option");
+  if (options.length === 0) return;
+
+  if (e.key === "ArrowDown") {
+    e.preventDefault();
+    mentionActiveIndex = (mentionActiveIndex + 1) % options.length;
+    updateMentionActive(options);
+  } else if (e.key === "ArrowUp") {
+    e.preventDefault();
+    mentionActiveIndex = (mentionActiveIndex - 1 + options.length) % options.length;
+    updateMentionActive(options);
+  } else if (e.key === "Enter" || e.key === "Tab") {
+    e.preventDefault();
+    const active = options[mentionActiveIndex];
+    if (active) selectMention(active.dataset.name);
+  } else if (e.key === "Escape") {
+    e.preventDefault();
+    closeMentionDropdown();
+  }
+}
+
+function updateMentionActive(options) {
+  options.forEach((opt, i) => {
+    opt.classList.toggle("is-active", i === mentionActiveIndex);
+  });
+}
+
+function showMentionDropdown(projects) {
+  closeMentionDropdown();
+  const textarea = elements.notes;
+  const rect = textarea.getBoundingClientRect();
+
+  mentionDropdown = document.createElement("div");
+  mentionDropdown.className = "runbook-mention-dropdown";
+  mentionDropdown.style.left = `${rect.left + 16}px`;
+  mentionDropdown.style.top = `${rect.top + rect.height - 220}px`;
+
+  projects.forEach((p, i) => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "runbook-mention-option" + (i === 0 ? " is-active" : "");
+    btn.textContent = `${p.name} (${p.status})`;
+    btn.dataset.name = p.name;
+    btn.addEventListener("mousedown", (e) => {
+      e.preventDefault(); // Prevent blur
+      selectMention(p.name);
+    });
+    mentionDropdown.appendChild(btn);
+  });
+
+  document.body.appendChild(mentionDropdown);
+}
+
+function selectMention(name) {
+  const textarea = elements.notes;
+  const cursorPos = textarea.selectionStart;
+  const before = textarea.value.slice(0, mentionStartIndex);
+  const after = textarea.value.slice(cursorPos);
+  const insert = `**${name}**`;
+  textarea.value = before + insert + after;
+  textarea.selectionStart = textarea.selectionEnd = before.length + insert.length;
+  saveNotesSynced(textarea.value);
+  textarea.focus();
+  closeMentionDropdown();
+}
+
+function closeMentionDropdown() {
+  if (mentionDropdown) {
+    mentionDropdown.remove();
+    mentionDropdown = null;
+  }
+  mentionStartIndex = -1;
+  mentionActiveIndex = 0;
 }

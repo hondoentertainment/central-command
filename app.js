@@ -40,6 +40,7 @@ import {
   validateIntegrationUrl,
 } from "./lib/integrations.js";
 import { showToast } from "./lib/toast.js";
+import { loadWorkspaces, getActiveWorkspace, filterToolsByWorkspace } from "./lib/workspaces.js";
 import { showConfirmDialog, showAlertDialog } from "./lib/confirm-dialog.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
@@ -129,6 +130,7 @@ const elements = {
   scheduledExportSaveBtn: document.querySelector("#scheduledExportSaveBtn"),
   scheduledExportCancelBtn: document.querySelector("#scheduledExportCancelBtn"),
   scheduledExportStatus: document.querySelector("#scheduledExportStatus"),
+  todayDashboard: document.querySelector("#todayDashboard"),
 };
 
 // --- Batch actions (delegated to module) ---
@@ -1093,10 +1095,96 @@ function handleToolGridKeydown(event) {
 
 function render() {
   renderHeroQuickLinks();
+  renderTodayDashboard();
   renderSpotlight();
   renderFilters();
   renderCards();
   updateStatusCards();
+}
+
+function renderTodayDashboard() {
+  const container = elements.todayDashboard;
+  if (!container) return;
+
+  const todayStr = new Date().toISOString().slice(0, 10);
+
+  // Load tasks
+  let tasks = [];
+  try { tasks = JSON.parse(localStorage.getItem("central-command.tasks.v1")) || []; } catch { tasks = []; }
+
+  // Load projects
+  let projects = [];
+  try { projects = JSON.parse(localStorage.getItem("central-command.projects")) || []; } catch { projects = []; }
+
+  // Filter tasks due today or with status "today"
+  const todayTasks = tasks.filter(
+    (t) => t.status === "today" || t.dueDate === todayStr
+  );
+
+  // Overdue tasks
+  const overdueTasks = tasks.filter(
+    (t) => t.dueDate && t.dueDate < todayStr && t.status !== "done"
+  );
+
+  // Completed today
+  const completedToday = tasks.filter(
+    (t) => t.status === "done" && t.dueDate === todayStr
+  );
+
+  // Active projects
+  const activeProjects = projects.filter(
+    (p) => p.status === "in-progress" || p.status === "planning"
+  );
+
+  // Tools launched today (from launch history)
+  const launchedToday = state.launchHistory.filter(
+    (entry) => entry.timestamp && entry.timestamp.slice(0, 10) === todayStr
+  );
+
+  // Priority color map
+  const priorityColors = { high: "#e54d42", medium: "#f5a623", low: "#4a9", };
+
+  // Build Tasks Due card
+  const taskItems = todayTasks.slice(0, 5).map((t) => {
+    const doneClass = t.status === "done" ? " today-card__item--done" : "";
+    const dot = t.priority
+      ? `<span class="today-card__priority" style="background:${priorityColors[t.priority] || "var(--muted)"}"></span>`
+      : "";
+    return `<li class="today-card__item${doneClass}">${dot}<span>${escapeHtml(t.title || t.name || "Untitled")}</span></li>`;
+  }).join("");
+
+  const projectItems = activeProjects.slice(0, 4).map((p) => {
+    return `<li class="today-card__item"><span class="badge badge--${p.status}">${p.status}</span> <span>${escapeHtml(p.name || "Untitled")}</span></li>`;
+  }).join("");
+
+  const overdueAlert = overdueTasks.length > 0 ? " today-card__stat-value--alert" : "";
+
+  container.innerHTML = `
+    <div class="today-card">
+      <p class="today-card__title">Tasks Due</p>
+      <div class="today-card__count">${todayTasks.length}</div>
+      <ul class="today-card__list">${taskItems || '<li class="today-card__item" style="color:var(--muted)">No tasks due today</li>'}</ul>
+      <a href="tasks.html" class="today-card__link">View all &rarr;</a>
+    </div>
+    <div class="today-card">
+      <p class="today-card__title">Active Projects</p>
+      <div class="today-card__count">${activeProjects.length}</div>
+      <ul class="today-card__list">${projectItems || '<li class="today-card__item" style="color:var(--muted)">No active projects</li>'}</ul>
+      <a href="projects.html" class="today-card__link">View all &rarr;</a>
+    </div>
+    <div class="today-card">
+      <p class="today-card__title">Quick Stats</p>
+      <div class="today-card__stat-row"><span>Overdue</span><span class="today-card__stat-value${overdueAlert}">${overdueTasks.length}</span></div>
+      <div class="today-card__stat-row"><span>Completed today</span><span class="today-card__stat-value">${completedToday.length}</span></div>
+      <div class="today-card__stat-row"><span>Tools launched today</span><span class="today-card__stat-value">${launchedToday.length}</span></div>
+    </div>
+  `;
+}
+
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
 }
 
 function renderHeroQuickLinks() {
@@ -1186,7 +1274,10 @@ function renderFilters() {
 }
 
 function getVisibleTools() {
-  return sortTools(getToolsWithIntegrationEntries()).filter((tool) => {
+  const allTools = sortTools(getToolsWithIntegrationEntries());
+  const workspace = getActiveWorkspace(loadWorkspaces());
+  const workspaceFiltered = filterToolsByWorkspace(allTools, workspace);
+  return workspaceFiltered.filter((tool) => {
     const matchesCategory =
       state.activeCategory === "All" || tool.category === state.activeCategory;
     const haystack = `${tool.name} ${tool.category} ${tool.description}`.toLowerCase();
