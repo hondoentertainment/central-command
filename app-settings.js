@@ -1,4 +1,5 @@
 import { renderNav } from "./lib/nav.js";
+import { loadWorkspaces, saveWorkspaces, createWorkspace, updateWorkspace, deleteWorkspace } from "./lib/workspaces.js";
 import { getTheme, setTheme, initTheme } from "./lib/theme.js";
 import {
   initFirebase,
@@ -32,6 +33,7 @@ const elements = {
   settingsCreativeHubOpenMode: document.querySelector("#settingsCreativeHubOpenMode"),
   integrationsStatus: document.querySelector("#integrationsStatus"),
   integrationUrlHealth: document.querySelector("#integrationUrlHealth"),
+  workspaceSettings: document.querySelector("#workspaceSettings"),
 };
 
 let accountControlsEnabled = false;
@@ -45,6 +47,7 @@ async function initialize() {
   applyThemeSelection(getTheme());
 
   elements.themeSettingsForm?.addEventListener("change", handleThemeChange);
+  initializeWorkspaceSettings();
   initializeIntegrations();
   await initializeAccountSecurity();
 }
@@ -187,6 +190,124 @@ function applyAccountControlDisabledState() {
   ].forEach((el) => {
     if (!el) return;
     el.disabled = disabled;
+  });
+}
+
+function initializeWorkspaceSettings() {
+  if (!elements.workspaceSettings) return;
+  renderWorkspaceList();
+}
+
+function renderWorkspaceList() {
+  const container = elements.workspaceSettings;
+  if (!container) return;
+
+  const workspaces = loadWorkspaces();
+
+  const cards = workspaces.map((ws) => {
+    const toolCount = ws.toolIds ? ws.toolIds.length : 0;
+    const projectCount = ws.projectIds ? ws.projectIds.length : 0;
+    const isAll = ws.id === "all";
+    const deleteBtn = isAll
+      ? ""
+      : `<button type="button" class="ghost-button ghost-button--danger workspace-delete-btn" data-ws-id="${ws.id}">Delete</button>`;
+
+    return `
+      <div class="workspace-item" data-ws-id="${ws.id}">
+        <span class="workspace-item__icon">${ws.icon}</span>
+        <span class="workspace-item__name">${ws.name}</span>
+        <span class="workspace-item__meta">${toolCount} tools, ${projectCount} projects</span>
+        <button type="button" class="ghost-button workspace-edit-btn" data-ws-id="${ws.id}">Edit</button>
+        ${deleteBtn}
+      </div>`;
+  }).join("");
+
+  container.innerHTML = `
+    ${cards}
+    <button type="button" class="ghost-button" id="addWorkspaceBtn">+ Add workspace</button>
+  `;
+
+  container.querySelectorAll(".workspace-edit-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-ws-id");
+      const ws = workspaces.find((w) => w.id === id);
+      if (ws) renderWorkspaceEditForm(ws);
+    });
+  });
+
+  container.querySelectorAll(".workspace-delete-btn").forEach((btn) => {
+    btn.addEventListener("click", () => {
+      const id = btn.getAttribute("data-ws-id");
+      const updated = deleteWorkspace(loadWorkspaces(), id);
+      saveWorkspaces(updated);
+      renderWorkspaceList();
+    });
+  });
+
+  container.querySelector("#addWorkspaceBtn")?.addEventListener("click", () => {
+    renderWorkspaceEditForm(null);
+  });
+}
+
+function renderWorkspaceEditForm(workspace) {
+  const container = elements.workspaceSettings;
+  if (!container) return;
+
+  const isNew = !workspace;
+  const name = workspace ? workspace.name : "";
+  const icon = workspace ? workspace.icon : "\u{1F4CB}";
+  const toolIds = workspace ? (workspace.toolIds || []).join(", ") : "";
+  const projectIds = workspace ? (workspace.projectIds || []).join(", ") : "";
+
+  container.innerHTML = `
+    <form class="tool-form workspace-edit-form" id="workspaceEditForm">
+      <label for="wsEditIcon">Icon
+        <input type="text" id="wsEditIcon" value="${icon}" maxlength="4" style="width:60px" />
+      </label>
+      <label for="wsEditName">Name
+        <input type="text" id="wsEditName" value="${name}" required />
+      </label>
+      <label for="wsEditToolIds">Tool IDs (comma-separated)
+        <input type="text" id="wsEditToolIds" value="${toolIds}" placeholder="e.g. calculator, timer" />
+      </label>
+      <label for="wsEditProjectIds">Project IDs (comma-separated)
+        <input type="text" id="wsEditProjectIds" value="${projectIds}" placeholder="e.g. project-alpha" />
+      </label>
+      <div class="tool-form__actions">
+        <button type="submit" class="ghost-button">${isNew ? "Create" : "Save"}</button>
+        <button type="button" class="ghost-button" id="wsEditCancel">Cancel</button>
+      </div>
+    </form>
+  `;
+
+  container.querySelector("#wsEditCancel")?.addEventListener("click", () => {
+    renderWorkspaceList();
+  });
+
+  container.querySelector("#workspaceEditForm")?.addEventListener("submit", (e) => {
+    e.preventDefault();
+    const newName = container.querySelector("#wsEditName")?.value.trim();
+    const newIcon = container.querySelector("#wsEditIcon")?.value.trim() || "\u{1F4CB}";
+    const newToolIds = container.querySelector("#wsEditToolIds")?.value
+      .split(",").map((s) => s.trim()).filter(Boolean);
+    const newProjectIds = container.querySelector("#wsEditProjectIds")?.value
+      .split(",").map((s) => s.trim()).filter(Boolean);
+
+    if (!newName) return;
+
+    if (isNew) {
+      createWorkspace({ name: newName, icon: newIcon, toolIds: newToolIds, projectIds: newProjectIds });
+    } else {
+      const updated = updateWorkspace(loadWorkspaces(), workspace.id, {
+        name: newName,
+        icon: newIcon,
+        toolIds: newToolIds,
+        projectIds: newProjectIds,
+      });
+      saveWorkspaces(updated);
+    }
+
+    renderWorkspaceList();
   });
 }
 

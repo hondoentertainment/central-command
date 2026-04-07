@@ -51,6 +51,7 @@
                 <button type="button" class="tab-button is-active" role="tab" aria-selected="true" data-mode="edit" id="tab-edit">Edit</button>
                 <button type="button" class="tab-button" role="tab" aria-selected="false" data-mode="preview" id="tab-preview">Preview</button>
               </div>
+              <button type="button" id="dailyStandupBtn" class="ghost-button">Daily Standup</button>
               <div class="notes-templates-wrap">
                 <button type="button" id="templatesToggleBtn" class="ghost-button" aria-expanded="false" aria-controls="templatesPanel">Templates</button>
                 <div id="templatesPanel" class="notes-templates-panel" hidden aria-labelledby="templatesToggleBtn">
@@ -71,6 +72,10 @@
             ></textarea>
             <p class="notes-hint">Try markdown: <strong>**bold**</strong>, <code>- list</code></p>
             <p id="notesLastEdited" class="notes-last-edited" aria-live="polite"></p>
+            <div id="projectRefPanel" class="runbook-project-refs">
+              <p class="runbook-project-refs__label">Active Projects</p>
+              <div id="projectRefList" class="runbook-project-refs__list"></div>
+            </div>
           </div>
           <div id="notes-preview-panel" role="tabpanel" aria-labelledby="tab-preview" hidden>
             <div id="notes-preview" class="notes-preview" aria-live="polite"></div>

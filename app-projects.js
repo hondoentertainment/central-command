@@ -25,11 +25,20 @@ const PRIORITY_CONFIG = {
   "critical": { label: "Critical", color: "#ff4d6a" },
 };
 
+const KNOWLEDGE_TYPES = {
+  note:     { label: "Note",           icon: "\ud83d\udcdd" },
+  decision: { label: "Decision",       icon: "\u2696\ufe0f" },
+  link:     { label: "Link / Resource", icon: "\ud83d\udd17" },
+  lesson:   { label: "Lesson Learned", icon: "\ud83d\udca1" },
+};
+
 let projects = [];
 let activeFilter = "all";
 let editingId = null;
 let allTools = [];
 let selectedToolIds = [];
+let knowledgeProjectId = null;
+let knowledgeFilter = "all";
 
 function loadProjects() {
   try {
@@ -57,6 +66,10 @@ function init() {
   document.getElementById("addProjectBtn")?.addEventListener("click", showForm);
   document.getElementById("projectCancelBtn")?.addEventListener("click", hideForm);
   document.getElementById("projectForm")?.addEventListener("submit", handleSubmit);
+  document.getElementById("closeKnowledgeBtn")?.addEventListener("click", closeKnowledgeBase);
+  document.getElementById("addKnowledgeBtn")?.addEventListener("click", toggleKnowledgeAddForm);
+  document.getElementById("knowledgeEntrySubmit")?.addEventListener("click", submitKnowledgeEntry);
+  document.getElementById("knowledgeEntryCancel")?.addEventListener("click", hideKnowledgeAddForm);
   initToolPicker();
 
   render();
@@ -218,6 +231,7 @@ function renderProjects() {
           <span class="project-card__date">${updatedLabel}</span>
           <div class="project-card__actions">
             ${linkHtml}
+            <button class="ghost-button project-card__knowledge" data-knowledge="${project.id}">Knowledge</button>
             <button class="ghost-button project-card__edit" data-edit="${project.id}">Edit</button>
             <button class="ghost-button project-card__delete" data-delete="${project.id}">Delete</button>
           </div>
@@ -228,6 +242,9 @@ function renderProjects() {
 
   grid.querySelectorAll("[data-cycle]").forEach(btn => {
     btn.addEventListener("click", () => cycleStatus(btn.dataset.cycle));
+  });
+  grid.querySelectorAll("[data-knowledge]").forEach(btn => {
+    btn.addEventListener("click", () => openKnowledgeBase(btn.dataset.knowledge));
   });
   grid.querySelectorAll("[data-edit]").forEach(btn => {
     btn.addEventListener("click", () => {
@@ -376,6 +393,156 @@ function getToolsForProject(project) {
   return project.toolIds
     .map(id => allTools.find(t => t.id === id))
     .filter(Boolean);
+}
+
+// --- Knowledge base ---
+
+function openKnowledgeBase(projectId) {
+  const project = projects.find(p => p.id === projectId);
+  if (!project) return;
+  knowledgeProjectId = projectId;
+  knowledgeFilter = "all";
+
+  document.querySelector(".panel--projects").hidden = true;
+  const section = document.getElementById("knowledgeSection");
+  section.hidden = false;
+  document.getElementById("knowledgeProjectName").textContent = project.name;
+  hideKnowledgeAddForm();
+  renderKnowledgeFilterBar();
+  renderKnowledgeEntries(project, knowledgeFilter);
+}
+
+function closeKnowledgeBase() {
+  knowledgeProjectId = null;
+  document.getElementById("knowledgeSection").hidden = true;
+  document.querySelector(".panel--projects").hidden = false;
+}
+
+function renderKnowledgeFilterBar() {
+  const bar = document.getElementById("knowledgeFilterBar");
+  if (!bar) return;
+  const types = [
+    { key: "all", label: "All" },
+    { key: "note", label: "Notes" },
+    { key: "decision", label: "Decisions" },
+    { key: "link", label: "Links" },
+    { key: "lesson", label: "Lessons" },
+  ];
+  bar.innerHTML = types.map(t =>
+    `<button class="filter-chip ${knowledgeFilter === t.key ? "is-active" : ""}" data-kfilter="${t.key}">${t.label}</button>`
+  ).join("");
+
+  bar.querySelectorAll("[data-kfilter]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      knowledgeFilter = btn.dataset.kfilter;
+      const project = projects.find(p => p.id === knowledgeProjectId);
+      if (project) {
+        renderKnowledgeFilterBar();
+        renderKnowledgeEntries(project, knowledgeFilter);
+      }
+    });
+  });
+}
+
+function renderKnowledgeEntries(project, filterType) {
+  const container = document.getElementById("knowledgeEntries");
+  const emptyEl = document.getElementById("knowledgeEmpty");
+  if (!container) return;
+
+  const log = Array.isArray(project.log) ? project.log : [];
+  const entries = filterType === "all"
+    ? log
+    : log.filter(e => e.type === filterType);
+
+  if (emptyEl) emptyEl.hidden = entries.length > 0;
+
+  if (entries.length === 0) {
+    container.innerHTML = "";
+    return;
+  }
+
+  container.innerHTML = entries.map(entry => {
+    const typeConf = KNOWLEDGE_TYPES[entry.type] || KNOWLEDGE_TYPES.note;
+    return `
+      <div class="knowledge-entry">
+        <span class="knowledge-entry__icon">${typeConf.icon}</span>
+        <div class="knowledge-entry__body">
+          <p class="knowledge-entry__text">${escapeHtml(entry.text)}</p>
+          <div class="knowledge-entry__meta">
+            <span class="knowledge-entry__type">${typeConf.label}</span>
+            <span>${formatRelativeDate(entry.createdAt)}</span>
+          </div>
+        </div>
+        <button class="knowledge-entry__delete" data-delete-entry="${entry.id}" title="Delete entry">&times;</button>
+      </div>
+    `;
+  }).join("");
+
+  container.querySelectorAll("[data-delete-entry]").forEach(btn => {
+    btn.addEventListener("click", async () => {
+      const confirmed = await showConfirmDialog({
+        title: "Delete this entry?",
+        message: "This knowledge base entry will be permanently removed.",
+        confirmLabel: "Delete",
+        destructive: true,
+      });
+      if (confirmed) {
+        deleteKnowledgeEntry(knowledgeProjectId, btn.dataset.deleteEntry);
+      }
+    });
+  });
+}
+
+function deleteKnowledgeEntry(projectId, entryId) {
+  const project = projects.find(p => p.id === projectId);
+  if (!project || !Array.isArray(project.log)) return;
+  project.log = project.log.filter(e => e.id !== entryId);
+  project.updatedAt = new Date().toISOString();
+  saveProjects();
+  showToast("Entry deleted");
+  renderKnowledgeEntries(project, knowledgeFilter);
+}
+
+function toggleKnowledgeAddForm() {
+  const form = document.getElementById("knowledgeAddForm");
+  if (!form) return;
+  form.hidden = !form.hidden;
+  if (!form.hidden) {
+    document.getElementById("knowledgeEntryText")?.focus();
+  }
+}
+
+function hideKnowledgeAddForm() {
+  const form = document.getElementById("knowledgeAddForm");
+  if (form) {
+    form.hidden = true;
+    const textInput = document.getElementById("knowledgeEntryText");
+    if (textInput) textInput.value = "";
+    const typeSelect = document.getElementById("knowledgeEntryType");
+    if (typeSelect) typeSelect.value = "note";
+  }
+}
+
+function submitKnowledgeEntry() {
+  const text = document.getElementById("knowledgeEntryText")?.value?.trim();
+  const type = document.getElementById("knowledgeEntryType")?.value || "note";
+  if (!text || !knowledgeProjectId) return;
+
+  const project = projects.find(p => p.id === knowledgeProjectId);
+  if (!project) return;
+
+  if (!Array.isArray(project.log)) project.log = [];
+  project.log.unshift({
+    id: generateId(),
+    text,
+    type,
+    createdAt: new Date().toISOString(),
+  });
+  project.updatedAt = new Date().toISOString();
+  saveProjects();
+  showToast("Entry added");
+  hideKnowledgeAddForm();
+  renderKnowledgeEntries(project, knowledgeFilter);
 }
 
 document.addEventListener("DOMContentLoaded", init);

@@ -99,6 +99,35 @@
             <p class="empty-state__text">Add your first project to start tracking.</p>
           </div>
         </section>
+        <section class="panel panel--knowledge" id="knowledgeSection" hidden>
+          <div class="panel__header">
+            <div>
+              <p class="eyebrow">Knowledge Base</p>
+              <h2 id="knowledgeProjectName">Project Knowledge</h2>
+            </div>
+            <div class="panel__header-actions">
+              <button type="button" id="addKnowledgeBtn" class="primary-button">Add entry</button>
+              <button type="button" id="closeKnowledgeBtn" class="ghost-button">Close</button>
+            </div>
+          </div>
+          <div id="knowledgeAddForm" class="knowledge-add-form" hidden>
+            <select id="knowledgeEntryType">
+              <option value="note">Note</option>
+              <option value="decision">Decision</option>
+              <option value="link">Link / Resource</option>
+              <option value="lesson">Lesson Learned</option>
+            </select>
+            <input id="knowledgeEntryText" type="text" placeholder="What do you want to record?" />
+            <button type="button" id="knowledgeEntrySubmit" class="primary-button">Add</button>
+            <button type="button" id="knowledgeEntryCancel" class="ghost-button">Cancel</button>
+          </div>
+          <div id="knowledgeFilterBar" class="filter-bar"></div>
+          <div id="knowledgeEntries" class="knowledge-entries"></div>
+          <div id="knowledgeEmpty" class="empty-state" hidden>
+            <p class="empty-state__title">No entries yet</p>
+            <p class="empty-state__text">Add decisions, notes, links, and lessons learned for this project.</p>
+          </div>
+        </section>
       </main>
     </div>
 
