@@ -44,7 +44,6 @@ import { loadWorkspaces, getActiveWorkspace, filterToolsByWorkspace } from "./li
 import { showConfirmDialog, showAlertDialog } from "./lib/confirm-dialog.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
-<<<<<<< HEAD
 import { initDragDrop, applyDragAttributes } from "./lib/drag-drop.js";
 import {
   getSuggestedTools,
@@ -58,10 +57,7 @@ import {
 } from "./lib/usage-intelligence.js";
 import { trackVitals } from "./lib/web-vitals.js";
 import { initPluginSystem, emit as pluginEmit } from "./lib/plugins.js";
-
-trackVitals();
 import { shouldShowOnboarding, startOnboarding } from "./lib/onboarding.js";
-=======
 import { importPackFromUrl, exportFullSetup } from "./lib/shareable-packs.js";
 import {
   mergeTools as fieldMergeTools,
@@ -71,6 +67,8 @@ import {
   loadSyncLog,
 } from "./lib/conflict-resolution.js";
 
+trackVitals();
+
 // Register conflict resolution module globally for firebase.js integration
 window.__conflictResolution = {
   mergeTools: fieldMergeTools,
@@ -78,7 +76,6 @@ window.__conflictResolution = {
   logSyncActivity,
   showSyncSummaryToast,
 };
->>>>>>> worktree-agent-a219a54e
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 

@@ -4690,11 +4690,8 @@ html.theme-light .topbar__workspace-dropdown {
   background: var(--bg-elevated);
 }
 
-<<<<<<< HEAD
 /* ── View Transitions API ─────────────────────────────── */
 
-.topbar {
-  view-transition-name: topbar;
 /* ══════════════════════════════════════════════════════════
    VIEW TRANSITIONS API
    ══════════════════════════════════════════════════════════ */
@@ -5718,7 +5715,7 @@ html.theme-light .onboarding-spotlight {
   font-size: 0.875rem;
   margin-bottom: 16px;
   line-height: 1.5;
-=======
+}
 /* --------------------------------------------------------------------------
    Shareable packs — preset card share button
    -------------------------------------------------------------------------- */
@@ -5823,5 +5820,4 @@ html.theme-light .preset-card__share-btn:hover {
   font-size: 0.85rem;
   text-align: center;
   list-style: none;
->>>>>>> worktree-agent-a219a54e
 }
