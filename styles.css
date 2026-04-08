@@ -4596,3 +4596,30 @@ html.theme-light .analytics-card {
 html.theme-light .topbar__workspace-dropdown {
   background: var(--bg-elevated);
 }
+
+/* --- Embed / Widget settings --- */
+
+.embed-snippet-textarea {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  color: var(--text);
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.embed-snippet-textarea:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.settings-desc {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+  line-height: 1.5;
+}

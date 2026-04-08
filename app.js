@@ -44,6 +44,7 @@ import { loadWorkspaces, getActiveWorkspace, filterToolsByWorkspace } from "./li
 import { showConfirmDialog, showAlertDialog } from "./lib/confirm-dialog.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
+import { initPluginSystem, emit as pluginEmit } from "./lib/plugins.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -142,6 +143,9 @@ const batch = createBatchActions({
   saveTools: (tools) => saveStoredToolsSynced(normalizePinRanks(tools)),
   saveHistory: (history) => saveLaunchHistorySynced(history),
 });
+
+// Initialize plugin system and expose window.CentralCommand API
+initPluginSystem();
 
 initialize();
 
@@ -694,6 +698,7 @@ async function handleQuickAddSubmit(event) {
 
   state.tools = [...state.tools, tool];
   await saveStoredToolsSynced(normalizePinRanks(state.tools));
+  pluginEmit("tool:add", tool);
   hideQuickAddForm();
   render();
   updateStatusCards();
@@ -979,6 +984,7 @@ function handleKeyboardShortcut(event) {
   if (!match) return;
 
   event.preventDefault();
+  pluginEmit("tool:launch", match);
   state.launchHistory = recordLaunch(state.launchHistory, match.id);
   saveLaunchHistorySynced(state.launchHistory);
   updateStatusCards();
@@ -1622,6 +1628,7 @@ async function removeTool(id) {
   state.launchHistory = filterHistoryForTools(state.launchHistory, state.tools);
   saveStoredToolsSynced(state.tools);
   saveLaunchHistorySynced(state.launchHistory);
+  pluginEmit("tool:remove", tool);
   render();
   updateStatusCards();
 }
@@ -1748,6 +1755,7 @@ function applyLaunchBehavior(element, tool, label = `Open ${tool.name}`) {
   }
 
   element.addEventListener("click", () => {
+    pluginEmit("tool:launch", tool);
     state.launchHistory = recordLaunch(state.launchHistory, tool.id);
     saveLaunchHistorySynced(state.launchHistory);
     updateStatusCards();
