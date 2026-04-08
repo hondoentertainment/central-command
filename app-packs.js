@@ -15,6 +15,7 @@ import {
 } from "./lib/storage.js";
 import { createFallbackMetadataMap, filterHistoryForTools } from "./lib/tool-model.js";
 import { ALL_PRESET_TOOLS, DEFAULT_TOOLS } from "./data/presets.js";
+import { exportPackAsUrl } from "./lib/shareable-packs.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -58,6 +59,9 @@ function renderPresetCards() {
   elements.presetGrid.innerHTML = "";
 
   PRESET_PACKS.forEach((pack) => {
+    const card = document.createElement("div");
+    card.className = "preset-card-wrap";
+
     const button = document.createElement("button");
     button.type = "button";
     button.className = "preset-card";
@@ -74,7 +78,19 @@ function renderPresetCards() {
     meta.textContent = `${pack.tools.length} tools`;
 
     button.append(title, description, meta);
-    elements.presetGrid.appendChild(button);
+
+    const shareBtn = document.createElement("button");
+    shareBtn.type = "button";
+    shareBtn.className = "preset-card__share-btn";
+    shareBtn.textContent = "Share";
+    shareBtn.title = `Share "${pack.title}" as a link`;
+    shareBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      exportPackAsUrl(pack.tools, pack.title);
+    });
+
+    card.append(button, shareBtn);
+    elements.presetGrid.appendChild(card);
   });
 }
 

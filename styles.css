@@ -4690,6 +4690,7 @@ html.theme-light .topbar__workspace-dropdown {
   background: var(--bg-elevated);
 }
 
+<<<<<<< HEAD
 /* ── View Transitions API ─────────────────────────────── */
 
 .topbar {
@@ -5717,4 +5718,110 @@ html.theme-light .onboarding-spotlight {
   font-size: 0.875rem;
   margin-bottom: 16px;
   line-height: 1.5;
+=======
+/* --------------------------------------------------------------------------
+   Shareable packs — preset card share button
+   -------------------------------------------------------------------------- */
+
+.preset-card-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+}
+
+.preset-card-wrap .preset-card {
+  flex: 1;
+}
+
+.preset-card__share-btn {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 4px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background 160ms, color 160ms, border-color 160ms;
+  z-index: 1;
+}
+
+.preset-card__share-btn:hover {
+  background: rgba(62, 180, 165, 0.12);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+html.theme-light .preset-card__share-btn {
+  background: rgba(0, 0, 0, 0.04);
+  border-color: var(--line);
+}
+
+html.theme-light .preset-card__share-btn:hover {
+  background: rgba(62, 180, 165, 0.1);
+  border-color: var(--teal);
+  color: var(--teal);
+}
+
+/* --------------------------------------------------------------------------
+   Sync log — profile page
+   -------------------------------------------------------------------------- */
+
+.sync-log {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.sync-log__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 10px;
+  border: 1px solid var(--line);
+  background: var(--surface-subtle);
+  font-size: 0.82rem;
+}
+
+.sync-log__item > div {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.sync-log__action {
+  font-weight: 500;
+  color: var(--text);
+  text-transform: capitalize;
+}
+
+.sync-log__details {
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.sync-log__time {
+  font-size: 0.75rem;
+  color: var(--muted);
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.sync-log__empty {
+  padding: 16px;
+  color: var(--muted);
+  font-size: 0.85rem;
+  text-align: center;
+  list-style: none;
+>>>>>>> worktree-agent-a219a54e
 }

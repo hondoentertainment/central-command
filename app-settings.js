@@ -12,6 +12,12 @@ import {
 import { evaluatePasswordStrength, getAccountTier, mapAuthError } from "./lib/auth-policy.js";
 import { recordSecurityEvent, loadIntegrationsPreferences, saveIntegrationsPreferences } from "./lib/storage.js";
 import { sanitizeIntegrationsPreferences, validateIntegrationUrl, checkIntegrationHealth } from "./lib/integrations.js";
+import { exportFullSetup } from "./lib/shareable-packs.js";
+import { ALL_PRESET_TOOLS, DEFAULT_TOOLS } from "./data/presets.js";
+import { createFallbackMetadataMap, hydrateTools } from "./lib/tool-model.js";
+import { loadStoredTools } from "./lib/storage.js";
+
+const settingsFallbackMeta = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
 const elements = {
   themeSettingsForm: document.querySelector("#themeSettingsForm"),
@@ -34,6 +40,7 @@ const elements = {
   integrationsStatus: document.querySelector("#integrationsStatus"),
   integrationUrlHealth: document.querySelector("#integrationUrlHealth"),
   workspaceSettings: document.querySelector("#workspaceSettings"),
+  settingsShareSetupBtn: document.querySelector("#settingsShareSetupBtn"),
 };
 
 let accountControlsEnabled = false;
@@ -47,6 +54,13 @@ async function initialize() {
   applyThemeSelection(getTheme());
 
   elements.themeSettingsForm?.addEventListener("change", handleThemeChange);
+  elements.settingsShareSetupBtn?.addEventListener("click", () => {
+    const tools = loadStoredTools(
+      (value) => hydrateTools(value, settingsFallbackMeta),
+      DEFAULT_TOOLS
+    );
+    exportFullSetup(tools, "My Setup");
+  });
   initializeWorkspaceSettings();
   initializeIntegrations();
   await initializeAccountSecurity();
