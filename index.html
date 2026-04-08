@@ -38,7 +38,7 @@
         <nav id="pageNav" class="page-nav" aria-label="Main navigation"></nav>
       </header>
 
-      <div id="mainContent">
+      <div id="mainContent" tabindex="-1">
       <header class="hero" id="heroSection">
         <div class="hero__copy">
           <p class="eyebrow">Command Center</p>
@@ -249,7 +249,7 @@
 
           <div id="filterBar" class="filter-bar"></div>
           <div id="toolGridScrollWrap" class="tool-grid-scroll-wrap" tabindex="-1">
-            <div id="toolGrid" class="tool-grid" aria-live="polite">
+            <div id="toolGrid" class="tool-grid" role="list" aria-label="Tool cards" aria-live="polite">
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
             <article class="skeleton-card"><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div><div class="skeleton"></div></article>
@@ -263,7 +263,7 @@
 
 
     <template id="toolCardTemplate">
-      <article class="tool-card">
+      <article class="tool-card" role="listitem">
         <div class="tool-card__top">
           <label class="tool-card__select-wrap" hidden>
             <span class="visually-hidden">Select tool</span>
@@ -278,7 +278,7 @@
         <div class="tool-card__meta" hidden></div>
         <code class="tool-card__url"></code>
         <div class="tool-card__actions">
-          <a class="launch-button" target="_blank" rel="noreferrer">Launch</a>
+          <a class="launch-button" target="_blank" rel="noreferrer" aria-label="Launch tool">Launch</a>
           <div class="tool-card__actions-more">
             <button type="button" class="ghost-button tool-card__more-trigger" aria-expanded="false" aria-haspopup="true" aria-label="More actions">⋮</button>
             <div class="tool-card__more-menu" hidden role="menu">

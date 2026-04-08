@@ -12,7 +12,7 @@
   --line-strong: rgba(255, 255, 255, 0.16);
   --text: #f7f4ee;
   --text-secondary: #d4cfc4;
-  --muted: #8f8b82;
+  --muted: #a09b92;
   --shadow: 0 24px 80px rgba(0, 0, 0, 0.32);
   --shadow-soft: 0 12px 36px rgba(0, 0, 0, 0.18);
   --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.2), 0 1px 4px rgba(0, 0, 0, 0.1);
@@ -57,13 +57,16 @@ html.theme-light {
   --line-strong: rgba(21, 27, 33, 0.15);
   --text: #161718;
   --text-secondary: #504b45;
-  --muted: #706a63;
+  --muted: #635d56;
   --shadow: 0 22px 70px rgba(44, 39, 32, 0.12);
   --shadow-soft: 0 10px 28px rgba(44, 39, 32, 0.08);
   --shadow-elevated: 0 4px 16px rgba(0, 0, 0, 0.08), 0 1px 4px rgba(0, 0, 0, 0.04);
   --shadow-float: 0 12px 48px rgba(0, 0, 0, 0.12), 0 4px 16px rgba(0, 0, 0, 0.06);
   --btn-on-primary: #0a0a0a;
   --focus-ring: rgba(62, 180, 165, 0.6);
+  --teal: #2a8a7d;
+  --crimson: #c44a5a;
+  --cobalt: #4568b8;
   --status-success: #1f7a56;
   --status-warning: #8a5a00;
   --status-error: #a3374b;
@@ -1353,15 +1356,23 @@ button:focus-visible,
 .preset-card:focus-visible,
 .history-item__link:focus-visible,
 .page-nav__palette-btn:focus-visible,
+.topbar__link:focus-visible,
+.topbar__profile-link:focus-visible,
+.topbar__search-btn:focus-visible,
+.topbar__workspace-btn:focus-visible,
+.tab-button:focus-visible,
+.task-filter-chip:focus-visible,
+.runbook-project-ref:focus-visible,
+.runbook-mention-option:focus-visible,
 a:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: var(--focus-ring-offset);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 .command-palette-overlay .command-palette-input:focus-visible,
 .command-palette-overlay .command-palette-hint:focus-visible {
-  outline: 2px solid var(--focus-ring);
-  outline-offset: var(--focus-ring-offset);
+  outline: 3px solid var(--focus-ring);
+  outline-offset: 3px;
 }
 
 .primary-button,
@@ -5123,5 +5134,65 @@ html.theme-light .digest-card__cat-bar-wrap {
   .stale-dialog-wrap,
   .stale-dialog {
     animation-duration: 0.01ms !important;
+  }
+
+  .tool-card,
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   WCAG 2.2 AA — HIGH CONTRAST MODE SUPPORT
+   ══════════════════════════════════════════════════════════ */
+
+@media (forced-colors: active) {
+  :root {
+    --focus-ring: Highlight;
+  }
+
+  button:focus-visible,
+  .launch-button:focus-visible,
+  .filter-chip:focus-visible,
+  .tool-card:focus-visible,
+  .hero__quick-link:focus-visible,
+  .spotlight-card:focus-visible,
+  .preset-card:focus-visible,
+  a:focus-visible,
+  input:focus-visible,
+  textarea:focus-visible,
+  select:focus-visible {
+    outline: 3px solid Highlight;
+    outline-offset: 2px;
+  }
+
+  .tool-card::after {
+    background: CanvasText;
+  }
+
+  .primary-button,
+  .launch-button {
+    background: ButtonFace;
+    color: ButtonText;
+    border: 2px solid ButtonText;
+  }
+
+  .ghost-button {
+    border: 1px solid ButtonText;
+    color: ButtonText;
+  }
+
+  .skip-link {
+    background: Highlight;
+    color: HighlightText;
+  }
+
+  .panel,
+  .hero,
+  .status-card,
+  .today-card {
+    border: 1px solid CanvasText;
+  }
+
+  .command-palette-item[aria-selected="true"] {
+    outline: 2px solid Highlight;
   }
 }

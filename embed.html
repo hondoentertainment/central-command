@@ -1,0 +1,46 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <script>
+      (function(){
+        var params = new URLSearchParams(location.search);
+        var theme = params.get('theme');
+        if (theme === 'light' || theme === 'dark') {
+          document.documentElement.classList.add('theme-' + theme);
+        } else {
+          var stored = localStorage.getItem('central-command.theme') || 'dark';
+          document.documentElement.classList.add('theme-' + stored);
+        }
+      })();
+    </script>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Central Command — Embed</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&family=JetBrains+Mono:wght@400;500&display=swap"
+      rel="stylesheet"
+    />
+    <link rel="stylesheet" href="./embed.css" />
+  </head>
+  <body class="embed-mode">
+    <div id="embedGrid" class="embed-grid" aria-label="Tool grid"></div>
+
+    <template id="embedCardTemplate">
+      <article class="embed-card">
+        <div class="embed-card__top">
+          <span class="embed-card__icon" aria-hidden="true"></span>
+          <span class="embed-card__category"></span>
+        </div>
+        <h3 class="embed-card__title"></h3>
+        <p class="embed-card__description"></p>
+        <div class="embed-card__actions">
+          <a class="embed-card__launch" target="_blank" rel="noreferrer">Launch</a>
+        </div>
+      </article>
+    </template>
+
+    <script type="module" src="./embed.js"></script>
+  </body>
+</html>
