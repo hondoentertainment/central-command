@@ -1,4 +1,4 @@
-const CACHE_VERSION = 7;
+const CACHE_VERSION = 8;
 const CACHE_NAME = `central-command-v${CACHE_VERSION}`;
 
 const BASE = location.pathname.includes("/central-command") ? "/central-command" : "";
@@ -89,12 +89,31 @@ const PRECACHE = [
   BASE + "/data/presets.js",
   BASE + "/icons/icon-192.svg",
   BASE + "/icons/icon-512.svg",
+  BASE + "/css/fonts.css",
+  BASE + "/lib/web-vitals.js",
+  BASE + "/lib/sw-update.js",
+  BASE + "/fonts/dm-sans-v15-latin-regular.woff2",
+  BASE + "/fonts/dm-sans-v15-latin-500.woff2",
+  BASE + "/fonts/dm-sans-v15-latin-600.woff2",
+  BASE + "/fonts/dm-sans-v15-latin-700.woff2",
+  BASE + "/fonts/dm-sans-v15-latin-italic.woff2",
+  BASE + "/fonts/instrument-serif-v1-latin-regular.woff2",
+  BASE + "/fonts/instrument-serif-v1-latin-italic.woff2",
+  BASE + "/fonts/jetbrains-mono-v18-latin-regular.woff2",
+  BASE + "/fonts/jetbrains-mono-v18-latin-500.woff2",
 ];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE)).then(() => self.skipWaiting())
+    caches.open(CACHE_NAME).then((cache) => cache.addAll(PRECACHE))
   );
+});
+
+// Allow the client to trigger skipWaiting via postMessage (see lib/sw-update.js)
+self.addEventListener("message", (event) => {
+  if (event.data && event.data.type === "SKIP_WAITING") {
+    self.skipWaiting();
+  }
 });
 
 self.addEventListener("activate", (event) => {
@@ -118,7 +137,9 @@ self.addEventListener("fetch", (event) => {
     path in REWRITES ||
     path.startsWith(BASE + "/lib/") ||
     path.startsWith(BASE + "/data/") ||
-    path.startsWith(BASE + "/icons/");
+    path.startsWith(BASE + "/icons/") ||
+    path.startsWith(BASE + "/css/") ||
+    path.startsWith(BASE + "/fonts/");
 
   if (!isStatic) return;
 

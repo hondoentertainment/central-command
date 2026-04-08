@@ -10,12 +10,11 @@
     <meta name="theme-color" content="#0f0f0f" />
     <title>Settings &mdash; Central Command</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&family=Instrument+Serif:ital@0;1&family=JetBrains+Mono:wght@400;500&display=swap"
-      rel="stylesheet"
-    />
+    <link rel="preload" href="./css/fonts.css" as="style" />
+    <link rel="preload" href="./styles.css" as="style" />
+    <link rel="preload" href="./fonts/dm-sans-v15-latin-regular.woff2" as="font" type="font/woff2" crossorigin />
+    <link rel="modulepreload" href="./lib/nav.js" />
+    <link rel="stylesheet" href="./css/fonts.css" />
     <link rel="stylesheet" href="./styles.css" />
     <link rel="manifest" href="./manifest.json" />
   </head>
@@ -144,11 +143,87 @@
             <p id="integrationsStatus" class="form-message" role="status" aria-live="polite"></p>
           </form>
         </section>
+
+        <section class="panel panel--form">
+          <div class="panel__header">
+            <div>
+              <h2>Embed / Widget</h2>
+              <p class="panel__intro-text">
+                Embed your tool grid on another page or in a dashboard. Use the snippet below or customize it.
+              </p>
+            </div>
+          </div>
+
+          <div class="tool-form">
+            <fieldset class="settings-fieldset">
+              <legend>Embed preview</legend>
+              <p class="settings-desc">Copy the iframe snippet and paste it into any HTML page. The embed loads tools from localStorage (same-origin only).</p>
+
+              <label for="embedThemeSelect">Theme
+                <select id="embedThemeSelect">
+                  <option value="dark">Dark</option>
+                  <option value="light">Light</option>
+                </select>
+              </label>
+
+              <label for="embedCategoryInput">Category filter
+                <input type="text" id="embedCategoryInput" placeholder="all" value="all" />
+              </label>
+
+              <label for="embedColsInput">Number of columns
+                <input type="number" id="embedColsInput" min="1" max="6" value="3" />
+              </label>
+
+              <label for="embedSnippet">Embed snippet</label>
+              <textarea id="embedSnippet" class="embed-snippet-textarea" rows="4" readonly></textarea>
+              <div class="tool-form__actions" style="margin-top: 8px;">
+                <button type="button" id="copyEmbedSnippetBtn" class="ghost-button">Copy snippet</button>
+              </div>
+            </fieldset>
+          </div>
+        </section>
       </main>
     </div>
 
     <script src="./sw-register.js" defer></script>
     <script type="module" src="./app-settings.js"></script>
+    <script>
+      // Embed snippet builder
+      (function () {
+        var themeSelect = document.getElementById("embedThemeSelect");
+        var categoryInput = document.getElementById("embedCategoryInput");
+        var colsInput = document.getElementById("embedColsInput");
+        var snippetEl = document.getElementById("embedSnippet");
+        var copyBtn = document.getElementById("copyEmbedSnippetBtn");
+
+        function updateSnippet() {
+          var theme = themeSelect ? themeSelect.value : "dark";
+          var category = (categoryInput ? categoryInput.value : "all") || "all";
+          var cols = colsInput ? colsInput.value : "3";
+          var baseUrl = location.origin + "/embed";
+          var params = "?theme=" + encodeURIComponent(theme);
+          if (category && category !== "all") params += "&category=" + encodeURIComponent(category);
+          if (cols && cols !== "3") params += "&cols=" + encodeURIComponent(cols);
+          var snippet = '<iframe src="' + baseUrl + params + '" width="400" height="600" style="border:none;border-radius:12px;" title="Central Command"></iframe>';
+          if (snippetEl) snippetEl.value = snippet;
+        }
+
+        if (themeSelect) themeSelect.addEventListener("change", updateSnippet);
+        if (categoryInput) categoryInput.addEventListener("input", updateSnippet);
+        if (colsInput) colsInput.addEventListener("input", updateSnippet);
+
+        if (copyBtn && snippetEl) {
+          copyBtn.addEventListener("click", function () {
+            navigator.clipboard.writeText(snippetEl.value).then(function () {
+              copyBtn.textContent = "Copied!";
+              setTimeout(function () { copyBtn.textContent = "Copy snippet"; }, 2000);
+            });
+          });
+        }
+
+        updateSnippet();
+      })();
+    </script>
   </body>
 </html>
 

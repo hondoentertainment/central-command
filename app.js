@@ -55,6 +55,9 @@ import {
   shouldShowStaleNudge,
   markStaleNudgeShown,
 } from "./lib/usage-intelligence.js";
+import { trackVitals } from "./lib/web-vitals.js";
+
+trackVitals();
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
