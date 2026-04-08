@@ -44,6 +44,9 @@ import { loadWorkspaces, getActiveWorkspace, filterToolsByWorkspace } from "./li
 import { showConfirmDialog, showAlertDialog } from "./lib/confirm-dialog.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
+import { trackVitals } from "./lib/web-vitals.js";
+
+trackVitals();
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
