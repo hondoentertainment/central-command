@@ -1401,6 +1401,7 @@ function createCardElement(tool, pinnedIds, opts = {}) {
   }
 
   card.style.setProperty("--accent", accentToColor(tool.accent));
+  card.setAttribute("aria-label", `${tool.name} — ${tool.category}${tool.pinned ? ", pinned" : ""}`);
   icon.innerHTML = getIconMarkup(tool);
   category.textContent = tool.category;
   pin.hidden = !tool.pinned;
