@@ -42,6 +42,13 @@
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=86400, stale-while-revalidate=86400" }]
     },
     {
+      "source": "/embed.html",
+      "headers": [
+        { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+        { "key": "Cache-Control", "value": "public, max-age=0, must-revalidate" }
+      ]
+    },
+    {
       "source": "/fonts/(.*)\\.woff2",
       "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
     }
@@ -63,6 +70,7 @@
     { "source": "/music", "destination": "/music.html" },
     { "source": "/movies", "destination": "/movies.html" },
     { "source": "/parties", "destination": "/parties.html" },
-    { "source": "/projects", "destination": "/projects.html" }
+    { "source": "/projects", "destination": "/projects.html" },
+    { "source": "/embed", "destination": "/embed.html" }
   ]
 }

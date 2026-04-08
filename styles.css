@@ -5142,6 +5142,19 @@ html.theme-light .digest-card__cat-bar-wrap {
 }
 
 @keyframes stale-dialog-overlay-in {
+/* === Onboarding: Overlay + Spotlight === */
+
+.onboarding-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1700;
+  background: rgba(3, 6, 10, 0.55);
+  backdrop-filter: blur(2px);
+  animation: onboarding-fade-in 250ms ease both;
+  pointer-events: auto;
+}
+
+@keyframes onboarding-fade-in {
   from { opacity: 0; }
   to { opacity: 1; }
 }
@@ -5306,5 +5319,367 @@ html.theme-light .digest-card__cat-bar-wrap {
 
   .command-palette-item[aria-selected="true"] {
     outline: 2px solid Highlight;
+.onboarding-spotlight {
+  position: absolute;
+  border-radius: var(--radius-md);
+  box-shadow:
+    0 0 0 4px var(--amber),
+    0 0 0 9999px rgba(3, 6, 10, 0.55);
+  pointer-events: none;
+  animation: onboarding-spotlight-pulse 2s ease-in-out infinite;
+  z-index: 1;
+}
+
+@keyframes onboarding-spotlight-pulse {
+  0%, 100% { box-shadow: 0 0 0 4px var(--amber), 0 0 0 9999px rgba(3, 6, 10, 0.55); }
+  50% { box-shadow: 0 0 0 6px var(--amber), 0 0 12px 4px rgba(232, 164, 58, 0.25), 0 0 0 9999px rgba(3, 6, 10, 0.55); }
+}
+
+/* === Onboarding: Tooltip === */
+
+.onboarding-tooltip {
+  position: absolute;
+  z-index: 1800;
+  width: min(380px, calc(100vw - 32px));
+  padding: 20px 22px 18px;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-md);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow-float);
+  animation: onboarding-tooltip-in 280ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+@keyframes onboarding-tooltip-in {
+  from { opacity: 0; transform: translateY(8px) scale(0.96); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+.onboarding-tooltip__arrow {
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  background: var(--bg-elevated);
+  border: 1px solid var(--line-strong);
+  transform: rotate(45deg);
+  z-index: -1;
+}
+
+.onboarding-tooltip__arrow--top {
+  top: -8px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.onboarding-tooltip__arrow--bottom {
+  bottom: -8px;
+  border-top: none;
+  border-left: none;
+}
+
+.onboarding-tooltip__arrow--left {
+  left: -8px;
+  border-bottom: none;
+  border-right: none;
+}
+
+.onboarding-tooltip__arrow--right {
+  right: -8px;
+  border-top: none;
+  border-left: none;
+}
+
+.onboarding-tooltip__counter {
+  display: inline-block;
+  font-family: var(--font-mono);
+  font-size: 0.72rem;
+  color: var(--amber);
+  margin-bottom: 6px;
+  letter-spacing: 0.06em;
+}
+
+.onboarding-tooltip__title {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: 1rem;
+  font-weight: 600;
+  color: var(--text);
+  margin-bottom: 4px;
+}
+
+.onboarding-tooltip__text {
+  font-size: 0.88rem;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.onboarding-tooltip__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.onboarding-tooltip__skip {
+  font-size: 0.82rem;
+  color: var(--muted);
+  padding: 6px 10px;
+}
+
+.onboarding-tooltip__next {
+  font-size: 0.85rem;
+  padding: 8px 20px;
+}
+
+/* === Workflow Wizard === */
+
+.workflow-wizard-overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 1700;
+  display: grid;
+  place-items: center;
+  padding: 24px;
+  background: rgba(3, 6, 10, 0.65);
+  backdrop-filter: blur(6px);
+  animation: onboarding-fade-in 250ms ease both;
+  overflow-y: auto;
+}
+
+.workflow-wizard {
+  width: min(680px, 100%);
+  max-height: calc(100vh - 48px);
+  overflow-y: auto;
+  border: 1px solid var(--line-strong);
+  border-radius: var(--radius-lg);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+  padding: 36px 32px 28px;
+  animation: onboarding-tooltip-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
+}
+
+.workflow-wizard__header {
+  margin-bottom: 24px;
+}
+
+.workflow-wizard__title {
+  font-family: var(--font-serif);
+  font-size: clamp(1.4rem, 2.5vw, 1.75rem);
+  font-weight: 400;
+  margin: 0 0 8px;
+  color: var(--text);
+}
+
+.workflow-wizard__subtitle {
+  font-size: 0.92rem;
+  color: var(--text-secondary);
+  margin: 0;
+}
+
+.workflow-wizard__grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 14px;
+  margin-bottom: 20px;
+}
+
+.workflow-wizard__card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-md);
+  background: var(--surface-subtle);
+  cursor: pointer;
+  text-align: left;
+  color: var(--text);
+  font-family: var(--font-sans);
+  transition: border-color 180ms ease, box-shadow 180ms ease, background 180ms ease;
+}
+
+.workflow-wizard__card:hover {
+  border-color: var(--line-strong);
+  background: var(--surface-hover);
+}
+
+.workflow-wizard__card:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.workflow-wizard__card--selected {
+  border-color: var(--amber);
+  background: rgba(232, 164, 58, 0.08);
+  box-shadow: 0 0 0 1px var(--amber);
+}
+
+.workflow-wizard__card-check {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 2px solid var(--line-strong);
+  transition: border-color 180ms ease, background 180ms ease;
+}
+
+.workflow-wizard__card--selected .workflow-wizard__card-check {
+  border-color: var(--amber);
+  background: var(--amber);
+}
+
+.workflow-wizard__card--selected .workflow-wizard__card-check::after {
+  content: "";
+  position: absolute;
+  top: 4px;
+  left: 6px;
+  width: 6px;
+  height: 10px;
+  border: solid var(--btn-on-primary);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.workflow-wizard__card-title {
+  font-size: 1rem;
+  font-weight: 600;
+}
+
+.workflow-wizard__card-desc {
+  font-size: 0.84rem;
+  color: var(--text-secondary);
+  line-height: 1.4;
+  margin: 0;
+}
+
+.workflow-wizard__card-meta {
+  font-family: var(--font-mono);
+  font-size: 0.74rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+/* Bookmark import */
+
+.workflow-wizard__import {
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+  margin-bottom: 12px;
+}
+
+.workflow-wizard__import-label {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border: 1px dashed var(--line-strong);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  font-size: 0.88rem;
+  cursor: pointer;
+  transition: border-color 180ms ease, color 180ms ease;
+}
+
+.workflow-wizard__import-label:hover {
+  border-color: var(--amber);
+  color: var(--text);
+}
+
+.workflow-wizard__import-label:focus-visible {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.workflow-wizard__import-icon {
+  font-size: 1.1rem;
+}
+
+.workflow-wizard__import-status {
+  font-size: 0.82rem;
+  color: var(--amber);
+  margin: 8px 0 0;
+  min-height: 1.2em;
+}
+
+/* Actions */
+
+.workflow-wizard__actions {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.workflow-wizard__scratch {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.workflow-wizard__setup {
+  font-size: 0.9rem;
+  padding: 10px 24px;
+}
+
+.workflow-wizard__setup:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Light theme overrides */
+
+html.theme-light .onboarding-overlay {
+  background: rgba(244, 241, 234, 0.6);
+}
+
+html.theme-light .workflow-wizard-overlay {
+  background: rgba(244, 241, 234, 0.7);
+}
+
+html.theme-light .onboarding-spotlight {
+  box-shadow:
+    0 0 0 4px var(--amber),
+    0 0 0 9999px rgba(244, 241, 234, 0.6);
+}
+
+@keyframes onboarding-spotlight-pulse-light {
+  0%, 100% { box-shadow: 0 0 0 4px var(--amber), 0 0 0 9999px rgba(244, 241, 234, 0.6); }
+  50% { box-shadow: 0 0 0 6px var(--amber), 0 0 12px 4px rgba(232, 164, 58, 0.2), 0 0 0 9999px rgba(244, 241, 234, 0.6); }
+}
+
+html.theme-light .onboarding-spotlight {
+  animation-name: onboarding-spotlight-pulse-light;
+}
+
+/* Reduced motion */
+
+@media (prefers-reduced-motion: reduce) {
+  .onboarding-overlay,
+  .onboarding-tooltip,
+  .workflow-wizard,
+  .onboarding-spotlight {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+/* Mobile */
+
+@media (max-width: 600px) {
+  .workflow-wizard {
+    padding: 24px 18px 20px;
+  }
+
+  .workflow-wizard__grid {
+    grid-template-columns: 1fr;
+  }
+
+  .onboarding-tooltip {
+    width: calc(100vw - 24px);
   }
 }

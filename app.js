@@ -58,6 +58,7 @@ import {
 import { trackVitals } from "./lib/web-vitals.js";
 
 trackVitals();
+import { shouldShowOnboarding, startOnboarding } from "./lib/onboarding.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -173,6 +174,8 @@ const batch = createBatchActions({
 initialize();
 
 async function initialize() {
+  const isFirstVisit = !hasSavedTools();
+
   let tools = await loadStoredToolsSynced(
     (value) => hydrateTools(value, fallbackMetadataBySignature),
     DEFAULT_TOOLS
@@ -316,6 +319,24 @@ async function initialize() {
   render();
   checkScheduledExport();
   initUsageIntelligence();
+
+  // First-run onboarding: show only when user has no tools and hasn't completed onboarding before,
+  // and did not arrive via an import URL or shared deck link.
+  if (!importUrl && !deckParam && shouldShowOnboarding(!isFirstVisit)) {
+    startOnboarding({
+      onComplete: async (result) => {
+        if (result.tools.length > 0) {
+          state.tools = normalizePinRanks(result.tools);
+          state.launchHistory = [];
+          await saveStoredToolsSynced(state.tools);
+          await saveLaunchHistorySynced(state.launchHistory);
+          render();
+          updateStatusCards();
+          showToast(`Set up ${state.tools.length} tools. Welcome to Central Command!`, "success");
+        }
+      },
+    });
+  }
 }
 
 function handleGlobalShortcuts(event) {
