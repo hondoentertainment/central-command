@@ -1,0 +1,50 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="accent" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#f59e0b"/>
+      <stop offset="100%" stop-color="#d97706"/>
+    </linearGradient>
+  </defs>
+
+  <!-- Background -->
+  <rect width="1200" height="630" fill="#0a0d10"/>
+
+  <!-- Accent border -->
+  <rect x="24" y="24" width="1152" height="582" rx="16" ry="16"
+        fill="none" stroke="url(#accent)" stroke-width="2" opacity="0.6"/>
+
+  <!-- Corner decorations -->
+  <rect x="24" y="24" width="80" height="3" fill="#f59e0b" opacity="0.8"/>
+  <rect x="24" y="24" width="3" height="80" fill="#f59e0b" opacity="0.8"/>
+  <rect x="1096" y="24" width="80" height="3" fill="#f59e0b" opacity="0.8"/>
+  <rect x="1173" y="24" width="3" height="80" fill="#f59e0b" opacity="0.8"/>
+  <rect x="24" y="603" width="80" height="3" fill="#f59e0b" opacity="0.8"/>
+  <rect x="24" y="526" width="3" height="80" fill="#f59e0b" opacity="0.8"/>
+  <rect x="1096" y="603" width="80" height="3" fill="#f59e0b" opacity="0.8"/>
+  <rect x="1173" y="526" width="3" height="80" fill="#f59e0b" opacity="0.8"/>
+
+  <!-- Subtle grid pattern -->
+  <g opacity="0.04" stroke="#f59e0b" stroke-width="1">
+    <line x1="300" y1="24" x2="300" y2="606"/>
+    <line x1="600" y1="24" x2="600" y2="606"/>
+    <line x1="900" y1="24" x2="900" y2="606"/>
+    <line x1="24" y1="210" x2="1176" y2="210"/>
+    <line x1="24" y1="420" x2="1176" y2="420"/>
+  </g>
+
+  <!-- Eyebrow -->
+  <text x="600" y="240" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="18" font-weight="500" fill="#f59e0b" text-anchor="middle"
+        letter-spacing="4" text-transform="uppercase" opacity="0.9">COMMAND CENTER</text>
+
+  <!-- Title -->
+  <text x="600" y="315" font-family="Georgia, 'Times New Roman', serif"
+        font-size="64" font-weight="700" fill="#ffffff" text-anchor="middle">Central Command</text>
+
+  <!-- Accent line -->
+  <rect x="520" y="340" width="160" height="3" rx="1.5" fill="url(#accent)" opacity="0.7"/>
+
+  <!-- Subtitle -->
+  <text x="600" y="400" font-family="system-ui, -apple-system, 'Segoe UI', sans-serif"
+        font-size="22" fill="#9ca3af" text-anchor="middle">One place for the tools you reach for most</text>
+</svg>

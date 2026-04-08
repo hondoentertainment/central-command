@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "checkJs": true,
+    "strict": false,
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "bundler",
+    "baseUrl": ".",
+    "paths": {
+      "./lib/*": ["./lib/*"],
+      "./data/*": ["./data/*"]
+    }
+  },
+  "include": ["*.js", "lib/**/*.js", "data/**/*.js"],
+  "exclude": ["node_modules", "tests", "e2e"]
+}
