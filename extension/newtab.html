@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New Tab — Central Command</title>
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      html, body { width: 100%; height: 100%; overflow: hidden; }
+      body {
+        font-family: system-ui, -apple-system, sans-serif;
+        background: #0a0d10;
+        color: #f7f4ee;
+        display: flex;
+        flex-direction: column;
+      }
+      .newtab-header {
+        padding: 16px 24px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+      }
+      .newtab-header__brand {
+        font-weight: 700;
+        font-size: 1rem;
+        color: #f7f4ee;
+        text-decoration: none;
+      }
+      .newtab-header__link {
+        margin-left: auto;
+        color: #3eb4a5;
+        text-decoration: none;
+        font-size: 0.85rem;
+      }
+      .newtab-header__link:hover { text-decoration: underline; }
+      #newtabFrame {
+        flex: 1;
+        border: none;
+        width: 100%;
+      }
+      .newtab-fallback {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 16px;
+        padding: 32px;
+      }
+      .newtab-fallback__title {
+        font-size: 1.25rem;
+        font-weight: 600;
+      }
+      .newtab-fallback__text {
+        color: #8f8b82;
+        text-align: center;
+        max-width: 400px;
+        line-height: 1.5;
+      }
+      #toolGrid {
+        display: grid;
+        gap: 12px;
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        padding: 24px;
+        overflow-y: auto;
+        flex: 1;
+      }
+      .newtab-card {
+        padding: 16px;
+        border-radius: 12px;
+        background: rgba(16, 21, 27, 0.98);
+        border: 1px solid rgba(255, 255, 255, 0.09);
+        cursor: pointer;
+        transition: transform 0.15s ease, border-color 0.15s ease;
+      }
+      .newtab-card:hover {
+        transform: translateY(-1px);
+        border-color: rgba(255, 255, 255, 0.16);
+      }
+      .newtab-card__name {
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-bottom: 4px;
+      }
+      .newtab-card__category {
+        font-size: 0.75rem;
+        color: #8f8b82;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="newtab-header">
+      <strong class="newtab-header__brand">Central Command</strong>
+      <a class="newtab-header__link" id="openAppLink" href="#">Open full app</a>
+    </div>
+    <div id="content"></div>
+    <script src="newtab.js"></script>
+  </body>
+</html>
