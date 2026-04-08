@@ -44,6 +44,17 @@ import { loadWorkspaces, getActiveWorkspace, filterToolsByWorkspace } from "./li
 import { showConfirmDialog, showAlertDialog } from "./lib/confirm-dialog.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
+import { initDragDrop, applyDragAttributes } from "./lib/drag-drop.js";
+import {
+  getSuggestedTools,
+  getStaleTools,
+  getWeeklyDigest,
+  getTimeBlockLabel,
+  shouldShowDigest,
+  markDigestShown,
+  shouldShowStaleNudge,
+  markStaleNudgeShown,
+} from "./lib/usage-intelligence.js";
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -131,6 +142,19 @@ const elements = {
   scheduledExportCancelBtn: document.querySelector("#scheduledExportCancelBtn"),
   scheduledExportStatus: document.querySelector("#scheduledExportStatus"),
   todayDashboard: document.querySelector("#todayDashboard"),
+  suggestionsSection: document.querySelector("#suggestionsSection"),
+  suggestionsLabel: document.querySelector("#suggestionsLabel"),
+  suggestionsRow: document.querySelector("#suggestionsRow"),
+  staleBanner: document.querySelector("#staleBanner"),
+  staleBannerText: document.querySelector("#staleBannerText"),
+  staleBannerReview: document.querySelector("#staleBannerReview"),
+  staleBannerDismiss: document.querySelector("#staleBannerDismiss"),
+  digestCard: document.querySelector("#digestCard"),
+  digestContent: document.querySelector("#digestContent"),
+  digestDismiss: document.querySelector("#digestDismiss"),
+  staleDialog: document.querySelector("#staleDialog"),
+  staleDialogList: document.querySelector("#staleDialogList"),
+  staleDialogClose: document.querySelector("#staleDialogClose"),
 };
 
 // --- Batch actions (delegated to module) ---
@@ -284,8 +308,11 @@ async function initialize() {
   });
   setupToolGridKeydown(elements.toolGrid);
 
+  initDragDrop("#toolGrid", handleDragReorder);
+
   render();
   checkScheduledExport();
+  initUsageIntelligence();
 }
 
 function handleGlobalShortcuts(event) {
@@ -1096,6 +1123,7 @@ function handleToolGridKeydown(event) {
 function render() {
   renderHeroQuickLinks();
   renderTodayDashboard();
+  renderSuggestions();
   renderSpotlight();
   renderFilters();
   renderCards();
@@ -1363,6 +1391,7 @@ function createCardElement(tool, pinnedIds, opts = {}) {
   const fragment = elements.toolCardTemplate.content.cloneNode(true);
   const card = fragment.querySelector(".tool-card");
   card.setAttribute("tabindex", "0");
+  card.dataset.toolId = tool.id;
   if (opts.dataIndex != null) card.dataset.index = String(opts.dataIndex);
   const selectWrap = fragment.querySelector(".tool-card__select-wrap");
   const selectCheckbox = fragment.querySelector(".tool-card__select");
@@ -1602,6 +1631,30 @@ function renderCards() {
 
 function reorderPinnedTool(id, direction) {
   state.tools = movePinnedTool(state.tools, id, direction);
+  saveStoredToolsSynced(normalizePinRanks(state.tools));
+  render();
+}
+
+function handleDragReorder(toolId, newIndex) {
+  const sorted = sortTools(state.tools);
+  const pinnedTools = sorted.filter((t) => t.pinned);
+  const draggedTool = state.tools.find((t) => t.id === toolId);
+
+  // Only reorder pinned tools via drag-and-drop
+  if (!draggedTool?.pinned) return;
+
+  // Build new pinned order: remove dragged tool, insert at newIndex (clamped to pinned range)
+  const pinnedWithout = pinnedTools.filter((t) => t.id !== toolId);
+  const clampedIndex = Math.max(0, Math.min(newIndex, pinnedWithout.length));
+  pinnedWithout.splice(clampedIndex, 0, draggedTool);
+
+  // Assign fresh pinRank values
+  const rankMap = new Map(pinnedWithout.map((t, i) => [t.id, i + 1]));
+  state.tools = state.tools.map((t) => ({
+    ...t,
+    pinRank: t.pinned ? (rankMap.get(t.id) ?? t.pinRank) : null,
+  }));
+
   saveStoredToolsSynced(normalizePinRanks(state.tools));
   render();
 }

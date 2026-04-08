@@ -69,6 +69,40 @@
         </div>
       </header>
 
+      <section class="panel panel--suggestions" id="suggestionsSection" hidden>
+        <div class="panel__header">
+          <div>
+            <p class="eyebrow">Smart Suggestions</p>
+            <h2 id="suggestionsLabel">Suggested for now</h2>
+          </div>
+        </div>
+        <div id="suggestionsRow" class="suggestions-row" aria-live="polite"></div>
+      </section>
+
+      <div id="staleBanner" class="stale-banner" hidden role="status" aria-live="polite">
+        <span class="stale-banner__icon" aria-hidden="true">&#9888;</span>
+        <span id="staleBannerText" class="stale-banner__text"></span>
+        <button type="button" id="staleBannerReview" class="stale-banner__action">Review</button>
+        <button type="button" id="staleBannerDismiss" class="stale-banner__close" aria-label="Dismiss">&times;</button>
+      </div>
+
+      <div id="digestCard" class="digest-card" hidden role="region" aria-label="Weekly usage digest">
+        <button type="button" id="digestDismiss" class="digest-card__close" aria-label="Dismiss">&times;</button>
+        <p class="digest-card__title">Weekly Digest</p>
+        <div id="digestContent" class="digest-card__content"></div>
+      </div>
+
+      <div id="staleDialog" class="stale-dialog-wrap" hidden role="dialog" aria-modal="true" aria-label="Review unused tools">
+        <div class="stale-dialog">
+          <h3 class="stale-dialog__title">Unused Tools</h3>
+          <p class="stale-dialog__desc">These tools haven't been launched in 30+ days. Keep or remove?</p>
+          <ul id="staleDialogList" class="stale-dialog__list"></ul>
+          <div class="stale-dialog__actions">
+            <button type="button" id="staleDialogClose" class="ghost-button">Done</button>
+          </div>
+        </div>
+      </div>
+
       <section class="panel panel--today" id="todaySection">
         <div class="panel__header">
           <div>
