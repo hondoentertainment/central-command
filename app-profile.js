@@ -4,6 +4,8 @@ import { createFallbackMetadataMap, hydrateTools, sanitizeLaunchHistory } from "
 import { loadStoredTools, loadLaunchHistory, loadNotesMeta, loadSecurityEvents } from "./lib/storage.js";
 import { initFirebase, isFirebaseConfigured, onAuthStateChanged } from "./lib/firebase.js";
 import { getAccountTier } from "./lib/auth-policy.js";
+import { exportFullSetup } from "./lib/shareable-packs.js";
+import { loadSyncLog } from "./lib/conflict-resolution.js";
 
 const fallbackMetadata = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -17,6 +19,8 @@ const elements = {
   profileLaunchCount: document.querySelector("#profileLaunchCount"),
   profileNotesEdited: document.querySelector("#profileNotesEdited"),
   profileSecurityEvents: document.querySelector("#profileSecurityEvents"),
+  profileShareSetupBtn: document.querySelector("#profileShareSetupBtn"),
+  profileSyncLog: document.querySelector("#profileSyncLog"),
 };
 
 initialize();
@@ -24,9 +28,81 @@ initialize();
 async function initialize() {
   renderNav("profile");
   renderWorkspaceStats();
+  renderSyncLog();
   renderSecurityEvents();
   renderAnalytics();
+  setupShareButton();
   await renderAccountState();
+}
+
+function setupShareButton() {
+  elements.profileShareSetupBtn?.addEventListener("click", () => {
+    const tools = loadStoredTools(
+      (value) => hydrateTools(value, fallbackMetadata),
+      DEFAULT_TOOLS
+    );
+    exportFullSetup(tools, "My Setup");
+  });
+}
+
+function renderSyncLog() {
+  const list = elements.profileSyncLog;
+  if (!list) return;
+  list.innerHTML = "";
+
+  const log = loadSyncLog(20);
+  if (log.length === 0) {
+    const empty = document.createElement("li");
+    empty.className = "sync-log__empty";
+    empty.textContent = "No sync activity yet.";
+    list.appendChild(empty);
+    return;
+  }
+
+  log.forEach((entry) => {
+    const item = document.createElement("li");
+    item.className = "sync-log__item";
+
+    const left = document.createElement("div");
+    const action = document.createElement("span");
+    action.className = "sync-log__action";
+    action.textContent = formatSyncAction(entry.action);
+    left.appendChild(action);
+
+    if (entry.details && typeof entry.details === "object") {
+      const details = document.createElement("span");
+      details.className = "sync-log__details";
+      details.textContent = formatSyncDetails(entry.details);
+      left.appendChild(details);
+    }
+
+    const time = document.createElement("span");
+    time.className = "sync-log__time";
+    time.textContent = formatTimestamp(entry.at);
+
+    item.append(left, time);
+    list.appendChild(item);
+  });
+}
+
+function formatSyncAction(action) {
+  const labels = {
+    sync_merge: "Synced from cloud",
+    sync_complete: "Sync complete",
+    conflicts_resolved: "Conflicts resolved",
+    pack_imported: "Pack imported",
+  };
+  return labels[action] || action.replaceAll("_", " ");
+}
+
+function formatSyncDetails(details) {
+  const parts = [];
+  if (details.added) parts.push(`${details.added} added`);
+  if (details.updated) parts.push(`${details.updated} updated`);
+  if (details.conflicted) parts.push(`${details.conflicted} conflicts`);
+  if (details.count) parts.push(`${details.count} tools`);
+  if (details.name) parts.push(`"${details.name}"`);
+  return parts.join(", ");
 }
 
 function renderWorkspaceStats() {

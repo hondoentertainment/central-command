@@ -44,6 +44,22 @@ import { loadWorkspaces, getActiveWorkspace, filterToolsByWorkspace } from "./li
 import { showConfirmDialog, showAlertDialog } from "./lib/confirm-dialog.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
+import { importPackFromUrl, exportFullSetup } from "./lib/shareable-packs.js";
+import {
+  mergeTools as fieldMergeTools,
+  showConflictDialog,
+  logSyncActivity,
+  showSyncSummaryToast,
+  loadSyncLog,
+} from "./lib/conflict-resolution.js";
+
+// Register conflict resolution module globally for firebase.js integration
+window.__conflictResolution = {
+  mergeTools: fieldMergeTools,
+  showConflictDialog,
+  logSyncActivity,
+  showSyncSummaryToast,
+};
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -124,6 +140,7 @@ const elements = {
   importUrlCancelBtn: document.querySelector("#importUrlCancelBtn"),
   importUrlStatus: document.querySelector("#importUrlStatus"),
   shareDeckBtn: document.querySelector("#shareDeckBtn"),
+  shareMySetupBtn: document.querySelector("#shareMySetupBtn"),
   scheduleExportBtn: document.querySelector("#scheduleExportBtn"),
   scheduledExportDialogWrap: document.querySelector("#scheduledExportDialogWrap"),
   scheduledExportInterval: document.querySelector("#scheduledExportInterval"),
@@ -185,6 +202,20 @@ async function initialize() {
       showToast("Could not load shared deck. The link may be corrupted.", "error");
     }
     history.replaceState(null, "", location.pathname + location.hash);
+  } else if (params.get("pack")) {
+    const packResult = await importPackFromUrl();
+    if (packResult?.tools?.length) {
+      const packTools = hydrateTools(packResult.tools, fallbackMetadataBySignature);
+      if (packTools.length) {
+        // Merge imported pack tools into existing tools (add new, skip duplicates by name+url)
+        const existingKeys = new Set(tools.map((t) => `${t.name}|${t.url}`.toLowerCase()));
+        const newTools = packTools.filter((t) => !existingKeys.has(`${t.name}|${t.url}`.toLowerCase()));
+        tools = normalizePinRanks([...tools, ...newTools]);
+        await saveStoredToolsSynced(tools);
+        showToast(`Imported ${newTools.length} tools from "${packResult.packName}".`, "success");
+        logSyncActivity("pack_imported", { name: packResult.packName, count: newTools.length });
+      }
+    }
   } else if (!hasSavedTools()) {
     const fromFile = await fetchAndImportBackup("./backup.json");
     if (fromFile?.tools?.length) {
@@ -208,10 +239,24 @@ async function initialize() {
           hydrateTools: (v) => hydrateTools(v, fallbackMetadataBySignature),
           fallbackTools: DEFAULT_TOOLS,
           sanitizeLaunchHistory,
-          onSynced: (data) => {
+          onSynced: async (data) => {
             state.tools = normalizePinRanks(data.tools);
             state.launchHistory = filterHistoryForTools(data.history, state.tools);
             render();
+            // Handle any pending sync conflicts from field-level merge
+            if (window.__pendingSyncConflicts?.length) {
+              const conflicts = window.__pendingSyncConflicts;
+              window.__pendingSyncConflicts = null;
+              const resolved = await showConflictDialog(conflicts);
+              if (resolved?.length) {
+                const resolvedMap = new Map(resolved.map((t) => [t.id, t]));
+                state.tools = normalizePinRanks(
+                  state.tools.map((t) => resolvedMap.get(t.id) || t)
+                );
+                await saveStoredToolsSynced(state.tools);
+                render();
+              }
+            }
           },
         });
       }
@@ -242,6 +287,7 @@ async function initialize() {
   elements.importUrlCancelBtn?.addEventListener("click", closeImportUrlDialog);
   elements.copyBackupBtn?.addEventListener("click", handleCopyBackupToClipboard);
   elements.shareDeckBtn?.addEventListener("click", handleShareDeckLink);
+  elements.shareMySetupBtn?.addEventListener("click", handleShareMySetup);
   elements.scheduleExportBtn?.addEventListener("click", openScheduledExportDialog);
   elements.scheduledExportSaveBtn?.addEventListener("click", handleScheduledExportSave);
   elements.scheduledExportCancelBtn?.addEventListener("click", closeScheduledExportDialog);
@@ -833,6 +879,11 @@ async function handleShareDeckLink() {
   } catch {
     showToast("Could not copy share link.", "error");
   }
+}
+
+async function handleShareMySetup() {
+  closeToolsMoreMenu();
+  await exportFullSetup(state.tools, "My Setup");
 }
 
 const SCHEDULED_EXPORT_KEY = "central-command.scheduled-export";
