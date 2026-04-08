@@ -56,6 +56,7 @@ import {
   markStaleNudgeShown,
 } from "./lib/usage-intelligence.js";
 import { trackVitals } from "./lib/web-vitals.js";
+import { initPluginSystem, emit as pluginEmit } from "./lib/plugins.js";
 
 trackVitals();
 import { shouldShowOnboarding, startOnboarding } from "./lib/onboarding.js";
@@ -170,6 +171,9 @@ const batch = createBatchActions({
   saveTools: (tools) => saveStoredToolsSynced(normalizePinRanks(tools)),
   saveHistory: (history) => saveLaunchHistorySynced(history),
 });
+
+// Initialize plugin system and expose window.CentralCommand API
+initPluginSystem();
 
 initialize();
 

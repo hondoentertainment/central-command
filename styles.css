@@ -1,3 +1,11 @@
+/* ══════════════════════════════════════════════════════════
+   CSS LAYER ORDER — controls cascade priority
+   Import css/tokens.css for the canonical token reference.
+   This file keeps all tokens inline for zero-build compat,
+   while the layer declarations organize the cascade.
+   ══════════════════════════════════════════════════════════ */
+@layer tokens, base, layout, components, pages, utilities;
+
 /* Single source of truth for design tokens (dark theme) */
 :root {
   --font-sans: "DM Sans", system-ui, -apple-system, sans-serif;
@@ -5682,4 +5690,31 @@ html.theme-light .onboarding-spotlight {
   .onboarding-tooltip {
     width: calc(100vw - 24px);
   }
+}
+
+/* --- Embed / Widget settings --- */
+
+.embed-snippet-textarea {
+  width: 100%;
+  font-family: var(--font-mono);
+  font-size: 0.8rem;
+  padding: 12px;
+  border-radius: 10px;
+  background: var(--surface-subtle);
+  border: 1px solid var(--line);
+  color: var(--text);
+  resize: vertical;
+  line-height: 1.5;
+}
+
+.embed-snippet-textarea:focus {
+  outline: 2px solid var(--focus-ring);
+  outline-offset: var(--focus-ring-offset);
+}
+
+.settings-desc {
+  color: var(--text-secondary);
+  font-size: 0.875rem;
+  margin-bottom: 16px;
+  line-height: 1.5;
 }
