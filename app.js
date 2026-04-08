@@ -721,6 +721,7 @@ async function handleQuickAddSubmit(event) {
 
   state.tools = [...state.tools, tool];
   await saveStoredToolsSynced(normalizePinRanks(state.tools));
+  pluginEmit("tool:add", tool);
   hideQuickAddForm();
   render();
   updateStatusCards();
@@ -1006,6 +1007,7 @@ function handleKeyboardShortcut(event) {
   if (!match) return;
 
   event.preventDefault();
+  pluginEmit("tool:launch", match);
   state.launchHistory = recordLaunch(state.launchHistory, match.id);
   saveLaunchHistorySynced(state.launchHistory);
   updateStatusCards();
@@ -1624,8 +1626,14 @@ function renderCards() {
     return;
   }
 
-  visibleTools.forEach((tool) => {
-    const { fragment } = createCardElement(tool, pinnedIds);
+  visibleTools.forEach((tool, index) => {
+    const { fragment, card } = createCardElement(tool, pinnedIds);
+    card.classList.add("card-enter");
+    if (index < 20) {
+      card.style.animationDelay = `${index * 0.03}s`;
+    } else {
+      card.style.animationDelay = "0.6s";
+    }
     grid.appendChild(fragment);
   });
 }
@@ -1676,6 +1684,7 @@ async function removeTool(id) {
   state.launchHistory = filterHistoryForTools(state.launchHistory, state.tools);
   saveStoredToolsSynced(state.tools);
   saveLaunchHistorySynced(state.launchHistory);
+  pluginEmit("tool:remove", tool);
   render();
   updateStatusCards();
 }
@@ -1802,6 +1811,7 @@ function applyLaunchBehavior(element, tool, label = `Open ${tool.name}`) {
   }
 
   element.addEventListener("click", () => {
+    pluginEmit("tool:launch", tool);
     state.launchHistory = recordLaunch(state.launchHistory, tool.id);
     saveLaunchHistorySynced(state.launchHistory);
     updateStatusCards();

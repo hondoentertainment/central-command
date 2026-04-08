@@ -1708,6 +1708,12 @@ html.theme-light .ghost-button:hover {
 
 .tool-card:hover {
   transform: translateY(-2px) scale(1.02);
+  transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1), box-shadow 0.2s ease, border-color 200ms ease;
+  will-change: transform;
+}
+
+.tool-card:hover {
+  transform: scale(1.02);
   box-shadow:
     0 12px 40px rgba(0, 0, 0, 0.3),
     0 4px 12px rgba(0, 0, 0, 0.15),
@@ -1720,6 +1726,7 @@ html.theme-light .ghost-button:hover {
 .tool-card:active {
   transform: scale(0.98);
   transition-duration: 0.1s;
+  transition-duration: 80ms;
 }
 
 .tool-card::after {
@@ -3307,7 +3314,7 @@ html.theme-light .project-tools-picker__dropdown {
   }
 }
 
-.tool-grid:not(.tool-grid--virtualized) .tool-card {
+.tool-grid:not(.tool-grid--virtualized) .tool-card.card-enter {
   animation: card-enter 400ms cubic-bezier(0.16, 1, 0.3, 1) both;
 }
 
@@ -3333,32 +3340,54 @@ html.theme-light .project-tools-picker__dropdown {
 @keyframes palette-in {
   from {
     opacity: 0;
-    transform: scale(0.96) translateY(-8px);
-    backdrop-filter: blur(0);
+    transform: scale(0.92) translateY(-12px);
   }
   to {
     opacity: 1;
     transform: scale(1) translateY(0);
-    backdrop-filter: blur(20px);
+  }
+}
+
+@keyframes palette-out {
+  from {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+  to {
+    opacity: 0;
+    transform: scale(0.95) translateY(-8px);
   }
 }
 
 @keyframes palette-overlay-in {
-  from { background: rgba(0, 0, 0, 0); }
-  to { background: rgba(0, 0, 0, 0.6); }
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes palette-overlay-out {
+  from { opacity: 1; }
+  to { opacity: 0; }
 }
 
 .command-palette-overlay {
   animation: palette-overlay-in 200ms ease both;
 }
 
+.command-palette-overlay.is-closing {
+  animation: palette-overlay-out 180ms ease both;
+}
+
 .command-palette-panel {
-  animation: palette-in 280ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: palette-in 280ms cubic-bezier(0.34, 1.56, 0.64, 1) both;
   border: 1px solid var(--line);
   box-shadow:
     0 24px 80px rgba(0, 0, 0, 0.45),
     0 8px 32px rgba(0, 0, 0, 0.25),
     inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.command-palette-overlay.is-closing .command-palette-panel {
+  animation: palette-out 180ms ease both;
 }
 
 .command-palette-item {
@@ -4657,6 +4686,12 @@ html.theme-light .topbar__workspace-dropdown {
 
 .topbar {
   view-transition-name: topbar;
+/* ══════════════════════════════════════════════════════════
+   VIEW TRANSITIONS API
+   ══════════════════════════════════════════════════════════ */
+
+.content-header {
+  view-transition-name: site-header;
 }
 
 #mainContent {
@@ -4683,6 +4718,17 @@ html.theme-light .topbar__workspace-dropdown {
 }
 
 @keyframes vt-fade-in {
+@keyframes vt-fade-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+@keyframes vt-fade-out {
+  from { opacity: 1; }
+  to   { opacity: 0; }
+}
+
+@keyframes vt-slide-up-in {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
@@ -5118,6 +5164,75 @@ html.theme-light .digest-card__cat-bar-wrap {
 
   .tool-card:active {
     transition-duration: 0.01ms !important;
+@keyframes vt-slide-up-out {
+  from { opacity: 1; transform: translateY(0); }
+  to   { opacity: 0; transform: translateY(-4px); }
+}
+
+::view-transition-old(site-header) {
+  animation: vt-fade-out 180ms ease both;
+}
+
+::view-transition-new(site-header) {
+  animation: vt-fade-in 180ms ease both;
+}
+
+::view-transition-old(main-content) {
+  animation: vt-slide-up-out 200ms ease both;
+}
+
+::view-transition-new(main-content) {
+  animation: vt-slide-up-in 300ms cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation-delay: 60ms;
+}
+
+/* ══════════════════════════════════════════════════════════
+   TOAST ENTRANCE / EXIT ANIMATIONS
+   ══════════════════════════════════════════════════════════ */
+
+@keyframes toast-slide-in {
+  from {
+    opacity: 0;
+    transform: translateY(24px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes toast-slide-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(16px) scale(0.96);
+  }
+}
+
+/* ══════════════════════════════════════════════════════════
+   PREFERS-REDUCED-MOTION: OVERRIDE ALL NEW ANIMATIONS
+   ══════════════════════════════════════════════════════════ */
+
+@media (prefers-reduced-motion: reduce) {
+  .tool-card,
+  .tool-card:hover,
+  .tool-card:active,
+  .spotlight-card,
+  .spotlight-card:hover,
+  .spotlight-card:active,
+  .command-palette-overlay,
+  .command-palette-overlay.is-closing,
+  .command-palette-panel,
+  .command-palette-overlay.is-closing .command-palette-panel {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+
+  .tool-card.card-enter {
+    animation-duration: 0.01ms !important;
   }
 
   ::view-transition-old(*),
@@ -5134,9 +5249,6 @@ html.theme-light .digest-card__cat-bar-wrap {
   .stale-dialog-wrap,
   .stale-dialog {
     animation-duration: 0.01ms !important;
-  }
-
-  .tool-card,
   }
 }
 
