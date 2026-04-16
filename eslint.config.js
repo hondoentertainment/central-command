@@ -35,6 +35,7 @@ export default [
         location: "readonly",
         self: "readonly",
         navigator: "readonly",
+        Notification: "readonly",
         CustomEvent: "readonly",
         marked: "readonly",
         structuredClone: "readonly",

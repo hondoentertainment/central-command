@@ -10,6 +10,12 @@ import {
   getOverdueTasks,
   processRecurringTasks,
 } from "./lib/tasks.js";
+import {
+  getNotificationPermission,
+  isNotificationSupported,
+  requestNotificationPermission,
+  showDueTodayReminders,
+} from "./lib/task-reminders.js";
 
 const PROJECTS_KEY = "central-command.projects";
 
@@ -87,7 +93,88 @@ function init() {
   document.getElementById("taskCancelBtn")?.addEventListener("click", hideForm);
   document.getElementById("taskForm")?.addEventListener("submit", handleSubmit);
 
+  bindReminderControls();
+  bindKeyboardShortcuts();
+
   render();
+
+  // Opportunistic due-today notifications (only when already granted).
+  if (getNotificationPermission() === "granted") {
+    showDueTodayReminders(tasks);
+  }
+}
+
+function bindReminderControls() {
+  const btn = document.getElementById("taskRemindersBtn");
+  if (!btn) return;
+
+  const refreshLabel = () => {
+    if (!isNotificationSupported()) {
+      btn.textContent = "Reminders unsupported";
+      btn.disabled = true;
+      return;
+    }
+    const perm = getNotificationPermission();
+    if (perm === "granted") btn.textContent = "Reminders: on";
+    else if (perm === "denied") btn.textContent = "Reminders: blocked";
+    else btn.textContent = "Enable reminders";
+  };
+
+  refreshLabel();
+  btn.addEventListener("click", async () => {
+    if (!isNotificationSupported()) return;
+    const perm = await requestNotificationPermission();
+    refreshLabel();
+    if (perm === "granted") {
+      const count = showDueTodayReminders(tasks);
+      showToast(
+        count > 0
+          ? `Reminders on. ${count} task${count === 1 ? "" : "s"} due today.`
+          : "Reminders on. You'll be notified on your next visit."
+      );
+    } else if (perm === "denied") {
+      showToast("Notifications are blocked in your browser settings.", "error");
+    }
+  });
+}
+
+function bindKeyboardShortcuts() {
+  document.addEventListener("keydown", (event) => {
+    if (event.defaultPrevented) return;
+    if (event.metaKey || event.ctrlKey || event.altKey) return;
+    const active = document.activeElement;
+    const isEditable =
+      active &&
+      (active.tagName === "INPUT" ||
+        active.tagName === "TEXTAREA" ||
+        active.tagName === "SELECT" ||
+        active.isContentEditable);
+    if (isEditable) return;
+
+    const key = event.key?.toLowerCase();
+    if (key === "n") {
+      event.preventDefault();
+      showForm();
+      return;
+    }
+    if (key === "t") {
+      event.preventDefault();
+      activeFilter = "today";
+      render();
+      return;
+    }
+    if (key === "a") {
+      event.preventDefault();
+      activeFilter = "all";
+      render();
+      return;
+    }
+    if (key === "i") {
+      event.preventDefault();
+      activeFilter = "inbox";
+      render();
+    }
+  });
 }
 
 function showForm(task = null) {

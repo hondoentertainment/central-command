@@ -34,8 +34,7 @@ import {
   saveIntegrationsPreferences,
 } from "./lib/storage.js";
 import {
-  buildCreativeHubTool,
-  getCreativeHubConfig,
+  buildIntegrationTools,
   sanitizeIntegrationsPreferences,
   validateIntegrationUrl,
 } from "./lib/integrations.js";
@@ -584,13 +583,19 @@ function getIntegrationPrefs() {
 
 function getToolsWithIntegrationEntries() {
   const prefs = getIntegrationPrefs();
-  const creativeHubTool = buildCreativeHubTool(getCreativeHubConfig(prefs));
-  if (!creativeHubTool) return state.tools;
-  const hasCreativeHub = state.tools.some((tool) => tool.name.toLowerCase() === "creative hub");
-  if (hasCreativeHub) return state.tools;
-  const hydrated = sanitizeTool(creativeHubTool);
-  if (hydrated) hydrated._virtualIntegration = true;
-  return [...state.tools, hydrated].filter(Boolean);
+  const integrationTools = buildIntegrationTools(prefs);
+  if (integrationTools.length === 0) return state.tools;
+  const existingNames = new Set(state.tools.map((tool) => tool.name.toLowerCase()));
+  const additions = [];
+  for (const raw of integrationTools) {
+    if (existingNames.has(raw.name.toLowerCase())) continue;
+    const hydrated = sanitizeTool(raw);
+    if (hydrated) {
+      hydrated._virtualIntegration = true;
+      additions.push(hydrated);
+    }
+  }
+  return additions.length > 0 ? [...state.tools, ...additions] : state.tools;
 }
 
 function setupIntegrationSettings() {

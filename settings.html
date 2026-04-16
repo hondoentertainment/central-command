@@ -111,36 +111,7 @@
           </div>
 
           <form id="integrationsForm" class="tool-form">
-            <fieldset class="settings-fieldset">
-              <legend>Creative Hub</legend>
-              <label class="checkbox">
-                <input type="checkbox" id="settingsCreativeHubEnabled" checked />
-                <span>Enable Creative Hub</span>
-              </label>
-              <label class="checkbox">
-                <input type="checkbox" id="settingsCreativeHubShowInNav" checked />
-                <span>Show in navigation</span>
-              </label>
-              <label class="checkbox">
-                <input type="checkbox" id="settingsCreativeHubShowInPalette" checked />
-                <span>Show in command palette</span>
-              </label>
-              <label class="checkbox">
-                <input type="checkbox" id="settingsCreativeHubShowAsTool" checked />
-                <span>Show as tool card on home</span>
-              </label>
-              <label for="settingsCreativeHubUrl">URL
-                <input type="url" id="settingsCreativeHubUrl" placeholder="https://creativehub.com" />
-              </label>
-              <label for="settingsCreativeHubOpenMode">Open mode
-                <select id="settingsCreativeHubOpenMode">
-                  <option value="new-tab">New tab</option>
-                  <option value="same-tab">Same tab</option>
-                </select>
-              </label>
-              <p id="integrationUrlHealth" class="form-message" role="status" aria-live="polite"></p>
-            </fieldset>
-
+            <div id="integrationsList"></div>
             <p id="integrationsStatus" class="form-message" role="status" aria-live="polite"></p>
           </form>
         </section>

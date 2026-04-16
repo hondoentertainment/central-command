@@ -2,12 +2,19 @@ import assert from "node:assert";
 import {
   CREATIVE_HUB_TOOL_ID,
   DEFAULT_INTEGRATIONS,
+  INTEGRATION_DEFINITIONS,
   INTEGRATION_EVENT_KEY,
   sanitizeIntegrationsPreferences,
   getCreativeHubConfig,
+  getIntegrationConfig,
   isCreativeHubConfigured,
+  isIntegrationConfigured,
+  listIntegrations,
   openCreativeHub,
+  openIntegration,
   buildCreativeHubTool,
+  buildIntegrationTool,
+  buildIntegrationTools,
   trackIntegrationEvent,
   validateIntegrationUrl,
 } from "../lib/integrations.js";
@@ -119,6 +126,60 @@ const events = JSON.parse(localStorage.getItem(INTEGRATION_EVENT_KEY));
 assert.strictEqual(events.length, 2);
 assert.strictEqual(events[0].payload.source, "nav");
 assert.strictEqual(events[1].payload.source, "hero");
+
+// --- Multi-integration plumbing ---
+
+// Definitions include the new integrations and stay stable by id.
+const definitionIds = INTEGRATION_DEFINITIONS.map((d) => d.id).sort();
+assert.deepStrictEqual(
+  definitionIds,
+  ["creativeHub", "googleCalendar", "linear", "notion"],
+  "known integration ids"
+);
+
+// Defaults: creativeHub opt-in, others opt-out.
+const freshDefaults = sanitizeIntegrationsPreferences(null);
+assert.strictEqual(freshDefaults.creativeHub.enabled, true);
+assert.strictEqual(freshDefaults.notion.enabled, false);
+assert.strictEqual(freshDefaults.linear.enabled, false);
+assert.strictEqual(freshDefaults.googleCalendar.enabled, false);
+
+// Enabling a new integration flips it through the generic helpers.
+const withNotion = sanitizeIntegrationsPreferences({
+  notion: { enabled: true, showAsTool: true, url: "example.com" },
+});
+assert.strictEqual(withNotion.notion.enabled, true);
+assert.strictEqual(withNotion.notion.url, "https://example.com");
+assert.strictEqual(isIntegrationConfigured(getIntegrationConfig(withNotion, "notion")), true);
+
+const entries = listIntegrations(withNotion);
+const notionEntry = entries.find((e) => e.id === "notion");
+assert.ok(notionEntry, "notion should be listed");
+assert.strictEqual(notionEntry.definition.name, "Notion");
+
+// buildIntegrationTools only emits tools where showAsTool is true.
+const tools = buildIntegrationTools(withNotion);
+const toolNames = tools.map((t) => t.name).sort();
+assert.ok(toolNames.includes("Notion"), "notion tool should build when enabled with showAsTool");
+
+// openIntegration uses definition event name.
+let openedEvent = null;
+openIntegration(
+  notionEntry.config,
+  notionEntry.definition,
+  {
+    openWindow: () => ({ closed: false }),
+    setLocation: () => {},
+    trackEvent: (name, payload) => {
+      openedEvent = { name, payload };
+    },
+  }
+);
+assert.strictEqual(openedEvent?.name, "notion_link_opened");
+assert.strictEqual(openedEvent?.payload?.integrationId, "notion");
+
+// buildIntegrationTool returns null when definition is missing.
+assert.strictEqual(buildIntegrationTool(notionEntry.config, null), null);
 
 console.log("integrations.test.js: all assertions passed");
 export default { ok: true };

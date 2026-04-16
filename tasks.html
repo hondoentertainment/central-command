@@ -258,6 +258,7 @@
               <h2>All Tasks</h2>
             </div>
             <div class="panel__header-actions">
+              <button type="button" id="taskRemindersBtn" class="ghost-button" title="Toggle browser reminders for tasks due today">Enable reminders</button>
               <button type="button" id="addTaskBtn" class="primary-button">Add task</button>
             </div>
           </div>
@@ -318,6 +319,7 @@
           </div>
 
           <div id="taskFilterBar" class="task-filter-bar"></div>
+          <p class="panel__intro-text" style="margin-bottom: 12px;">Keyboard: <kbd>N</kbd> new task · <kbd>T</kbd> today · <kbd>I</kbd> inbox · <kbd>A</kbd> all</p>
           <div id="taskList" aria-live="polite"></div>
           <div id="taskEmpty" class="empty-state" hidden>
             <p class="empty-state__title">No tasks yet</p>

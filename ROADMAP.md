@@ -19,9 +19,12 @@
 - **Empty category page hints** — Contextual per-category hints with links to relevant starter packs and the tool registry when a category page is empty.
 - **Integration settings panel** — Dedicated Integrations section on the Settings page for managing Creative Hub and future integrations (URL, visibility, open mode).
 - **Integration reliability** — URL health checks for integration endpoints, friendly fallback messages, and unit tests for health-check logic.
-- **Test coverage expansion** — New unit tests for hooks, surfaces-settings, and integration health check modules (12 total test files).
+- **Test coverage expansion** — New unit tests for hooks, surfaces-settings, and integration health check modules.
+- **Multi-integration framework** — Generalized integrations registry with first-class Notion, Linear, and Google Calendar alongside Creative Hub. Nav, command palette, and tool deck surface each enabled integration; settings page renders all entries dynamically.
+- **Sync status indicator** — Small nav badge reflects syncing / synced / offline / error state, with an inline Retry action when a cloud write fails. Concurrent operations coalesce; online/offline events flip state automatically.
+- **Task depth** — Browser notification reminders for tasks due today (opt-in, once-per-day per task) and keyboard shortcuts on the Tasks page (`N` new, `T` today, `I` inbox, `A` all).
 
 ## Next
 
-- **More integrations** — Additional linkable services (e.g. dashboards, Notion) and optional Creative Hub–style quick actions.
-- **Advanced sync indicator** — Lightweight UI indicator when Firebase sync is in progress or slow.
+- **Integration adoption telemetry** — Per-integration open counts and conversion metrics so we know which surfaces drive usage.
+- **Scheduled reminder push** — Move task reminders to a service-worker push so they fire without an open tab.
