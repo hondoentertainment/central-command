@@ -19,9 +19,15 @@
 - **Empty category page hints** — Contextual per-category hints with links to relevant starter packs and the tool registry when a category page is empty.
 - **Integration settings panel** — Dedicated Integrations section on the Settings page for managing Creative Hub and future integrations (URL, visibility, open mode).
 - **Integration reliability** — URL health checks for integration endpoints, friendly fallback messages, and unit tests for health-check logic.
-- **Test coverage expansion** — New unit tests for hooks, surfaces-settings, and integration health check modules (12 total test files).
+- **Test coverage expansion** — New unit tests for hooks, surfaces-settings, and integration health check modules.
+- **Multi-integration framework** — Generalized integrations registry with first-class Notion, Linear, and Google Calendar alongside Creative Hub. Nav, command palette, and tool deck surface each enabled integration; settings page renders all entries dynamically.
+- **Sync status indicator** — Small nav badge reflects syncing / synced / offline / error state, with an inline Retry action when a cloud write fails. Concurrent operations coalesce; online/offline events flip state automatically.
+- **Task depth** — Browser notification reminders for tasks due today (opt-in, once-per-day per task) and keyboard shortcuts on the Tasks page (`N` new, `T` today, `I` inbox, `A` all).
+- **Sync indicator bootstrap** — Nav mount now emits a "Connecting to cloud…" sync signal for returning signed-in users so the indicator is not blank while the first read fires.
+- **Integration adoption telemetry** — Admin page shows per-integration open counts, share-of-total, last-opened time, and last-open source. Clear-log action wipes the local event store.
+- **Background task reminders** — Tasks page persists a due-today IndexedDB snapshot; the service worker handles `periodicsync` (6-hour min interval) and `notificationclick` to fire and route reminders even when no tab is open. Falls back gracefully on browsers without periodic background sync.
 
 ## Next
 
-- **More integrations** — Additional linkable services (e.g. dashboards, Notion) and optional Creative Hub–style quick actions.
-- **Advanced sync indicator** — Lightweight UI indicator when Firebase sync is in progress or slow.
+- **Sync data types** — Extend Firestore sync to cover tasks, projects, and knowledge-base entries (currently only tools/notes/history sync).
+- **Integration health dashboard** — Surface repeated failed launches per integration alongside the telemetry table.

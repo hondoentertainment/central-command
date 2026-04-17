@@ -11,7 +11,12 @@ import {
 } from "./lib/firebase.js";
 import { evaluatePasswordStrength, getAccountTier, mapAuthError } from "./lib/auth-policy.js";
 import { recordSecurityEvent, loadIntegrationsPreferences, saveIntegrationsPreferences } from "./lib/storage.js";
-import { sanitizeIntegrationsPreferences, validateIntegrationUrl, checkIntegrationHealth } from "./lib/integrations.js";
+import {
+  INTEGRATION_DEFINITIONS,
+  sanitizeIntegrationsPreferences,
+  validateIntegrationUrl,
+  checkIntegrationHealth,
+} from "./lib/integrations.js";
 
 const elements = {
   themeSettingsForm: document.querySelector("#themeSettingsForm"),
@@ -25,14 +30,8 @@ const elements = {
   currentPasswordInput: document.querySelector("#currentPasswordInput"),
   newPasswordInput: document.querySelector("#newPasswordInput"),
   changePasswordBtn: document.querySelector("#changePasswordBtn"),
-  settingsCreativeHubEnabled: document.querySelector("#settingsCreativeHubEnabled"),
-  settingsCreativeHubShowInNav: document.querySelector("#settingsCreativeHubShowInNav"),
-  settingsCreativeHubShowInPalette: document.querySelector("#settingsCreativeHubShowInPalette"),
-  settingsCreativeHubShowAsTool: document.querySelector("#settingsCreativeHubShowAsTool"),
-  settingsCreativeHubUrl: document.querySelector("#settingsCreativeHubUrl"),
-  settingsCreativeHubOpenMode: document.querySelector("#settingsCreativeHubOpenMode"),
+  integrationsList: document.querySelector("#integrationsList"),
   integrationsStatus: document.querySelector("#integrationsStatus"),
-  integrationUrlHealth: document.querySelector("#integrationUrlHealth"),
   workspaceSettings: document.querySelector("#workspaceSettings"),
 };
 
@@ -312,56 +311,119 @@ function renderWorkspaceEditForm(workspace) {
 }
 
 function initializeIntegrations() {
-  const prefs = sanitizeIntegrationsPreferences(loadIntegrationsPreferences());
-  const ch = prefs.creativeHub;
+  if (!elements.integrationsList) return;
 
-  if (elements.settingsCreativeHubEnabled) elements.settingsCreativeHubEnabled.checked = ch.enabled;
-  if (elements.settingsCreativeHubShowInNav) elements.settingsCreativeHubShowInNav.checked = ch.showInNav;
-  if (elements.settingsCreativeHubShowInPalette) elements.settingsCreativeHubShowInPalette.checked = ch.showInCommandPalette;
-  if (elements.settingsCreativeHubShowAsTool) elements.settingsCreativeHubShowAsTool.checked = ch.showAsTool;
-  if (elements.settingsCreativeHubUrl) elements.settingsCreativeHubUrl.value = ch.url;
-  if (elements.settingsCreativeHubOpenMode) elements.settingsCreativeHubOpenMode.value = ch.openMode;
+  const renderIntegrations = () => {
+    const prefs = sanitizeIntegrationsPreferences(loadIntegrationsPreferences());
 
-  const saveIntegration = () => {
-    const urlValidation = validateIntegrationUrl(elements.settingsCreativeHubUrl?.value);
-    const next = sanitizeIntegrationsPreferences({
-      creativeHub: {
-        enabled: elements.settingsCreativeHubEnabled?.checked ?? true,
-        showInNav: elements.settingsCreativeHubShowInNav?.checked ?? true,
-        showInCommandPalette: elements.settingsCreativeHubShowInPalette?.checked ?? true,
-        showAsTool: elements.settingsCreativeHubShowAsTool?.checked ?? true,
-        url: urlValidation.url,
-        openMode: elements.settingsCreativeHubOpenMode?.value,
-      },
+    elements.integrationsList.innerHTML = INTEGRATION_DEFINITIONS.map((def) => {
+      const cfg = prefs[def.id];
+      const idPrefix = `settings-integration-${def.id}`;
+      return `
+        <fieldset class="settings-fieldset" data-integration-id="${def.id}">
+          <legend>${def.icon ? `${def.icon} ` : ""}${escapeHtml(def.name)}</legend>
+          <p class="panel__intro-text">${escapeHtml(def.description)}</p>
+          <label class="checkbox">
+            <input type="checkbox" data-field="enabled" id="${idPrefix}-enabled" ${cfg.enabled ? "checked" : ""} />
+            <span>Enable ${escapeHtml(def.name)}</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" data-field="showInNav" id="${idPrefix}-nav" ${cfg.showInNav ? "checked" : ""} />
+            <span>Show in navigation</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" data-field="showInCommandPalette" id="${idPrefix}-palette" ${cfg.showInCommandPalette ? "checked" : ""} />
+            <span>Show in command palette</span>
+          </label>
+          <label class="checkbox">
+            <input type="checkbox" data-field="showAsTool" id="${idPrefix}-tool" ${cfg.showAsTool ? "checked" : ""} />
+            <span>Show as tool card on home</span>
+          </label>
+          <label for="${idPrefix}-url">URL
+            <input type="url" data-field="url" id="${idPrefix}-url" value="${escapeHtml(cfg.url)}" placeholder="${escapeHtml(def.defaultUrl)}" />
+          </label>
+          <label for="${idPrefix}-openmode">Open mode
+            <select data-field="openMode" id="${idPrefix}-openmode">
+              <option value="new-tab" ${cfg.openMode === "new-tab" ? "selected" : ""}>New tab</option>
+              <option value="same-tab" ${cfg.openMode === "same-tab" ? "selected" : ""}>Same tab</option>
+            </select>
+          </label>
+          <p class="form-message" data-role="health" role="status" aria-live="polite"></p>
+        </fieldset>
+      `;
+    }).join("");
+
+    elements.integrationsList.querySelectorAll("[data-integration-id]").forEach((fieldset) => {
+      const id = fieldset.getAttribute("data-integration-id");
+      const inputs = {
+        enabled: fieldset.querySelector('[data-field="enabled"]'),
+        showInNav: fieldset.querySelector('[data-field="showInNav"]'),
+        showInCommandPalette: fieldset.querySelector('[data-field="showInCommandPalette"]'),
+        showAsTool: fieldset.querySelector('[data-field="showAsTool"]'),
+        url: fieldset.querySelector('[data-field="url"]'),
+        openMode: fieldset.querySelector('[data-field="openMode"]'),
+      };
+      const healthEl = fieldset.querySelector('[data-role="health"]');
+
+      const saveEntry = () => {
+        const currentPrefs = sanitizeIntegrationsPreferences(loadIntegrationsPreferences());
+        const urlValidation = validateIntegrationUrl(inputs.url?.value);
+        const next = {
+          ...currentPrefs,
+          [id]: {
+            enabled: inputs.enabled?.checked ?? currentPrefs[id]?.enabled ?? false,
+            showInNav: inputs.showInNav?.checked ?? currentPrefs[id]?.showInNav ?? false,
+            showInCommandPalette:
+              inputs.showInCommandPalette?.checked ?? currentPrefs[id]?.showInCommandPalette ?? false,
+            showAsTool: inputs.showAsTool?.checked ?? currentPrefs[id]?.showAsTool ?? false,
+            url: urlValidation.url,
+            openMode: inputs.openMode?.value ?? currentPrefs[id]?.openMode,
+          },
+        };
+        const sanitized = sanitizeIntegrationsPreferences(next);
+        if (inputs.url) inputs.url.value = sanitized[id].url;
+        saveIntegrationsPreferences(sanitized);
+        if (!urlValidation.isValid) {
+          setIntegrationsStatus(`URL for ${id} is invalid. Default URL applied.`, "error");
+        } else {
+          setIntegrationsStatus("Integration settings saved.", "success");
+        }
+      };
+
+      const runEntryHealth = async () => {
+        if (!healthEl || !inputs.url?.value) return;
+        healthEl.textContent = "Checking URL…";
+        healthEl.className = "form-message is-info";
+        const result = await checkIntegrationHealth(inputs.url.value);
+        if (result.ok) {
+          healthEl.textContent = "URL is reachable.";
+          healthEl.className = "form-message is-success";
+        } else {
+          healthEl.textContent = result.message || "URL may be unreachable.";
+          healthEl.className = "form-message is-warning";
+        }
+      };
+
+      [inputs.enabled, inputs.showInNav, inputs.showInCommandPalette, inputs.showAsTool, inputs.openMode]
+        .filter(Boolean)
+        .forEach((el) => el.addEventListener("change", saveEntry));
+
+      inputs.url?.addEventListener("blur", () => {
+        saveEntry();
+        runEntryHealth();
+      });
+
+      runEntryHealth();
     });
-
-    if (elements.settingsCreativeHubUrl) {
-      elements.settingsCreativeHubUrl.value = next.creativeHub.url;
-    }
-
-    saveIntegrationsPreferences(next);
-
-    if (!urlValidation.isValid) {
-      setIntegrationsStatus("URL is invalid. Default URL applied.", "error");
-    } else {
-      setIntegrationsStatus("Integration settings saved.", "success");
-    }
   };
 
-  [
-    elements.settingsCreativeHubEnabled,
-    elements.settingsCreativeHubShowInNav,
-    elements.settingsCreativeHubShowInPalette,
-    elements.settingsCreativeHubShowAsTool,
-    elements.settingsCreativeHubOpenMode,
-  ].forEach((el) => el?.addEventListener("change", saveIntegration));
+  renderIntegrations();
+}
 
-  elements.settingsCreativeHubUrl?.addEventListener("blur", () => {
-    saveIntegration();
-    runHealthCheck();
-  });
-
-  runHealthCheck();
+function escapeHtml(str) {
+  const div = document.createElement("div");
+  div.textContent = str ?? "";
+  return div.innerHTML;
 }
 
 function setIntegrationsStatus(message, tone = "info") {
@@ -371,19 +433,4 @@ function setIntegrationsStatus(message, tone = "info") {
   setTimeout(() => {
     if (elements.integrationsStatus) elements.integrationsStatus.textContent = "";
   }, 4000);
-}
-
-async function runHealthCheck() {
-  const url = elements.settingsCreativeHubUrl?.value;
-  if (!url || !elements.integrationUrlHealth) return;
-  elements.integrationUrlHealth.textContent = "Checking URL…";
-  elements.integrationUrlHealth.className = "form-message is-info";
-  const result = await checkIntegrationHealth(url);
-  if (result.ok) {
-    elements.integrationUrlHealth.textContent = "URL is reachable.";
-    elements.integrationUrlHealth.className = "form-message is-success";
-  } else {
-    elements.integrationUrlHealth.textContent = result.message || "URL may be unreachable.";
-    elements.integrationUrlHealth.className = "form-message is-warning";
-  }
 }

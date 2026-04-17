@@ -23,6 +23,8 @@ const testFiles = [
   "hooks.test.js",
   "surfaces-settings.test.js",
   "integration-health.test.js",
+  "sync-status.test.js",
+  "task-reminders.test.js",
 ];
 
 let passed = 0;
