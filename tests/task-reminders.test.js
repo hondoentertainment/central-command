@@ -57,5 +57,32 @@ localStorage.setItem("central-command.task-reminders.v1", "not json");
 const fourth = collectTasksDueToday(tasks);
 assert.strictEqual(fourth.dueTasks.length, 1);
 
+// persistDueTodaySnapshot produces a valid payload shape and no-ops IDB when
+// IndexedDB is unavailable in the Node runtime.
+const { persistDueTodaySnapshot, registerReminderPeriodicSync } = await import(
+  "../lib/task-reminders.js"
+);
+
+// No global navigator / serviceWorker in Node — should report unsupported.
+const regResult = await registerReminderPeriodicSync();
+assert.strictEqual(regResult, "unsupported");
+
+// persistDueTodaySnapshot returns a snapshot even when IDB is unavailable.
+localStorage.clear();
+const snapshot = await persistDueTodaySnapshot(tasks);
+assert.strictEqual(snapshot.date, today);
+assert.strictEqual(snapshot.tasks.length, 1);
+assert.strictEqual(snapshot.tasks[0].id, "a");
+assert.ok(Array.isArray(snapshot.remindedIds));
+assert.ok(snapshot.savedAt);
+
+// Completed and archived tasks are pruned from the snapshot.
+const onlyFinished = [
+  { id: "x", title: "Done today", dueDate: today, status: "done" },
+  { id: "y", title: "Archived", dueDate: today, status: "archived" },
+];
+const prunedSnapshot = await persistDueTodaySnapshot(onlyFinished);
+assert.strictEqual(prunedSnapshot.tasks.length, 0);
+
 console.log("task-reminders.test.js: all assertions passed");
 export default { ok: true };

@@ -36,6 +36,8 @@ export default [
         self: "readonly",
         navigator: "readonly",
         Notification: "readonly",
+        indexedDB: "readonly",
+        IDBRequest: "readonly",
         CustomEvent: "readonly",
         marked: "readonly",
         structuredClone: "readonly",

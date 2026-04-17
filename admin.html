@@ -50,6 +50,23 @@
           </div>
           <div id="adminGrid" class="spotlight-grid" aria-live="polite"></div>
         </section>
+
+        <section class="panel panel--integration-telemetry">
+          <div class="panel__header">
+            <div>
+              <h2>Integration adoption</h2>
+              <p class="panel__intro-text">
+                Opens per integration since this device last cleared its event log. Use this to decide
+                which integrations to promote or retire.
+              </p>
+            </div>
+            <div class="panel__header-actions">
+              <button type="button" id="integrationTelemetryRefresh" class="ghost-button">Refresh</button>
+              <button type="button" id="integrationTelemetryClear" class="ghost-button ghost-button--danger">Clear log</button>
+            </div>
+          </div>
+          <div id="integrationTelemetry" aria-live="polite"></div>
+        </section>
       </main>
     </div>
 

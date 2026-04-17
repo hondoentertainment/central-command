@@ -27,6 +27,9 @@ global.localStorage = {
   setItem(key, value) {
     store[key] = String(value);
   },
+  removeItem(key) {
+    delete store[key];
+  },
   clear() {
     Object.keys(store).forEach((k) => delete store[k]);
   },
@@ -180,6 +183,46 @@ assert.strictEqual(openedEvent?.payload?.integrationId, "notion");
 
 // buildIntegrationTool returns null when definition is missing.
 assert.strictEqual(buildIntegrationTool(notionEntry.config, null), null);
+
+// --- Telemetry aggregation ---
+
+const { aggregateIntegrationEvents, readIntegrationEvents, clearIntegrationEvents } = await import(
+  "../lib/integrations.js"
+);
+
+localStorage.clear();
+const emptyAgg = aggregateIntegrationEvents();
+assert.ok(Array.isArray(emptyAgg));
+assert.strictEqual(emptyAgg.length, INTEGRATION_DEFINITIONS.length);
+assert.ok(emptyAgg.every((row) => row.opens === 0));
+
+// New-style events carry integrationId on the payload.
+trackIntegrationEvent("notion_link_opened", { integrationId: "notion", source: "nav" });
+trackIntegrationEvent("notion_link_opened", { integrationId: "notion", source: "palette" });
+trackIntegrationEvent("linear_link_opened", { integrationId: "linear", source: "palette" });
+
+// Legacy events (pre-generalization) still count via eventName reverse-map.
+trackIntegrationEvent("creative_hub_link_opened", { source: "hero" });
+
+const agg = aggregateIntegrationEvents();
+const byId = new Map(agg.map((row) => [row.id, row]));
+assert.strictEqual(byId.get("notion").opens, 2);
+assert.strictEqual(byId.get("notion").lastSource, "palette");
+assert.strictEqual(byId.get("linear").opens, 1);
+assert.strictEqual(byId.get("creativeHub").opens, 1);
+assert.strictEqual(byId.get("googleCalendar").opens, 0);
+
+// Rows come back in INTEGRATION_DEFINITIONS order.
+assert.deepStrictEqual(
+  agg.map((r) => r.id),
+  INTEGRATION_DEFINITIONS.map((d) => d.id)
+);
+
+assert.ok(readIntegrationEvents().length >= 3, "events are readable");
+
+clearIntegrationEvents();
+assert.strictEqual(readIntegrationEvents().length, 0);
+assert.ok(aggregateIntegrationEvents().every((row) => row.opens === 0));
 
 console.log("integrations.test.js: all assertions passed");
 export default { ok: true };

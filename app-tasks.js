@@ -15,6 +15,9 @@ import {
   isNotificationSupported,
   requestNotificationPermission,
   showDueTodayReminders,
+  persistDueTodaySnapshot,
+  clearPersistedSnapshot,
+  registerReminderPeriodicSync,
 } from "./lib/task-reminders.js";
 
 const PROJECTS_KEY = "central-command.projects";
@@ -101,6 +104,16 @@ function init() {
   // Opportunistic due-today notifications (only when already granted).
   if (getNotificationPermission() === "granted") {
     showDueTodayReminders(tasks);
+    persistDueTodaySnapshot(tasks);
+    registerReminderPeriodicSync();
+  } else {
+    clearPersistedSnapshot();
+  }
+}
+
+function refreshReminderSnapshot() {
+  if (getNotificationPermission() === "granted") {
+    persistDueTodaySnapshot(tasks);
   }
 }
 
@@ -127,10 +140,18 @@ function bindReminderControls() {
     refreshLabel();
     if (perm === "granted") {
       const count = showDueTodayReminders(tasks);
+      persistDueTodaySnapshot(tasks);
+      const syncResult = await registerReminderPeriodicSync();
+      const backgroundNote =
+        syncResult === "registered"
+          ? " Background reminders on."
+          : syncResult === "denied"
+            ? " Background reminders blocked — grant periodic-sync permission in site settings to enable."
+            : "";
       showToast(
-        count > 0
+        (count > 0
           ? `Reminders on. ${count} task${count === 1 ? "" : "s"} due today.`
-          : "Reminders on. You'll be notified on your next visit."
+          : "Reminders on. You'll be notified on your next visit.") + backgroundNote
       );
     } else if (perm === "denied") {
       showToast("Notifications are blocked in your browser settings.", "error");
@@ -247,6 +268,7 @@ function handleSubmit(e) {
   saveTasks(tasks);
   hideForm();
   render();
+  refreshReminderSnapshot();
 }
 
 function handleDelete(id) {
@@ -261,6 +283,7 @@ function handleDelete(id) {
       saveTasks(tasks);
       showToast("Task deleted");
       render();
+      refreshReminderSnapshot();
     }
   });
 }
@@ -278,6 +301,7 @@ function toggleDone(id) {
 
   saveTasks(tasks);
   render();
+  refreshReminderSnapshot();
 }
 
 function getFilteredTasks() {

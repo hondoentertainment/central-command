@@ -708,6 +708,50 @@ select,
   50% { opacity: 0.4; }
 }
 
+.integration-telemetry {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.88rem;
+}
+
+.integration-telemetry th,
+.integration-telemetry td {
+  text-align: left;
+  padding: 10px 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.integration-telemetry th {
+  font-weight: 600;
+  color: var(--text-secondary);
+  text-transform: uppercase;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+}
+
+.integration-telemetry__name {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 600;
+}
+
+.integration-telemetry__opens,
+.integration-telemetry__share {
+  font-variant-numeric: tabular-nums;
+}
+
+.integration-telemetry__last,
+.integration-telemetry__source {
+  color: var(--muted);
+}
+
+.ghost-button--danger {
+  color: var(--crimson, #e94f63);
+  border-color: var(--crimson, #e94f63);
+}
+
 .auth-ui__badge--verified {
   color: var(--status-success);
 }
