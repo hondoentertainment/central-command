@@ -849,8 +849,55 @@ button:focus-visible,
   gap: 12px;
 }
 
+.surfaces-settings-panel__intro {
+  display: grid;
+  gap: 4px;
+}
+
+.surfaces-settings-panel__text,
+.surfaces-settings-panel__hint,
+.surfaces-settings-panel__status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.9rem;
+}
+
 .surfaces-settings-panel .checkbox {
   margin: 0;
+}
+
+.surfaces-settings-panel__divider {
+  border: 0;
+  border-top: 1px solid var(--line);
+  width: 100%;
+  margin: 4px 0;
+}
+
+.stacked-label {
+  display: grid;
+  gap: 6px;
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.stacked-label input,
+.stacked-label select {
+  width: 100%;
+}
+
+.surfaces-settings-panel__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.surfaces-settings-panel__status[data-state="saved"] {
+  color: var(--teal);
+}
+
+.surfaces-settings-panel__status[data-state="warning"] {
+  color: var(--amber);
 }
 
 .tool-card {
