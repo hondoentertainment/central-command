@@ -18,8 +18,11 @@ const testFiles = [
   "tool-model-extended.test.js",
   "storage.test.js",
   "integrations.test.js",
+<<<<<<< ours
   "debounce.test.js",
   "nav.test.js",
+=======
+>>>>>>> theirs
 ];
 
 let passed = 0;

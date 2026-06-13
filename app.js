@@ -15,10 +15,12 @@ import {
   sanitizeLaunchHistory,
   sanitizeTool,
   sortTools,
+  toolMatchesSearchQuery,
 } from "./lib/tool-model.js";
 import {
   hasSavedTools,
   loadCustomCategories,
+  loadSurfacesPreferences,
   loadLayoutPreference,
   loadLaunchHistorySynced,
   loadNotes,
@@ -35,20 +37,21 @@ import {
 import {
   buildCreativeHubTool,
   getCreativeHubConfig,
+<<<<<<< ours
   sanitizeIntegrationsPreferences,
   validateIntegrationUrl,
 } from "./lib/integrations.js";
 import { showToast } from "./lib/toast.js";
-} from "./lib/integrations.js";
-import { showToast } from "./lib/toast.js";
 import { setupKeyboardShortcuts, setupToolGridKeydown } from "./lib/keyboard-shortcuts.js";
 import { createBatchActions } from "./lib/batch-actions.js";
-import {
-  applySurfacesVisibility,
-  getIntegrationPrefs,
-  setupIntegrationSettings,
-  setupSurfacesSettings,
-} from "./lib/surfaces-settings.js";
+=======
+  openCreativeHub,
+  sanitizeIntegrationsPreferences,
+  trackIntegrationEvent,
+  validateIntegrationUrl,
+} from "./lib/integrations.js";
+import { showToast } from "./lib/toast.js";
+>>>>>>> theirs
 
 const fallbackMetadataBySignature = createFallbackMetadataMap(ALL_PRESET_TOOLS);
 
@@ -109,6 +112,7 @@ const elements = {
   surfacesSettingsPanel: document.querySelector("#surfacesSettingsPanel"),
   surfacesShowHero: document.querySelector("#surfacesShowHero"),
   surfacesShowSpotlight: document.querySelector("#surfacesShowSpotlight"),
+<<<<<<< ours
   launchHookUrlInput: document.querySelector("#launchHookUrlInput"),
   importBackupBtn: document.querySelector("#importBackupBtn"),
   importBackupInput: document.querySelector("#importBackupInput"),
@@ -116,13 +120,20 @@ const elements = {
   copyBackupBtn: document.querySelector("#copyBackupBtn"),
   toolsMoreBtn: document.querySelector("#toolsMoreBtn"),
   toolsMoreMenu: document.querySelector("#toolsMoreMenu"),
+=======
+>>>>>>> theirs
   creativeHubEnabled: document.querySelector("#creativeHubEnabled"),
   creativeHubShowInNav: document.querySelector("#creativeHubShowInNav"),
   creativeHubShowInPalette: document.querySelector("#creativeHubShowInPalette"),
   creativeHubShowAsTool: document.querySelector("#creativeHubShowAsTool"),
   creativeHubUrl: document.querySelector("#creativeHubUrl"),
   creativeHubOpenMode: document.querySelector("#creativeHubOpenMode"),
+<<<<<<< ours
   mainContent: document.querySelector(".dashboard-main"),
+=======
+  creativeHubLaunchBtn: document.querySelector("#creativeHubLaunchBtn"),
+  creativeHubSettingsStatus: document.querySelector("#creativeHubSettingsStatus"),
+>>>>>>> theirs
 };
 
 // --- Batch actions (delegated to module) ---
@@ -193,9 +204,6 @@ async function initialize() {
   applySurfacesVisibility("command");
   setupSurfacesSettings();
   setupIntegrationSettings();
-  applySurfacesVisibility("command", elements);
-  setupSurfacesSettings(elements);
-  setupIntegrationSettings(elements, render);
   elements.searchInput.addEventListener("input", (event) => {
     state.query = event.target.value.trim().toLowerCase();
     render();
@@ -222,7 +230,6 @@ async function initialize() {
   elements.batchDeleteBtn?.addEventListener("click", batchDeleteSelected);
   elements.batchCategorySelect?.addEventListener("change", batchChangeCategory);
   elements.batchDoneBtn?.addEventListener("click", exitSelectMode);
-
   document.addEventListener("keydown", handleGlobalShortcuts);
   document.addEventListener("keydown", handleKeyboardShortcut);
   document.addEventListener("keydown", handleToolGridKeydown);
@@ -236,12 +243,6 @@ async function initialize() {
       document.querySelectorAll(".tool-card__more-trigger").forEach((b) => b.setAttribute("aria-expanded", "false"));
     }
   });
-  elements.selectModeBtn?.addEventListener("click", batch.toggleSelectMode);
-  elements.batchPinBtn?.addEventListener("click", batch.batchPinSelected);
-  elements.batchDeleteBtn?.addEventListener("click", batch.batchDeleteSelected);
-  elements.batchCategorySelect?.addEventListener("change", batch.batchChangeCategory);
-  elements.batchDoneBtn?.addEventListener("click", batch.exitSelectMode);
-
   setupKeyboardShortcuts({
     getTools: () => state.tools,
     getLaunchHistory: () => state.launchHistory,
@@ -532,16 +533,12 @@ function setupSurfacesSettings() {
 
   elements.surfacesShowHero?.addEventListener("change", updateFromCheckboxes);
   elements.surfacesShowSpotlight?.addEventListener("change", updateFromCheckboxes);
-function getToolsWithIntegrationEntries() {
-  const prefs = getIntegrationPrefs();
-  const creativeHubTool = buildCreativeHubTool(getCreativeHubConfig(prefs));
-  if (!creativeHubTool) return state.tools;
-  const hasCreativeHub = state.tools.some((tool) => tool.name.toLowerCase() === "creative hub");
-  if (hasCreativeHub) return state.tools;
-  return [...state.tools, sanitizeTool(creativeHubTool)].filter(Boolean);
 }
 
+<<<<<<< ours
+=======
 
+>>>>>>> theirs
 function getIntegrationPrefs() {
   return sanitizeIntegrationsPreferences(loadIntegrationsPreferences());
 }
@@ -552,9 +549,13 @@ function getToolsWithIntegrationEntries() {
   if (!creativeHubTool) return state.tools;
   const hasCreativeHub = state.tools.some((tool) => tool.name.toLowerCase() === "creative hub");
   if (hasCreativeHub) return state.tools;
+<<<<<<< ours
   const hydrated = sanitizeTool(creativeHubTool);
   if (hydrated) hydrated._virtualIntegration = true;
   return [...state.tools, hydrated].filter(Boolean);
+=======
+  return [...state.tools, sanitizeTool(creativeHubTool)].filter(Boolean);
+>>>>>>> theirs
 }
 
 function setupIntegrationSettings() {
@@ -567,6 +568,7 @@ function setupIntegrationSettings() {
   if (elements.creativeHubShowAsTool) elements.creativeHubShowAsTool.checked = creativeHub.showAsTool;
   if (elements.creativeHubUrl) elements.creativeHubUrl.value = creativeHub.url;
   if (elements.creativeHubOpenMode) elements.creativeHubOpenMode.value = creativeHub.openMode;
+<<<<<<< ours
 
   const savePrefs = () => {
     const urlValidation = validateIntegrationUrl(elements.creativeHubUrl?.value);
@@ -574,6 +576,12 @@ function setupIntegrationSettings() {
       showToast("Creative Hub URL is invalid. Using default URL.", "error");
     }
 
+=======
+  setIntegrationStatus("Changes save automatically.");
+
+  const savePrefs = () => {
+    const urlValidation = validateIntegrationUrl(elements.creativeHubUrl?.value);
+>>>>>>> theirs
     const next = sanitizeIntegrationsPreferences({
       creativeHub: {
         enabled: elements.creativeHubEnabled?.checked ?? true,
@@ -589,6 +597,16 @@ function setupIntegrationSettings() {
       elements.creativeHubUrl.value = next.creativeHub.url;
     }
 
+<<<<<<< ours
+=======
+    if (!urlValidation.isValid) {
+      showToast("Creative Hub URL is invalid. Using default URL.", "error");
+      setIntegrationStatus("Saved with the default Creative Hub URL.", "warning");
+    } else {
+      setIntegrationStatus("Creative Hub settings saved.", "saved");
+    }
+
+>>>>>>> theirs
     saveIntegrationsPreferences(next);
     renderNav("command");
     render();
@@ -602,7 +620,29 @@ function setupIntegrationSettings() {
     elements.creativeHubOpenMode,
   ].forEach((el) => el?.addEventListener("change", savePrefs));
 
+<<<<<<< ours
   elements.creativeHubUrl?.addEventListener("blur", savePrefs);
+=======
+  elements.creativeHubUrl?.addEventListener("change", savePrefs);
+  elements.creativeHubLaunchBtn?.addEventListener("click", () => {
+    const creativeHubConfig = getCreativeHubConfig(loadIntegrationsPreferences());
+    openCreativeHub(creativeHubConfig, {
+      source: "settings-panel",
+      trackEvent: trackIntegrationEvent,
+      onError: (message) => {
+        setIntegrationStatus(message, "warning");
+        showToast(message, "error");
+      },
+    });
+  });
+}
+
+function setIntegrationStatus(message, state = "") {
+  if (!elements.creativeHubSettingsStatus) return;
+  elements.creativeHubSettingsStatus.textContent = message;
+  if (state) elements.creativeHubSettingsStatus.dataset.state = state;
+  else delete elements.creativeHubSettingsStatus.dataset.state;
+>>>>>>> theirs
 }
 
 function showQuickAddForm() {
@@ -1014,9 +1054,7 @@ function getVisibleTools() {
   return sortTools(getToolsWithIntegrationEntries()).filter((tool) => {
     const matchesCategory =
       state.activeCategory === "All" || tool.category === state.activeCategory;
-    const haystack = `${tool.name} ${tool.category} ${tool.description}`.toLowerCase();
-    const matchesQuery = !state.query || haystack.includes(state.query);
-    return matchesCategory && matchesQuery;
+    return matchesCategory && toolMatchesSearchQuery(tool, state.query);
   });
 }
 
@@ -1062,6 +1100,7 @@ function computeVirtualVisibleRange(visibleTools) {
   const scrollTop = wrap.scrollTop;
   const viewHeight = Math.max(1, wrap.clientHeight || 400);
 
+<<<<<<< ours
   let startRow = Math.max(0, Math.floor(scrollTop / rowHeight) - OVERSCAN_ROWS);
   let endRow = Math.min(
     totalRows - 1,
@@ -1124,10 +1163,9 @@ function createCardElement(tool, pinnedIds, opts = {}) {
       selectCheckbox.addEventListener("change", () => {
         if (selectCheckbox.checked) state.selectedToolIds.add(tool.id);
         else state.selectedToolIds.delete(tool.id);
-        updateBatchActionBar();
+        batch.updateBatchActionBar();
       });
-  batch.updateBatchActionBar();
-
+=======
   visibleTools.forEach((tool) => {
     const isVirtualIntegration = !tool.id;
     const fragment = elements.toolCardTemplate.content.cloneNode(true);
@@ -1157,7 +1195,7 @@ function createCardElement(tool, pinnedIds, opts = {}) {
         selectCheckbox.addEventListener("change", () => {
           if (selectCheckbox.checked) state.selectedToolIds.add(tool.id);
           else state.selectedToolIds.delete(tool.id);
-          batch.updateBatchActionBar();
+          updateBatchActionBar();
         });
       }
       card.querySelector(".tool-card__actions")?.classList.add("is-hidden");
@@ -1165,6 +1203,7 @@ function createCardElement(tool, pinnedIds, opts = {}) {
       card.classList.remove("tool-card--select-mode");
       selectWrap.hidden = true;
       card.querySelector(".tool-card__actions")?.classList.remove("is-hidden");
+>>>>>>> theirs
     }
     card.querySelector(".tool-card__actions")?.classList.add("is-hidden");
   } else {
@@ -1249,6 +1288,7 @@ function createCardElement(tool, pinnedIds, opts = {}) {
     });
   }
 
+<<<<<<< ours
   const pinnedIndex = pinnedIds.indexOf(tool.id);
   const isPinned = pinnedIndex >= 0 && !isVirtualIntegration;
   if (moveUpButton) { moveUpButton.hidden = !isPinned; moveUpButton.disabled = !isPinned || pinnedIndex === 0; }
@@ -1322,8 +1362,7 @@ function renderCards() {
   const visibleTools = getVisibleTools();
   const wrap = elements.toolGridScrollWrap;
   const grid = elements.toolGrid;
-
-  if (!grid) return;
+=======
     const pinnedIndex = pinnedIds.indexOf(tool.id);
     const isPinned = pinnedIndex >= 0 && !isVirtualIntegration;
     moveUpButton.hidden = !isPinned;
@@ -1346,6 +1385,9 @@ function renderCards() {
       moveUpButton.hidden = true;
       moveDownButton.hidden = true;
     }
+>>>>>>> theirs
+
+  if (!grid) return;
 
   const useVirtualization = visibleTools.length >= VIRTUALIZE_THRESHOLD;
 

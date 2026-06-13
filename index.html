@@ -96,6 +96,7 @@
                 <span class="visually-hidden">Search tools</span>
                 <input id="searchInput" type="search" placeholder="Search tools or categories (press /)" autocomplete="off" />
               </label>
+<<<<<<< ours
               <button type="button" id="addToolBtn" class="primary-button panel__header-actions-cta">Add tool</button>
               <div class="panel__header-more-wrap">
                 <button type="button" id="toolsMoreBtn" class="ghost-button panel__header-more-btn" aria-expanded="false" aria-haspopup="true" aria-label="More actions">More</button>
@@ -107,17 +108,33 @@
                   <button type="button" id="selectModeBtn" class="panel__header-more-item" role="menuitem">Select</button>
                 </div>
               </div>
+=======
+              <button type="button" id="surfacesSettingsBtn" class="ghost-button" aria-label="Page customization settings" aria-expanded="false">⚙ Customize</button>
+              <button type="button" id="addToolBtn" class="ghost-button">Add tool</button>
+              <button type="button" id="selectModeBtn" class="ghost-button">Select</button>
+>>>>>>> theirs
             </div>
             <input type="file" id="importBackupInput" accept=".json" hidden aria-hidden="true" />
           </div>
+<<<<<<< ours
           <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-modal="true" aria-label="Layout and launch settings">
+=======
+          <div id="surfacesSettingsPanel" class="surfaces-settings-panel" hidden role="dialog" aria-label="Page and integration settings">
+>>>>>>> theirs
             <div class="surfaces-settings-panel__content">
+              <div class="surfaces-settings-panel__intro">
+                <p class="eyebrow">Page surfaces</p>
+                <p class="surfaces-settings-panel__text">Choose what appears on the command page and how Creative Hub should launch.</p>
+              </div>
               <label class="checkbox"><input type="checkbox" id="surfacesShowHero" checked /> Show hero</label>
               <label class="checkbox"><input type="checkbox" id="surfacesShowSpotlight" checked /> Show spotlight</label>
+<<<<<<< ours
               <label class="surfaces-settings-panel__webhook">
                 <span>Launch webhook URL</span>
                 <input type="url" id="launchHookUrlInput" placeholder="https://…" />
               </label>
+=======
+>>>>>>> theirs
               <hr class="surfaces-settings-panel__divider" />
               <p class="eyebrow">Integrations</p>
               <label class="checkbox"><input type="checkbox" id="creativeHubEnabled" checked /> Enable Creative Hub</label>
@@ -127,13 +144,24 @@
               <label class="stacked-label">Creative Hub URL
                 <input type="url" id="creativeHubUrl" placeholder="https://creativehub.com" />
               </label>
+<<<<<<< ours
+=======
+              <p id="creativeHubUrlHelp" class="surfaces-settings-panel__hint">Paste a full Creative Hub destination. If the URL is invalid, Central Command falls back to the default Creative Hub home.</p>
+>>>>>>> theirs
               <label class="stacked-label">Open mode
                 <select id="creativeHubOpenMode">
                   <option value="new-tab">New tab</option>
                   <option value="same-tab">Same tab</option>
                 </select>
               </label>
+<<<<<<< ours
               <p class="surfaces-settings-panel__hint">Add Calendar, Docs, and more from Starter Packs.</p>
+=======
+              <div class="surfaces-settings-panel__actions">
+                <button type="button" id="creativeHubLaunchBtn" class="ghost-button">Open Creative Hub now</button>
+                <span id="creativeHubSettingsStatus" class="surfaces-settings-panel__status" aria-live="polite"></span>
+              </div>
+>>>>>>> theirs
             </div>
           </div>
           <div id="batchActionBar" class="batch-action-bar" hidden role="status" aria-live="polite" aria-atomic="true" aria-label="Bulk actions">

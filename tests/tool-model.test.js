@@ -7,6 +7,7 @@ import {
   sanitizeSurfaces,
   getToolSignature,
   getNextPinRank,
+  toolMatchesSearchQuery,
 } from "../lib/tool-model.js";
 
 // --- sanitizeTool ---
@@ -99,6 +100,26 @@ assert.strictEqual(
   "gmail|https://mail.google.com"
 );
 assert.strictEqual(getToolSignature({ name: "A", url: "B" }), "a|b");
+
+// --- toolMatchesSearchQuery ---
+const searchTool = sanitizeTool({
+  name: "Docs",
+  url: "https://docs.example.com",
+  category: "Productivity",
+  description: "Team wiki",
+  shortcutLabel: "Ctrl+D",
+  iconKey: "auto",
+});
+assert.ok(searchTool);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, ""), true);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, "   "), true);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, "docs"), true);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, "EXAMPLE.COM"), true);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, "ctrl+d"), true);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, "productivity wiki"), true);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, "wiki productivity"), true);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, "notfound"), false);
+assert.strictEqual(toolMatchesSearchQuery(searchTool, "docs missingtoken"), false);
 
 // --- getNextPinRank ---
 assert.strictEqual(getNextPinRank([]), 1);
