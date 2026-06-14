@@ -1,6 +1,7 @@
 {
   "$schema": "https://openapi.vercel.sh/vercel.json",
   "framework": null,
+  "outputDirectory": ".",
   "installCommand": "npm ci --omit=dev",
   "buildCommand": "node scripts/build-firebase-config.js",
   "headers": [
