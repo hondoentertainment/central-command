@@ -1460,24 +1460,10 @@ a:focus-visible {
   gap: 12px;
 }
 
-.surfaces-settings-panel__intro {
-  display: grid;
-  gap: 4px;
-}
-
-.surfaces-settings-panel__text,
-.surfaces-settings-panel__hint,
-.surfaces-settings-panel__status {
-  margin: 0;
-  color: var(--muted);
-  font-size: 0.9rem;
-}
-
 .surfaces-settings-panel .checkbox {
   margin: 0;
 }
 
-<<<<<<< ours
 .surfaces-settings-panel__webhook {
   display: flex;
   flex-direction: column;
@@ -1491,8 +1477,6 @@ a:focus-visible {
   font-size: 0.9rem;
 }
 
-=======
->>>>>>> theirs
 .surfaces-settings-panel__divider {
   border: 0;
   border-top: 1px solid var(--line);
@@ -1500,15 +1484,12 @@ a:focus-visible {
   margin: 4px 0;
 }
 
-<<<<<<< ours
 .surfaces-settings-panel__hint {
   font-size: 0.85rem;
   color: var(--text-secondary);
   margin: 0;
 }
 
-=======
->>>>>>> theirs
 .stacked-label {
   display: grid;
   gap: 6px;
@@ -1521,24 +1502,6 @@ a:focus-visible {
   width: 100%;
 }
 
-<<<<<<< ours
-=======
-.surfaces-settings-panel__actions {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
-}
-
-.surfaces-settings-panel__status[data-state="saved"] {
-  color: var(--teal);
-}
-
-.surfaces-settings-panel__status[data-state="warning"] {
-  color: var(--amber);
-}
-
->>>>>>> theirs
 .tool-card {
   position: relative;
   overflow: hidden;

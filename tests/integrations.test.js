@@ -1,9 +1,6 @@
 import assert from "node:assert";
 import {
-<<<<<<< ours
   CREATIVE_HUB_TOOL_ID,
-=======
->>>>>>> theirs
   DEFAULT_INTEGRATIONS,
   INTEGRATION_EVENT_KEY,
   sanitizeIntegrationsPreferences,
@@ -109,28 +106,9 @@ const blocked = openCreativeHub(defaults.creativeHub, {
 assert.strictEqual(blocked, false);
 assert.ok(errorMessage.includes("blocked"));
 
-<<<<<<< ours
 const tool = buildCreativeHubTool(defaults.creativeHub);
 assert.strictEqual(tool?.name, "Creative Hub");
 assert.strictEqual(tool?.id, CREATIVE_HUB_TOOL_ID);
-=======
-
-let invalidError = "";
-const invalidOpen = openCreativeHub({ ...defaults.creativeHub, enabled: false }, {
-  openWindow: () => ({ closed: false }),
-  trackEvent: () => {
-    throw new Error("trackEvent should not run for invalid config");
-  },
-  onError: (message) => {
-    invalidError = message;
-  },
-});
-assert.strictEqual(invalidOpen, false);
-assert.ok(invalidError.includes("not configured"));
-
-const tool = buildCreativeHubTool(defaults.creativeHub);
-assert.strictEqual(tool?.name, "Creative Hub");
->>>>>>> theirs
 assert.strictEqual(buildCreativeHubTool({ ...defaults.creativeHub, showAsTool: false }), null);
 
 localStorage.clear();
