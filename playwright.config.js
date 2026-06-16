@@ -12,7 +12,7 @@ export default defineConfig({
   webServer: {
     command: "npx serve . -l 8080 --single",
     port: 8080,
-    reuseExistingServer: true,
+    reuseExistingServer: !process.env.CI,
   },
   projects: [
     { name: "chromium", use: { browserName: "chromium" } },

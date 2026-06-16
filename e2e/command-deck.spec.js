@@ -6,6 +6,7 @@ test.describe("Command Deck (index page)", () => {
     // Clear localStorage for a clean state
     await page.evaluate(() => localStorage.clear());
     await page.reload();
+    await page.waitForLoadState("networkidle");
   });
 
   test("loads the page with title", async ({ page }) => {
