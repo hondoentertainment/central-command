@@ -17,6 +17,11 @@ export const DUPLICATE_FOLDERS = [
     duplicates: ["Spine Scanner/spine-scanner-1", "Spine Scanner/spine-scanner-deploy", "Spine Scanner (parent)"],
     note: "spine-scanner is the primary app repo; parent folder has no origin remote.",
   },
+  {
+    canonical: "Play Generator",
+    duplicates: ["The Portfolio"],
+    note: "Play Generator is stagecraft on GitHub. The Portfolio Vercel project redirects to stagecraft production.",
+  },
 ];
 
 /** @type {Array<{id:string,name:string,category:string,canonicalPath:string,branch:string,github:string,productionUrl:string|null,vercel:boolean}>} */
@@ -89,6 +94,16 @@ export const DEPLOY_PROJECTS = [
     branch: "main",
     github: "https://github.com/hondoentertainment/SiskelBot",
     productionUrl: "https://experimentagent-pyxma8203-hondo4185-5820s-projects.vercel.app",
+    vercel: true,
+  },
+  {
+    id: "stagecraft",
+    name: "Stagecraft",
+    category: "Writing",
+    canonicalPath: "Play Generator",
+    branch: "main",
+    github: "https://github.com/hondoentertainment/stagecraft",
+    productionUrl: "https://stagecraft-kappa.vercel.app",
     vercel: true,
   },
   {
