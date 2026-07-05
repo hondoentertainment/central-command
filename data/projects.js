@@ -113,7 +113,7 @@ export const DEPLOY_PROJECTS = [
     canonicalPath: "portfolio-ops",
     branch: "main",
     github: "https://github.com/hondoentertainment/portfolio-ops",
-    productionUrl: "https://portfolio-ops.vercel.app",
+    productionUrl: "https://portfolio-ops-seven.vercel.app",
     vercel: true,
   },
   {

@@ -656,7 +656,7 @@ export const PRESET_PACKS = [
       }),
       createTool({
         name: "Portfolio Ops",
-        url: "https://portfolio-ops.vercel.app",
+        url: "https://portfolio-ops-seven.vercel.app",
         category: "Workspace",
         description: "Morning brief and action queue across CI, deploys, and life ops.",
         accent: "cobalt",
