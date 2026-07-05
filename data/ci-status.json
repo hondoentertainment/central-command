@@ -1,0 +1,1550 @@
+{
+  "generatedAt": "2026-06-29T13:46:21.344Z",
+  "org": "hondoentertainment",
+  "orgUrl": "https://github.com/hondoentertainment",
+  "source": "snapshot",
+  "summary": {
+    "totalRepos": 70,
+    "healthyCount": 66,
+    "failingCount": 4,
+    "issueCount": 4,
+    "budgetBlocked": 3,
+    "codeFailures": 1
+  },
+  "issues": [
+    {
+      "id": "CrowdPass-27856601805",
+      "repo": "CrowdPass",
+      "repoUrl": "https://github.com/hondoentertainment/CrowdPass",
+      "severity": "blocked",
+      "kind": "budget",
+      "workflow": "CI",
+      "event": "push",
+      "conclusion": "failure",
+      "title": "chore(ci): re-trigger CI (budget reset; lint/test/build verified loca…",
+      "message": "The job was not started because an Actions budget is preventing further use.",
+      "runUrl": "https://github.com/hondoentertainment/CrowdPass/actions/runs/27856601805",
+      "runId": 27856601805,
+      "createdAt": "2026-06-20T01:50:16Z",
+      "headSha": "6f932007359d45b22cd8a49f306a69f681f07879",
+      "failedJobs": [
+        {
+          "id": 82445171193,
+          "name": "e2e",
+          "conclusion": "failure",
+          "started_at": "2026-06-20T01:50:16Z",
+          "completed_at": "2026-06-20T01:50:18Z",
+          "steps": 0,
+          "html_url": "https://github.com/hondoentertainment/CrowdPass/actions/runs/27856601805/job/82445171193"
+        },
+        {
+          "id": 82445171197,
+          "name": "build",
+          "conclusion": "failure",
+          "started_at": "2026-06-20T01:50:16Z",
+          "completed_at": "2026-06-20T01:50:18Z",
+          "steps": 0,
+          "html_url": "https://github.com/hondoentertainment/CrowdPass/actions/runs/27856601805/job/82445171197"
+        }
+      ],
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/hondoentertainment/CrowdPass/blob/6f932007359d45b22cd8a49f306a69f681f07879/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because an Actions budget is preventing further use.",
+          "raw_details": ""
+        },
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/hondoentertainment/CrowdPass/blob/6f932007359d45b22cd8a49f306a69f681f07879/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because an Actions budget is preventing further use.",
+          "raw_details": ""
+        }
+      ]
+    },
+    {
+      "id": "i-am-drunk-28399901373",
+      "repo": "i-am-drunk",
+      "repoUrl": "https://github.com/hondoentertainment/i-am-drunk",
+      "severity": "blocked",
+      "kind": "budget",
+      "workflow": "CI",
+      "event": "push",
+      "conclusion": "failure",
+      "title": "fix(ci): pin explicit pnpm version in action-setup",
+      "message": "The job was not started because an Actions budget is preventing further use.",
+      "runUrl": "https://github.com/hondoentertainment/i-am-drunk/actions/runs/28399901373",
+      "runId": 28399901373,
+      "createdAt": "2026-06-29T20:16:13Z",
+      "headSha": "7237771dd7a257123a840c25b8d72e18f6540680",
+      "failedJobs": [
+        {
+          "id": 84148170408,
+          "name": "build",
+          "conclusion": "failure",
+          "started_at": "2026-06-29T20:16:14Z",
+          "completed_at": "2026-06-29T20:16:16Z",
+          "steps": 0,
+          "html_url": "https://github.com/hondoentertainment/i-am-drunk/actions/runs/28399901373/job/84148170408"
+        }
+      ],
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/hondoentertainment/i-am-drunk/blob/7237771dd7a257123a840c25b8d72e18f6540680/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because an Actions budget is preventing further use.",
+          "raw_details": ""
+        }
+      ]
+    },
+    {
+      "id": "v0-games-library-28399898384",
+      "repo": "v0-games-library",
+      "repoUrl": "https://github.com/hondoentertainment/v0-games-library",
+      "severity": "blocked",
+      "kind": "budget",
+      "workflow": "Competitor Analysis Agent",
+      "event": "workflow_dispatch",
+      "conclusion": "failure",
+      "title": "Competitor Analysis Agent",
+      "message": "The job was not started because an Actions budget is preventing further use.",
+      "runUrl": "https://github.com/hondoentertainment/v0-games-library/actions/runs/28399898384",
+      "runId": 28399898384,
+      "createdAt": "2026-06-29T20:16:10Z",
+      "headSha": "77f1f3cdc254ec45b0aa11d9d305870778e9094f",
+      "failedJobs": [
+        {
+          "id": 84148163347,
+          "name": "scan",
+          "conclusion": "failure",
+          "started_at": "2026-06-29T20:16:11Z",
+          "completed_at": "2026-06-29T20:16:13Z",
+          "steps": 0,
+          "html_url": "https://github.com/hondoentertainment/v0-games-library/actions/runs/28399898384/job/84148163347"
+        }
+      ],
+      "annotations": [
+        {
+          "path": ".github",
+          "blob_href": "https://github.com/hondoentertainment/v0-games-library/blob/77f1f3cdc254ec45b0aa11d9d305870778e9094f/.github",
+          "start_line": 1,
+          "start_column": null,
+          "end_line": 1,
+          "end_column": null,
+          "annotation_level": "failure",
+          "title": "",
+          "message": "The job was not started because an Actions budget is preventing further use.",
+          "raw_details": ""
+        }
+      ]
+    },
+    {
+      "id": "SchaferFamilyCookbook-28399114500",
+      "repo": "SchaferFamilyCookbook",
+      "repoUrl": "https://github.com/hondoentertainment/SchaferFamilyCookbook",
+      "severity": "failure",
+      "kind": "workflow",
+      "workflow": "CI",
+      "event": "push",
+      "conclusion": null,
+      "title": "fix(ci): use explicit false checks for discriminated union narrowing",
+      "message": "Workflow run failed.",
+      "runUrl": "https://github.com/hondoentertainment/SchaferFamilyCookbook/actions/runs/28399114500",
+      "runId": 28399114500,
+      "createdAt": "2026-06-29T20:02:08Z",
+      "headSha": "23b3ad764d87715fff313229a9dc703241d751df",
+      "failedJobs": [],
+      "annotations": []
+    }
+  ],
+  "repos": [
+    {
+      "repo": "2026GoalTracker",
+      "repoUrl": "https://github.com/hondoentertainment/2026GoalTracker",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 25895078770,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "47d7cb4d2d827a881f4cc2cd16b4064029fd26f9",
+        "displayTitle": "fix(ci): fix ErrorBoundary TypeScript errors for React 19 (#3)",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-05-15T01:23:09Z",
+        "url": "https://github.com/hondoentertainment/2026GoalTracker/actions/runs/25895078770",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "ai-life",
+      "repoUrl": "https://github.com/hondoentertainment/ai-life",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 23947789534,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "4512e7adf321957daa1431279b1ab10cc08c3048",
+        "displayTitle": "Merge pull request #1 from hondoentertainment/claude/review-code-upda…",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-04-03T13:26:31Z",
+        "url": "https://github.com/hondoentertainment/ai-life/actions/runs/23947789534",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "AIKnowledgeBase",
+      "repoUrl": "https://github.com/hondoentertainment/AIKnowledgeBase",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28399031608,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "ae0a5c722d84dde2f4b1acbf34c29043189eaf49",
+        "displayTitle": "Daily Content Update",
+        "name": "Daily Content Update",
+        "event": "workflow_dispatch",
+        "createdAt": "2026-06-29T20:00:42Z",
+        "url": "https://github.com/hondoentertainment/AIKnowledgeBase/actions/runs/28399031608",
+        "workflowName": "Daily Content Update"
+      },
+      "issues": []
+    },
+    {
+      "repo": "autoresearch",
+      "repoUrl": "https://github.com/hondoentertainment/autoresearch",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "balanced-life-os",
+      "repoUrl": "https://github.com/hondoentertainment/balanced-life-os",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 25895079402,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "6b0dcd4942a61872de589432031dd147616713db",
+        "displayTitle": "fix(e2e): wait for pulse loading before filling morning form (#1)",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-05-15T01:23:11Z",
+        "url": "https://github.com/hondoentertainment/balanced-life-os/actions/runs/25895079402",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "budget-grocery-list",
+      "repoUrl": "https://github.com/hondoentertainment/budget-grocery-list",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 25895078703,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "5fe1ef48e975242cfb90add5a2eabae959cca44f",
+        "displayTitle": "fix(ci): resolve CI failures (#2)",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-05-15T01:23:09Z",
+        "url": "https://github.com/hondoentertainment/budget-grocery-list/actions/runs/25895078703",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "canadian-ice-breaker",
+      "repoUrl": "https://github.com/hondoentertainment/canadian-ice-breaker",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "canadian-tuxedo-party",
+      "repoUrl": "https://github.com/hondoentertainment/canadian-tuxedo-party",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "central-command",
+      "repoUrl": "https://github.com/hondoentertainment/central-command",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27593487512,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "90611a4c7041ac9f32af32867dfbd849d4e6bdde",
+        "displayTitle": "fix(ci): allow standalone E2E workflow to continue on selector drift",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-16T04:08:20Z",
+        "url": "https://github.com/hondoentertainment/central-command/actions/runs/27593487512",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "Chromacloset",
+      "repoUrl": "https://github.com/hondoentertainment/Chromacloset",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 24893815366,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "9c1c05fb10596467f9a6a1aab3362b3b44ca0a0e",
+        "displayTitle": "Merge pull request #16 from hondoentertainment/codex/suggest-improvem…",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-04-24T14:07:26Z",
+        "url": "https://github.com/hondoentertainment/Chromacloset/actions/runs/24893815366",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "church-merge-",
+      "repoUrl": "https://github.com/hondoentertainment/church-merge-",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "ComedyCountry",
+      "repoUrl": "https://github.com/hondoentertainment/ComedyCountry",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 26477943782,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "3ed445289162b6b9b4a8b648f7aadac215a44f72",
+        "displayTitle": "fix(deploy): trim env values and support DIRECT_DATABASE_URL fallback",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-05-26T22:07:53Z",
+        "url": "https://github.com/hondoentertainment/ComedyCountry/actions/runs/26477943782",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "competition",
+      "repoUrl": "https://github.com/hondoentertainment/competition",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "cowboy-disco-party",
+      "repoUrl": "https://github.com/hondoentertainment/cowboy-disco-party",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "creative-hub",
+      "repoUrl": "https://github.com/hondoentertainment/creative-hub",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 26456638632,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "548e8565110a1eaa9627e3984aea67ae775009b1",
+        "displayTitle": "Deploy to GitHub Pages",
+        "name": "Deploy to GitHub Pages",
+        "event": "workflow_dispatch",
+        "createdAt": "2026-05-26T15:04:52Z",
+        "url": "https://github.com/hondoentertainment/creative-hub/actions/runs/26456638632",
+        "workflowName": "Deploy to GitHub Pages"
+      },
+      "issues": []
+    },
+    {
+      "repo": "CrowdPass",
+      "repoUrl": "https://github.com/hondoentertainment/CrowdPass",
+      "status": "completed",
+      "conclusion": "failure",
+      "healthy": false,
+      "latestRun": {
+        "databaseId": 27856601805,
+        "conclusion": "failure",
+        "status": "completed",
+        "headSha": "6f932007359d45b22cd8a49f306a69f681f07879",
+        "displayTitle": "chore(ci): re-trigger CI (budget reset; lint/test/build verified loca…",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-20T01:50:16Z",
+        "url": "https://github.com/hondoentertainment/CrowdPass/actions/runs/27856601805",
+        "workflowName": "CI"
+      },
+      "issues": [
+        {
+          "id": "CrowdPass-27856601805",
+          "repo": "CrowdPass",
+          "repoUrl": "https://github.com/hondoentertainment/CrowdPass",
+          "severity": "blocked",
+          "kind": "budget",
+          "workflow": "CI",
+          "event": "push",
+          "conclusion": "failure",
+          "title": "chore(ci): re-trigger CI (budget reset; lint/test/build verified loca…",
+          "message": "The job was not started because an Actions budget is preventing further use.",
+          "runUrl": "https://github.com/hondoentertainment/CrowdPass/actions/runs/27856601805",
+          "runId": 27856601805,
+          "createdAt": "2026-06-20T01:50:16Z",
+          "headSha": "6f932007359d45b22cd8a49f306a69f681f07879",
+          "failedJobs": [
+            {
+              "id": 82445171193,
+              "name": "e2e",
+              "conclusion": "failure",
+              "started_at": "2026-06-20T01:50:16Z",
+              "completed_at": "2026-06-20T01:50:18Z",
+              "steps": 0,
+              "html_url": "https://github.com/hondoentertainment/CrowdPass/actions/runs/27856601805/job/82445171193"
+            },
+            {
+              "id": 82445171197,
+              "name": "build",
+              "conclusion": "failure",
+              "started_at": "2026-06-20T01:50:16Z",
+              "completed_at": "2026-06-20T01:50:18Z",
+              "steps": 0,
+              "html_url": "https://github.com/hondoentertainment/CrowdPass/actions/runs/27856601805/job/82445171197"
+            }
+          ],
+          "annotations": [
+            {
+              "path": ".github",
+              "blob_href": "https://github.com/hondoentertainment/CrowdPass/blob/6f932007359d45b22cd8a49f306a69f681f07879/.github",
+              "start_line": 1,
+              "start_column": null,
+              "end_line": 1,
+              "end_column": null,
+              "annotation_level": "failure",
+              "title": "",
+              "message": "The job was not started because an Actions budget is preventing further use.",
+              "raw_details": ""
+            },
+            {
+              "path": ".github",
+              "blob_href": "https://github.com/hondoentertainment/CrowdPass/blob/6f932007359d45b22cd8a49f306a69f681f07879/.github",
+              "start_line": 1,
+              "start_column": null,
+              "end_line": 1,
+              "end_column": null,
+              "annotation_level": "failure",
+              "title": "",
+              "message": "The job was not started because an Actions budget is preventing further use.",
+              "raw_details": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "repo": "daily-ten",
+      "repoUrl": "https://github.com/hondoentertainment/daily-ten",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27709043007,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "42a08715a76434ca8add91251024c9d2d2d21c80",
+        "displayTitle": "ci: allow database pgTAP job to continue on error",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-17T17:55:55Z",
+        "url": "https://github.com/hondoentertainment/daily-ten/actions/runs/27709043007",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "day2-big-dance",
+      "repoUrl": "https://github.com/hondoentertainment/day2-big-dance",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27525970792,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "4b1a25a88feafe701735198dd92ae5fa5909cee4",
+        "displayTitle": "chore: exclude locked .env from Vercel uploads",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-15T05:27:19Z",
+        "url": "https://github.com/hondoentertainment/day2-big-dance/actions/runs/27525970792",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "deep-seats",
+      "repoUrl": "https://github.com/hondoentertainment/deep-seats",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "deep-seats1",
+      "repoUrl": "https://github.com/hondoentertainment/deep-seats1",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "ethanol-free-gas",
+      "repoUrl": "https://github.com/hondoentertainment/ethanol-free-gas",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28398574270,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "8441a1fb15a32ea9002fcfd28f3c99819c6dd657",
+        "displayTitle": "fix(ci): regenerate package-lock with explicit @emnapi entries for np…",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-29T19:52:32Z",
+        "url": "https://github.com/hondoentertainment/ethanol-free-gas/actions/runs/28398574270",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "fargo-flooring-2",
+      "repoUrl": "https://github.com/hondoentertainment/fargo-flooring-2",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27729280802,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "f12b048ba6174165663e7a8d681ee9f8fa8d20dd",
+        "displayTitle": "fix: resolve eslint errors (node env for api, unused navigate, react-…",
+        "name": "CI Pipeline",
+        "event": "push",
+        "createdAt": "2026-06-18T00:47:06Z",
+        "url": "https://github.com/hondoentertainment/fargo-flooring-2/actions/runs/27729280802",
+        "workflowName": "CI Pipeline"
+      },
+      "issues": []
+    },
+    {
+      "repo": "fuzzy-octo-broccoli",
+      "repoUrl": "https://github.com/hondoentertainment/fuzzy-octo-broccoli",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "giant-schrodinger",
+      "repoUrl": "https://github.com/hondoentertainment/giant-schrodinger",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28306027383,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "fb5a1c32fdc44d6856a00c8adc9e5b260c33d87b",
+        "displayTitle": "feat: progressive media loading, rehearsal tooling, and launch polish",
+        "name": "Deploy to GitHub Pages",
+        "event": "push",
+        "createdAt": "2026-06-28T00:12:13Z",
+        "url": "https://github.com/hondoentertainment/giant-schrodinger/actions/runs/28306027383",
+        "workflowName": "Deploy to GitHub Pages"
+      },
+      "issues": []
+    },
+    {
+      "repo": "github-digest-agent-v2",
+      "repoUrl": "https://github.com/hondoentertainment/github-digest-agent-v2",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28381873023,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "a4e59a848f3db4c533802acfbe6594f5e1c12a90",
+        "displayTitle": "Daily Digest",
+        "name": "Daily Digest",
+        "event": "schedule",
+        "createdAt": "2026-06-29T15:05:08Z",
+        "url": "https://github.com/hondoentertainment/github-digest-agent-v2/actions/runs/28381873023",
+        "workflowName": "Daily Digest"
+      },
+      "issues": []
+    },
+    {
+      "repo": "GolfChallenge",
+      "repoUrl": "https://github.com/hondoentertainment/GolfChallenge",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27478081067,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "60b62cdfd81403040ed21ea50b9a3e77ff15092a",
+        "displayTitle": "chore: sync outstanding local changes to production",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-13T20:23:37Z",
+        "url": "https://github.com/hondoentertainment/GolfChallenge/actions/runs/27478081067",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "high-school-sports-master-db",
+      "repoUrl": "https://github.com/hondoentertainment/high-school-sports-master-db",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 23242343549,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "cc3aa5ff69a50a340f2068755bbabba770c9ac89",
+        "displayTitle": "feat(data): add schools, affiliations, and enhancement scripts",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-03-18T11:24:27Z",
+        "url": "https://github.com/hondoentertainment/high-school-sports-master-db/actions/runs/23242343549",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "hockey26",
+      "repoUrl": "https://github.com/hondoentertainment/hockey26",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28399191123,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "3bc87e3bd31f3a828ac4f982577234e466e5f114",
+        "displayTitle": "Update playoff stats",
+        "name": "Update playoff stats",
+        "event": "schedule",
+        "createdAt": "2026-06-29T20:03:27Z",
+        "url": "https://github.com/hondoentertainment/hockey26/actions/runs/28399191123",
+        "workflowName": "Update playoff stats"
+      },
+      "issues": []
+    },
+    {
+      "repo": "HockeyPlayoffs26",
+      "repoUrl": "https://github.com/hondoentertainment/HockeyPlayoffs26",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "hondoentertainment",
+      "repoUrl": "https://github.com/hondoentertainment/hondoentertainment",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 25951811741,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "d4fb7645876d929919051df1661ec19de95e5bf0",
+        "displayTitle": "Running Copilot cloud agent",
+        "name": "Running Copilot cloud agent",
+        "event": "dynamic",
+        "createdAt": "2026-05-16T03:38:34Z",
+        "url": "https://github.com/hondoentertainment/hondoentertainment/actions/runs/25951811741",
+        "workflowName": "Running Copilot cloud agent"
+      },
+      "issues": []
+    },
+    {
+      "repo": "hoops-intel",
+      "repoUrl": "https://github.com/hondoentertainment/hoops-intel",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28401187240,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "038de43114806a5d98e963e365330b1549dd80e6",
+        "displayTitle": "Playoff Push Alerts",
+        "name": "Playoff Push Alerts",
+        "event": "schedule",
+        "createdAt": "2026-06-29T20:39:35Z",
+        "url": "https://github.com/hondoentertainment/hoops-intel/actions/runs/28401187240",
+        "workflowName": "Playoff Push Alerts"
+      },
+      "issues": []
+    },
+    {
+      "repo": "i-am-drunk",
+      "repoUrl": "https://github.com/hondoentertainment/i-am-drunk",
+      "status": "completed",
+      "conclusion": "failure",
+      "healthy": false,
+      "latestRun": {
+        "databaseId": 28399901373,
+        "conclusion": "failure",
+        "status": "completed",
+        "headSha": "7237771dd7a257123a840c25b8d72e18f6540680",
+        "displayTitle": "fix(ci): pin explicit pnpm version in action-setup",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-29T20:16:13Z",
+        "url": "https://github.com/hondoentertainment/i-am-drunk/actions/runs/28399901373",
+        "workflowName": "CI"
+      },
+      "issues": [
+        {
+          "id": "i-am-drunk-28399901373",
+          "repo": "i-am-drunk",
+          "repoUrl": "https://github.com/hondoentertainment/i-am-drunk",
+          "severity": "blocked",
+          "kind": "budget",
+          "workflow": "CI",
+          "event": "push",
+          "conclusion": "failure",
+          "title": "fix(ci): pin explicit pnpm version in action-setup",
+          "message": "The job was not started because an Actions budget is preventing further use.",
+          "runUrl": "https://github.com/hondoentertainment/i-am-drunk/actions/runs/28399901373",
+          "runId": 28399901373,
+          "createdAt": "2026-06-29T20:16:13Z",
+          "headSha": "7237771dd7a257123a840c25b8d72e18f6540680",
+          "failedJobs": [
+            {
+              "id": 84148170408,
+              "name": "build",
+              "conclusion": "failure",
+              "started_at": "2026-06-29T20:16:14Z",
+              "completed_at": "2026-06-29T20:16:16Z",
+              "steps": 0,
+              "html_url": "https://github.com/hondoentertainment/i-am-drunk/actions/runs/28399901373/job/84148170408"
+            }
+          ],
+          "annotations": [
+            {
+              "path": ".github",
+              "blob_href": "https://github.com/hondoentertainment/i-am-drunk/blob/7237771dd7a257123a840c25b8d72e18f6540680/.github",
+              "start_line": 1,
+              "start_column": null,
+              "end_line": 1,
+              "end_column": null,
+              "annotation_level": "failure",
+              "title": "",
+              "message": "The job was not started because an Actions budget is preventing further use.",
+              "raw_details": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "repo": "LateNightVibesSeattle",
+      "repoUrl": "https://github.com/hondoentertainment/LateNightVibesSeattle",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 23790461393,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "42fef36967456b430bca512ab813565024cd4741",
+        "displayTitle": "Merge pull request #5 from hondoentertainment/claude/review-next-step…",
+        "name": "Deploy to GitHub Pages",
+        "event": "push",
+        "createdAt": "2026-03-31T09:31:31Z",
+        "url": "https://github.com/hondoentertainment/LateNightVibesSeattle/actions/runs/23790461393",
+        "workflowName": "Deploy to GitHub Pages"
+      },
+      "issues": []
+    },
+    {
+      "repo": "little-red-hen",
+      "repoUrl": "https://github.com/hondoentertainment/little-red-hen",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 26454269215,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "2134a23280d1fb40243a7d8f9e7567597bb91c8c",
+        "displayTitle": "chore(deploy): production release",
+        "name": "Deploy to GitHub Pages",
+        "event": "push",
+        "createdAt": "2026-05-26T14:24:56Z",
+        "url": "https://github.com/hondoentertainment/little-red-hen/actions/runs/26454269215",
+        "workflowName": "Deploy to GitHub Pages"
+      },
+      "issues": []
+    },
+    {
+      "repo": "minor-league-performers-tracker",
+      "repoUrl": "https://github.com/hondoentertainment/minor-league-performers-tracker",
+      "status": "completed",
+      "conclusion": "skipped",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28399916465,
+        "conclusion": "skipped",
+        "status": "completed",
+        "headSha": "13d8753fe2e09b52bcbfb81f374f9c53764f49da",
+        "displayTitle": "Production smoke",
+        "name": "Production smoke",
+        "event": "workflow_run",
+        "createdAt": "2026-06-29T20:16:30Z",
+        "url": "https://github.com/hondoentertainment/minor-league-performers-tracker/actions/runs/28399916465",
+        "workflowName": "Production smoke"
+      },
+      "issues": []
+    },
+    {
+      "repo": "MN-Fun-Squad-Hall-of-Fame",
+      "repoUrl": "https://github.com/hondoentertainment/MN-Fun-Squad-Hall-of-Fame",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 22094328382,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "b30e4e980f0763d96d1f47b2a89ca4a523cea9a1",
+        "displayTitle": "Add theme toggle, print CSS, remove nextPow2 duplication, improve a11y",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-02-17T10:11:17Z",
+        "url": "https://github.com/hondoentertainment/MN-Fun-Squad-Hall-of-Fame/actions/runs/22094328382",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "ModernSportsIntelligenceDemo",
+      "repoUrl": "https://github.com/hondoentertainment/ModernSportsIntelligenceDemo",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28396085557,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "8d50e13023b13c693cb15b617392cc49c4bacbc4",
+        "displayTitle": "chore(deps): bump the dev-dependencies group across 1 directory with 15 updates",
+        "name": "PR Checks",
+        "event": "pull_request",
+        "createdAt": "2026-06-29T19:06:47Z",
+        "url": "https://github.com/hondoentertainment/ModernSportsIntelligenceDemo/actions/runs/28396085557",
+        "workflowName": "PR Checks"
+      },
+      "issues": []
+    },
+    {
+      "repo": "monthly-bible-study",
+      "repoUrl": "https://github.com/hondoentertainment/monthly-bible-study",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 25328027554,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "c2afe9d8dc8a5758969bf697447b561147d12e54",
+        "displayTitle": "chore: display gathering time as 4 PM PT",
+        "name": "Deploy GitHub Pages",
+        "event": "push",
+        "createdAt": "2026-05-04T15:32:29Z",
+        "url": "https://github.com/hondoentertainment/monthly-bible-study/actions/runs/25328027554",
+        "workflowName": "Deploy GitHub Pages"
+      },
+      "issues": []
+    },
+    {
+      "repo": "name-that-canadian",
+      "repoUrl": "https://github.com/hondoentertainment/name-that-canadian",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "nanoclaw",
+      "repoUrl": "https://github.com/hondoentertainment/nanoclaw",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "openclaw",
+      "repoUrl": "https://github.com/hondoentertainment/openclaw",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "party-commander",
+      "repoUrl": "https://github.com/hondoentertainment/party-commander",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 26456640670,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "ac20cf6a83ca53dd649b145e1e1f8da794b41b2d",
+        "displayTitle": "fix(ci): add @testing-library/dom and correct placeholder queries in …",
+        "name": "Deploy to GitHub Pages",
+        "event": "push",
+        "createdAt": "2026-05-26T15:04:54Z",
+        "url": "https://github.com/hondoentertainment/party-commander/actions/runs/26456640670",
+        "workflowName": "Deploy to GitHub Pages"
+      },
+      "issues": []
+    },
+    {
+      "repo": "party-planner",
+      "repoUrl": "https://github.com/hondoentertainment/party-planner",
+      "status": "completed",
+      "conclusion": "skipped",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28361844141,
+        "conclusion": "skipped",
+        "status": "completed",
+        "headSha": "33985f389bca4550cdc5806b67487832b9a2b83b",
+        "displayTitle": "Smoke",
+        "name": "Smoke",
+        "event": "deployment_status",
+        "createdAt": "2026-06-29T09:21:39Z",
+        "url": "https://github.com/hondoentertainment/party-planner/actions/runs/28361844141",
+        "workflowName": "Smoke"
+      },
+      "issues": []
+    },
+    {
+      "repo": "pickin-potluck",
+      "repoUrl": "https://github.com/hondoentertainment/pickin-potluck",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "pitchprops",
+      "repoUrl": "https://github.com/hondoentertainment/pitchprops",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28398507100,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "317612f1c79bd6e332739d758ce0f1771458e9fd",
+        "displayTitle": "fix(ci): regenerate package-lock with explicit @emnapi entries for np…",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-29T19:51:20Z",
+        "url": "https://github.com/hondoentertainment/pitchprops/actions/runs/28398507100",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "pov-analyzer",
+      "repoUrl": "https://github.com/hondoentertainment/pov-analyzer",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27124046994,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "56bc308368cc36bffba607bb088cd25426946122",
+        "displayTitle": "Ollama integration",
+        "name": "Ollama integration",
+        "event": "schedule",
+        "createdAt": "2026-06-08T08:02:03Z",
+        "url": "https://github.com/hondoentertainment/pov-analyzer/actions/runs/27124046994",
+        "workflowName": "Ollama integration"
+      },
+      "issues": []
+    },
+    {
+      "repo": "pulse",
+      "repoUrl": "https://github.com/hondoentertainment/pulse",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27593211008,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "b97a446ca7316400b76a81234b8fb811a347f428",
+        "displayTitle": "fix(e2e): use stable nav clicks in signal smoke tests",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-16T04:00:53Z",
+        "url": "https://github.com/hondoentertainment/pulse/actions/runs/27593211008",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "QQQQ",
+      "repoUrl": "https://github.com/hondoentertainment/QQQQ",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28400906370,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "810f8625ec20ce9ced3470e33dfefb9034b9a60b",
+        "displayTitle": "Refresh QQQQ holdings",
+        "name": "Refresh QQQQ holdings",
+        "event": "schedule",
+        "createdAt": "2026-06-29T20:34:30Z",
+        "url": "https://github.com/hondoentertainment/QQQQ/actions/runs/28400906370",
+        "workflowName": "Refresh QQQQ holdings"
+      },
+      "issues": []
+    },
+    {
+      "repo": "retail-roadshow-scraper",
+      "repoUrl": "https://github.com/hondoentertainment/retail-roadshow-scraper",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "SchaferFamilyCookbook",
+      "repoUrl": "https://github.com/hondoentertainment/SchaferFamilyCookbook",
+      "status": "in_progress",
+      "conclusion": null,
+      "healthy": false,
+      "latestRun": {
+        "databaseId": 28399114500,
+        "conclusion": null,
+        "status": "in_progress",
+        "headSha": "23b3ad764d87715fff313229a9dc703241d751df",
+        "displayTitle": "fix(ci): use explicit false checks for discriminated union narrowing",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-29T20:02:08Z",
+        "url": "https://github.com/hondoentertainment/SchaferFamilyCookbook/actions/runs/28399114500",
+        "workflowName": "CI"
+      },
+      "issues": [
+        {
+          "id": "SchaferFamilyCookbook-28399114500",
+          "repo": "SchaferFamilyCookbook",
+          "repoUrl": "https://github.com/hondoentertainment/SchaferFamilyCookbook",
+          "severity": "failure",
+          "kind": "workflow",
+          "workflow": "CI",
+          "event": "push",
+          "conclusion": null,
+          "title": "fix(ci): use explicit false checks for discriminated union narrowing",
+          "message": "Workflow run failed.",
+          "runUrl": "https://github.com/hondoentertainment/SchaferFamilyCookbook/actions/runs/28399114500",
+          "runId": 28399114500,
+          "createdAt": "2026-06-29T20:02:08Z",
+          "headSha": "23b3ad764d87715fff313229a9dc703241d751df",
+          "failedJobs": [],
+          "annotations": []
+        }
+      ]
+    },
+    {
+      "repo": "scottsdale-trip",
+      "repoUrl": "https://github.com/hondoentertainment/scottsdale-trip",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "Seattle-Social-Demo",
+      "repoUrl": "https://github.com/hondoentertainment/Seattle-Social-Demo",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28399117682,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "1475f33e655784ccb1e95e014658a334d00f8cdf",
+        "displayTitle": "Deploy to GitHub Pages",
+        "name": "Deploy to GitHub Pages",
+        "event": "workflow_dispatch",
+        "createdAt": "2026-06-29T20:02:11Z",
+        "url": "https://github.com/hondoentertainment/Seattle-Social-Demo/actions/runs/28399117682",
+        "workflowName": "Deploy to GitHub Pages"
+      },
+      "issues": []
+    },
+    {
+      "repo": "SeattleSocial",
+      "repoUrl": "https://github.com/hondoentertainment/SeattleSocial",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "seinfeld-trivia",
+      "repoUrl": "https://github.com/hondoentertainment/seinfeld-trivia",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 26475700264,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "23f662c525b03e8d1f6cc7c383a27a08c43600aa",
+        "displayTitle": "fix(ci): relax Lighthouse SEO and layout thresholds for CI",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-05-26T21:17:37Z",
+        "url": "https://github.com/hondoentertainment/seinfeld-trivia/actions/runs/26475700264",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "SiskelBot",
+      "repoUrl": "https://github.com/hondoentertainment/SiskelBot",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28400812065,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "3b475fb996cd3d7ac81188bf413b07888125ffc2",
+        "displayTitle": "Merge pull request #61 from hondoentertainment/claude/exciting-turing…",
+        "name": "Docker",
+        "event": "push",
+        "createdAt": "2026-06-29T20:32:51Z",
+        "url": "https://github.com/hondoentertainment/SiskelBot/actions/runs/28400812065",
+        "workflowName": "Docker"
+      },
+      "issues": []
+    },
+    {
+      "repo": "social-circles",
+      "repoUrl": "https://github.com/hondoentertainment/social-circles",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28352411902,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "533edc2e98e1935d47261734586adefcd466262b",
+        "displayTitle": "npm_and_yarn in / for @trpc/client, @trpc/react-query, @trpc/server - Update #1438440703",
+        "name": "npm_and_yarn in / for @trpc/client, @trpc/react-query, @trpc/server - Update #1438440703",
+        "event": "dynamic",
+        "createdAt": "2026-06-29T06:13:46Z",
+        "url": "https://github.com/hondoentertainment/social-circles/actions/runs/28352411902",
+        "workflowName": "npm_and_yarn in / for @trpc/client, @trpc/react-query, @trpc/server - Update #1438440703"
+      },
+      "issues": []
+    },
+    {
+      "repo": "spine-scanner",
+      "repoUrl": "https://github.com/hondoentertainment/spine-scanner",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 28365881552,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "ca540958d70416e0078c6e7af86a9526cd8b1bf3",
+        "displayTitle": "OCR Heavy Checks",
+        "name": "OCR Heavy Checks",
+        "event": "schedule",
+        "createdAt": "2026-06-29T10:34:55Z",
+        "url": "https://github.com/hondoentertainment/spine-scanner/actions/runs/28365881552",
+        "workflowName": "OCR Heavy Checks"
+      },
+      "issues": []
+    },
+    {
+      "repo": "st-paul-mobsters",
+      "repoUrl": "https://github.com/hondoentertainment/st-paul-mobsters",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27507845552,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "ee31d572c36971699d9342caaf0fbdf48a0a7d0e",
+        "displayTitle": "Merge branch 'main' of https://github.com/hondoentertainment/st-paul-…",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-14T18:19:54Z",
+        "url": "https://github.com/hondoentertainment/st-paul-mobsters/actions/runs/27507845552",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "stagecraft",
+      "repoUrl": "https://github.com/hondoentertainment/stagecraft",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27729305594,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "e2ecd264a25c857f40905656923a0c66d9ab1b13",
+        "displayTitle": "fix(ci): build before E2E so vite preview serves dist (fixes webServe…",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-18T00:47:50Z",
+        "url": "https://github.com/hondoentertainment/stagecraft/actions/runs/27729305594",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "Star-Wars-App-workspace",
+      "repoUrl": "https://github.com/hondoentertainment/Star-Wars-App-workspace",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "star-wars-card-tracker",
+      "repoUrl": "https://github.com/hondoentertainment/star-wars-card-tracker",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 26614935127,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "b51f783e8939d9cc3ae417406106d7127654a604",
+        "displayTitle": "PWA/offline, collection value, and trade matching (#4)",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-05-29T02:47:48Z",
+        "url": "https://github.com/hondoentertainment/star-wars-card-tracker/actions/runs/26614935127",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "StarWarsApp",
+      "repoUrl": "https://github.com/hondoentertainment/StarWarsApp",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27339533585,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "d570a0333d4ae00b98dc8664aea6da7cb400430e",
+        "displayTitle": "ci: pass smoke test with warning when production is auth-protected",
+        "name": "Deploy",
+        "event": "push",
+        "createdAt": "2026-06-11T10:08:44Z",
+        "url": "https://github.com/hondoentertainment/StarWarsApp/actions/runs/27339533585",
+        "workflowName": "Deploy"
+      },
+      "issues": []
+    },
+    {
+      "repo": "StepSprint",
+      "repoUrl": "https://github.com/hondoentertainment/StepSprint",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27856140513,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "5f853c45ed006a5ea49bab99b837c7eb2fdbde6e",
+        "displayTitle": "fix(auth): share auth state so logout returns to login; fix(submit): …",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-06-20T01:30:29Z",
+        "url": "https://github.com/hondoentertainment/StepSprint/actions/runs/27856140513",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "timberwolves-history",
+      "repoUrl": "https://github.com/hondoentertainment/timberwolves-history",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 24960567873,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "6abfed2cb350e30434855105104e8f477bc43e41",
+        "displayTitle": "test: coaches register, changelog JSON, draft picks, tenure overlap",
+        "name": "CI",
+        "event": "push",
+        "createdAt": "2026-04-26T15:45:10Z",
+        "url": "https://github.com/hondoentertainment/timberwolves-history/actions/runs/24960567873",
+        "workflowName": "CI"
+      },
+      "issues": []
+    },
+    {
+      "repo": "timing-optimization",
+      "repoUrl": "https://github.com/hondoentertainment/timing-optimization",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "v0-games-library",
+      "repoUrl": "https://github.com/hondoentertainment/v0-games-library",
+      "status": "completed",
+      "conclusion": "failure",
+      "healthy": false,
+      "latestRun": {
+        "databaseId": 28399898384,
+        "conclusion": "failure",
+        "status": "completed",
+        "headSha": "77f1f3cdc254ec45b0aa11d9d305870778e9094f",
+        "displayTitle": "Competitor Analysis Agent",
+        "name": "Competitor Analysis Agent",
+        "event": "workflow_dispatch",
+        "createdAt": "2026-06-29T20:16:10Z",
+        "url": "https://github.com/hondoentertainment/v0-games-library/actions/runs/28399898384",
+        "workflowName": "Competitor Analysis Agent"
+      },
+      "issues": [
+        {
+          "id": "v0-games-library-28399898384",
+          "repo": "v0-games-library",
+          "repoUrl": "https://github.com/hondoentertainment/v0-games-library",
+          "severity": "blocked",
+          "kind": "budget",
+          "workflow": "Competitor Analysis Agent",
+          "event": "workflow_dispatch",
+          "conclusion": "failure",
+          "title": "Competitor Analysis Agent",
+          "message": "The job was not started because an Actions budget is preventing further use.",
+          "runUrl": "https://github.com/hondoentertainment/v0-games-library/actions/runs/28399898384",
+          "runId": 28399898384,
+          "createdAt": "2026-06-29T20:16:10Z",
+          "headSha": "77f1f3cdc254ec45b0aa11d9d305870778e9094f",
+          "failedJobs": [
+            {
+              "id": 84148163347,
+              "name": "scan",
+              "conclusion": "failure",
+              "started_at": "2026-06-29T20:16:11Z",
+              "completed_at": "2026-06-29T20:16:13Z",
+              "steps": 0,
+              "html_url": "https://github.com/hondoentertainment/v0-games-library/actions/runs/28399898384/job/84148163347"
+            }
+          ],
+          "annotations": [
+            {
+              "path": ".github",
+              "blob_href": "https://github.com/hondoentertainment/v0-games-library/blob/77f1f3cdc254ec45b0aa11d9d305870778e9094f/.github",
+              "start_line": 1,
+              "start_column": null,
+              "end_line": 1,
+              "end_column": null,
+              "annotation_level": "failure",
+              "title": "",
+              "message": "The job was not started because an Actions budget is preventing further use.",
+              "raw_details": ""
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "repo": "v0-venn-with-friends",
+      "repoUrl": "https://github.com/hondoentertainment/v0-venn-with-friends",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "VennWithFriendsDemo",
+      "repoUrl": "https://github.com/hondoentertainment/VennWithFriendsDemo",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    },
+    {
+      "repo": "Wanderlog",
+      "repoUrl": "https://github.com/hondoentertainment/Wanderlog",
+      "status": "completed",
+      "conclusion": "success",
+      "healthy": true,
+      "latestRun": {
+        "databaseId": 27851235902,
+        "conclusion": "success",
+        "status": "completed",
+        "headSha": "d03943e6f0cfeb9237b57554376d184e0aced1f8",
+        "displayTitle": "fix(e2e): short-circuit shared-trip Firestore read in placeholder mode",
+        "name": "Deploy production",
+        "event": "push",
+        "createdAt": "2026-06-19T22:28:03Z",
+        "url": "https://github.com/hondoentertainment/Wanderlog/actions/runs/27851235902",
+        "workflowName": "Deploy production"
+      },
+      "issues": []
+    },
+    {
+      "repo": "world-sports",
+      "repoUrl": "https://github.com/hondoentertainment/world-sports",
+      "status": "unknown",
+      "conclusion": null,
+      "healthy": true,
+      "issues": []
+    }
+  ],
+  "healthyRepos": [
+    "2026GoalTracker",
+    "ai-life",
+    "AIKnowledgeBase",
+    "autoresearch",
+    "balanced-life-os",
+    "budget-grocery-list",
+    "canadian-ice-breaker",
+    "canadian-tuxedo-party",
+    "central-command",
+    "Chromacloset",
+    "church-merge-",
+    "ComedyCountry",
+    "competition",
+    "cowboy-disco-party",
+    "creative-hub",
+    "daily-ten",
+    "day2-big-dance",
+    "deep-seats",
+    "deep-seats1",
+    "ethanol-free-gas",
+    "fargo-flooring-2",
+    "fuzzy-octo-broccoli",
+    "giant-schrodinger",
+    "github-digest-agent-v2",
+    "GolfChallenge",
+    "high-school-sports-master-db",
+    "hockey26",
+    "HockeyPlayoffs26",
+    "hondoentertainment",
+    "hoops-intel",
+    "LateNightVibesSeattle",
+    "little-red-hen",
+    "minor-league-performers-tracker",
+    "MN-Fun-Squad-Hall-of-Fame",
+    "ModernSportsIntelligenceDemo",
+    "monthly-bible-study",
+    "name-that-canadian",
+    "nanoclaw",
+    "openclaw",
+    "party-commander",
+    "party-planner",
+    "pickin-potluck",
+    "pitchprops",
+    "pov-analyzer",
+    "pulse",
+    "QQQQ",
+    "retail-roadshow-scraper",
+    "scottsdale-trip",
+    "Seattle-Social-Demo",
+    "SeattleSocial",
+    "seinfeld-trivia",
+    "SiskelBot",
+    "social-circles",
+    "spine-scanner",
+    "st-paul-mobsters",
+    "stagecraft",
+    "Star-Wars-App-workspace",
+    "star-wars-card-tracker",
+    "StarWarsApp",
+    "StepSprint",
+    "timberwolves-history",
+    "timing-optimization",
+    "v0-venn-with-friends",
+    "VennWithFriendsDemo",
+    "Wanderlog",
+    "world-sports"
+  ]
+}
