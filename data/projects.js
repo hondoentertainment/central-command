@@ -107,6 +107,16 @@ export const DEPLOY_PROJECTS = [
     vercel: true,
   },
   {
+    id: "portfolio-ops",
+    name: "Portfolio Ops",
+    category: "Workspace",
+    canonicalPath: "portfolio-ops",
+    branch: "main",
+    github: "https://github.com/hondoentertainment/portfolio-ops",
+    productionUrl: "https://portfolio-ops.vercel.app",
+    vercel: true,
+  },
+  {
     id: "fargo-flooring",
     name: "Fargo Flooring 2",
     category: "Build",
